@@ -2,8 +2,7 @@ name: Daily Scraper
 
 on:
   schedule:
-    # 18:00 UTC = Midnight Dhaka Time
-    - cron: '0 18 * * *'
+    - cron: '0 18 * * *' # Midnight Dhaka Time
   workflow_dispatch:
 
 permissions:
@@ -14,16 +13,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout CODE (from main)
+      # 1. Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # 2. Checkout DATA (from database branch) into 'public' folder
+      # 2. Checkout Database (Into the 'public' folder)
       - name: Checkout Database
         uses: actions/checkout@v3
         with:
-          ref: database        # Pull from this branch
-          path: public         # Put it in this folder
+          ref: database
+          path: public
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -36,21 +35,20 @@ jobs:
           playwright install chromium
 
       - name: Run Scraper
-        # The script writes to 'public/', which is actually the other branch!
+        # This will write files into the 'public' folder
         run: python scraper/main.py
 
       - name: Commit and Push Data
         run: |
-          # Go INSIDE the public folder (the database branch)
+          # ENTER THE DATABASE BRANCH
           cd public
           
           git config --global user.name "DaamTrack Bot"
           git config --global user.email "bot@daamtrack.bd"
           
-          # Add changes
+          # Add all new files in this branch
           git add .
           
-          # Commit and Push (This pushes to 'database' branch, NOT main)
           if git diff --staged --quiet; then
             echo "No changes to commit."
           else
