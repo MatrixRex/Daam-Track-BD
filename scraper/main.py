@@ -10,15 +10,13 @@ from PIL import Image
 from io import BytesIO
 
 # --- CONFIGURATION ---
-# Base Paths
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.dirname(CURRENT_DIR) # Go up one level to project root
+BASE_DIR = os.path.dirname(CURRENT_DIR)
 DATA_DIR = os.path.join(BASE_DIR, "public", "data")
 IMAGE_DIR = os.path.join(BASE_DIR, "public", "images")
 PRICES_DIR = os.path.join(DATA_DIR, "prices")
 CATEGORIES_FILE = os.path.join(CURRENT_DIR, "categories.json")
 
-# Ensure directories exist
 os.makedirs(IMAGE_DIR, exist_ok=True)
 os.makedirs(PRICES_DIR, exist_ok=True)
 
@@ -32,7 +30,6 @@ if os.path.exists(CATEGORIES_FILE):
     except Exception as e:
         print(f"Error reading categories file: {e}")
 
-# Fallback if file is missing or empty
 if not URLS:
     print("Warning: Using default fallback categories.")
     URLS = [
@@ -41,37 +38,34 @@ if not URLS:
     ]
 
 def get_image_filename(product_name):
-    """Generates a consistent filename using MD5 hash of the name."""
     hash_object = hashlib.md5(product_name.encode())
     return f"{hash_object.hexdigest()}.webp"
 
 def process_image(image_url, filename):
-    """Downloads and saves image ONLY if it doesn't exist."""
     filepath = os.path.join(IMAGE_DIR, filename)
-    
-    if os.path.exists(filepath):
-        return 
-
+    if os.path.exists(filepath): return 
     try:
         response = requests.get(image_url, timeout=10)
         if response.status_code == 200:
             img = Image.open(BytesIO(response.content))
-            img.thumbnail((256, 256)) # Optimize size
+            img.thumbnail((256, 256))
             img.save(filepath, "WEBP", quality=80)
     except Exception:
         pass 
 
 def scrape():
+    # 1. START TIMER
+    start_time = time.time()
+    print(f"--- Starting Scraper at {datetime.datetime.now().strftime('%H:%M:%S')} ---")
+
     scraped_data = []
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     current_year = datetime.datetime.now().year
 
     with sync_playwright() as p:
         print("Launching browser...")
-        # SET HEADLESS=TRUE FOR GITHUB ACTIONS / PRODUCTION
         browser = p.chromium.launch(headless=True) 
         
-        # Context with Location Spoofing (Dhaka)
         context = browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             permissions=['geolocation'], 
@@ -82,13 +76,13 @@ def scrape():
         total_cats = len(URLS)
         
         for index, entry in enumerate(URLS):
+            # Optional: Add simple ETA based on average time per category
             print(f"[{index+1}/{total_cats}] Scraping: {entry['category']}...")
             
             try:
                 page = context.new_page()
                 page.goto(entry['url'], timeout=60000)
 
-                # Wait for grid
                 try:
                     page.wait_for_selector('.product', timeout=10000)
                 except:
@@ -96,10 +90,9 @@ def scrape():
                     page.close()
                     continue
 
-                # Aggressive Scroll (15 times)
                 for i in range(15): 
                     page.keyboard.press("PageDown")
-                    time.sleep(0.5) # Faster scroll for production
+                    time.sleep(0.5)
 
                 products = page.query_selector_all('.product')
                 count_for_page = 0
@@ -107,8 +100,7 @@ def scrape():
                 for product in products:
                     try:
                         class_attr = product.get_attribute("class")
-                        if "total" in class_attr or "shoppingCart" in class_attr:
-                            continue
+                        if "total" in class_attr or "shoppingCart" in class_attr: continue
 
                         name_el = product.query_selector('.name')
                         price_el = product.query_selector('.price')
@@ -126,7 +118,6 @@ def scrape():
                         img_el = product.query_selector('img')
                         img_url = img_el.get_attribute('src') if img_el else None
                         
-                        # Image Handling
                         img_filename = get_image_filename(name)
                         if img_url:
                             process_image(img_url, img_filename)
@@ -151,7 +142,6 @@ def scrape():
 
         browser.close()
 
-    # --- SAVE & DEDUPLICATE ---
     if scraped_data:
         df_new = pd.DataFrame(scraped_data)
         
@@ -167,14 +157,14 @@ def scrape():
             print("Creating new database...")
             df_final = df_new
 
-        # Deduplicate: Keep 1 entry per product per day
         initial_count = len(df_final)
         df_final = df_final.drop_duplicates(subset=['date', 'name'], keep='first')
         
-        # Save Parquet
+        # Sort for optimization
+        df_final = df_final.sort_values(by=['name', 'date'])
+        
         df_final.to_parquet(parquet_file, index=False, compression='snappy')
         
-        # Save Search Index (Meta JSON)
         meta_df = df_final.sort_values('date').drop_duplicates('name', keep='last')
         meta_df = meta_df[['name', 'category', 'unit', 'image', 'price']]
         meta_df.to_json(os.path.join(DATA_DIR, "meta.json"), orient='records')
@@ -182,6 +172,14 @@ def scrape():
         print(f"DONE! Database contains {len(df_final)} records.")
     else:
         print("No data scraped.")
+
+    # 2. STOP TIMER & REPORT
+    end_time = time.time()
+    duration = end_time - start_time
+    minutes = int(duration // 60)
+    seconds = int(duration % 60)
+    
+    print(f"--- Finished in {minutes}m {seconds}s ---")
 
 if __name__ == "__main__":
     scrape()
