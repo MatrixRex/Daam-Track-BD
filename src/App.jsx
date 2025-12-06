@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import SearchBar from './components/SearchBar';
 import PriceChart from './components/PriceChart';
 import { useDuckDB } from './hooks/useDuckDB';
@@ -27,11 +27,30 @@ function App() {
   // Array for multi-item comparison (no limit)
   const [selectedItems, setSelectedItems] = useState([]);
 
+  // Persistent color assignments - each item keeps its color even after others are removed
+  const colorAssignmentsRef = useRef(new Map());
+  const nextColorIndexRef = useRef(0);
+
+  // Get or assign a persistent color for an item
+  const getItemColor = (itemName) => {
+    if (colorAssignmentsRef.current.has(itemName)) {
+      return colorAssignmentsRef.current.get(itemName);
+    }
+    // Assign next available color
+    const colorIndex = nextColorIndexRef.current % COLORS.length;
+    const color = COLORS[colorIndex];
+    colorAssignmentsRef.current.set(itemName, color);
+    nextColorIndexRef.current++;
+    return color;
+  };
+
   // Add item to comparison (no limit)
   const handleAddItem = (item) => {
     if (!item) return;
     // Check if already selected
     if (selectedItems.some(i => i.name === item.name)) return;
+    // Pre-assign color when item is added
+    getItemColor(item.name);
     setSelectedItems([...selectedItems, item]);
   };
 
@@ -43,6 +62,9 @@ function App() {
   // Clear all items
   const handleClearAll = () => {
     setSelectedItems([]);
+    // Reset color assignments when all items are cleared
+    colorAssignmentsRef.current.clear();
+    nextColorIndexRef.current = 0;
   };
 
   return (
@@ -114,54 +136,57 @@ function App() {
 
                 {/* Items List */}
                 <ul className="max-h-[60vh] overflow-y-auto divide-y divide-slate-50">
-                  {selectedItems.map((item, index) => (
-                    <li
-                      key={item.name}
-                      className="p-3 hover:bg-slate-50 transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        {/* Color Indicator */}
-                        <div
-                          className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-offset-1"
-                          style={{
-                            backgroundColor: COLORS[index % COLORS.length].stroke,
-                            ringColor: COLORS[index % COLORS.length].stroke + '40'
-                          }}
-                        />
-
-                        {/* Small Image */}
-                        <div className="w-10 h-10 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200">
-                          <img
-                            src={`/images/${item.image}`}
-                            alt={item.name}
-                            className="w-full h-full object-contain mix-blend-multiply"
-                            onError={(e) => {
-                              e.target.style.display = 'none';
+                  {selectedItems.map((item) => {
+                    const itemColor = getItemColor(item.name);
+                    return (
+                      <li
+                        key={item.name}
+                        className="p-3 hover:bg-slate-50 transition-colors group"
+                      >
+                        <div className="flex items-center gap-3">
+                          {/* Color Indicator */}
+                          <div
+                            className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-offset-1"
+                            style={{
+                              backgroundColor: itemColor.stroke,
+                              ringColor: itemColor.stroke + '40'
                             }}
                           />
-                        </div>
 
-                        {/* Item Info */}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-slate-900 truncate">
-                            {item.name}
-                          </h4>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-slate-400">{item.category}</span>
-                            <span className="text-xs font-semibold text-slate-700">৳{item.price}</span>
+                          {/* Small Image */}
+                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200">
+                            <img
+                              src={`/images/${item.image}`}
+                              alt={item.name}
+                              className="w-full h-full object-contain mix-blend-multiply"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                              }}
+                            />
                           </div>
-                        </div>
 
-                        {/* Remove Button */}
-                        <button
-                          onClick={() => handleRemoveItem(item.name)}
-                          className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all p-1"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    </li>
-                  ))}
+                          {/* Item Info */}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-medium text-slate-900 truncate">
+                              {item.name}
+                            </h4>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-slate-400">{item.category}</span>
+                              <span className="text-xs font-semibold text-slate-700">৳{item.price}</span>
+                            </div>
+                          </div>
+
+                          {/* Remove Button */}
+                          <button
+                            onClick={() => handleRemoveItem(item.name)}
+                            className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all p-1"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
 
                 {/* Footer hint */}

@@ -70,6 +70,10 @@ export default function PriceChart({ items = [], colors = [] }) {
   // Items waiting for domain animation to complete before line animation starts
   const [pendingLineAnimation, setPendingLineAnimation] = useState(new Set());
 
+  // Persistent color assignments - each item keeps its color even after others are removed
+  const colorAssignmentsRef = useRef(new Map());
+  const nextColorIndexRef = useRef(0);
+
   const prevItemNamesRef = useRef(new Set());
 
   // --- Data Fetching Logic ---
@@ -228,29 +232,40 @@ export default function PriceChart({ items = [], colors = [] }) {
   // Animate domain
   const { currentDomain } = useAnimatedDomain(targetDomain);
 
-  // Stats calculation
+  // Get or assign a persistent color for an item
+  const getItemColor = useCallback((itemName) => {
+    // If already assigned, return the stored color
+    if (colorAssignmentsRef.current.has(itemName)) {
+      return colorAssignmentsRef.current.get(itemName);
+    }
+
+    // Assign next available color
+    const colorIndex = nextColorIndexRef.current % colors.length;
+    const color = colors[colorIndex]?.stroke || '#3B82F6';
+    colorAssignmentsRef.current.set(itemName, color);
+    nextColorIndexRef.current++;
+
+    return color;
+  }, [colors]);
+
+  // Stats calculation - use persistent colors
   const stats = useMemo(() => {
     if (!chartData.length || !items.length) return [];
-    return items.map((item, index) => {
+    return items.map((item) => {
       const prices = chartData.map(d => d[item.name]).filter(p => p !== undefined);
       if (!prices.length) return null;
       const current = prices[prices.length - 1];
       const prev = prices.length > 1 ? prices[prices.length - 2] : current;
       return {
         name: item.name,
-        color: colors[index % colors.length]?.stroke || '#3B82F6',
+        color: getItemColor(item.name),
         current,
         min: Math.min(...prices),
         max: Math.max(...prices),
         change: current - prev
       };
     }).filter(Boolean);
-  }, [chartData, items, colors]);
-
-  const getItemColor = useCallback((itemName) => {
-    const index = items.findIndex(i => i.name === itemName);
-    return colors[index >= 0 ? index % colors.length : 0]?.stroke || '#3B82F6';
-  }, [items, colors]);
+  }, [chartData, items, getItemColor]);
 
   // Determine animation state for each line
   const getLineState = useCallback((itemName) => {
