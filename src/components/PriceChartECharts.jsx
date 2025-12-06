@@ -633,7 +633,9 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                     ref={echartsRef}
                     option={{}} // Controlled manually via useEffect
                     style={{ height: '100%', width: '100%' }}
-                // notMerge prop removed to rely on manual setOption
+                    onChartReady={(chart) => {
+                        chart.setOption(option, { replaceMerge: ['series'] });
+                    }}
                 />
             </div>
         </div>
