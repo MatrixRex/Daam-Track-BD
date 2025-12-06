@@ -3,7 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import { useDuckDB } from '../hooks/useDuckDB';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Calendar } from 'lucide-react';
 
 // Hook to smoothly animate Y-axis domain values
 const useAnimatedDomain = (targetDomain, onAnimationComplete) => {
@@ -55,6 +55,62 @@ const useAnimatedDomain = (targetDomain, onAnimationComplete) => {
   return { currentDomain, isAnimating: isAnimatingRef.current };
 };
 
+// Helper to get date string in YYYY-MM-DD format (for input value)
+const formatDateForInput = (date) => {
+  return date.toISOString().split('T')[0];
+};
+
+// Helper to display date in DD/MM/YYYY format
+const formatDateForDisplay = (dateString) => {
+  if (!dateString) return '';
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+};
+
+// Get default date range (last 90 days)
+const getDefaultDateRange = () => {
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - 90);
+  return {
+    start: formatDateForInput(start),
+    end: formatDateForInput(end)
+  };
+};
+
+// Custom styled date input component  
+const DateInput = ({ value, onChange, label }) => {
+  const inputRef = useRef(null);
+
+  // Format for display (DD/MM/YYYY)
+  const displayValue = formatDateForDisplay(value);
+
+  const openPicker = () => {
+    if (inputRef.current) {
+      inputRef.current.showPicker?.();
+    }
+  };
+
+  return (
+    <div
+      className="relative flex items-center bg-white border border-slate-200 rounded-lg px-3 py-1.5 hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer"
+      onClick={openPicker}
+    >
+      <span className="text-sm font-medium text-slate-700 pointer-events-none">
+        {displayValue}
+      </span>
+      <input
+        ref={inputRef}
+        type="date"
+        value={value}
+        onChange={onChange}
+        aria-label={label}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      />
+    </div>
+  );
+};
+
 export default function PriceChart({ items = [], colors = [] }) {
   const { runQuery, loading: engineLoading } = useDuckDB();
   const dataCache = useRef(new Map());
@@ -75,6 +131,11 @@ export default function PriceChart({ items = [], colors = [] }) {
   const nextColorIndexRef = useRef(0);
 
   const prevItemNamesRef = useRef(new Set());
+
+  // Date range filter
+  const defaultRange = getDefaultDateRange();
+  const [startDate, setStartDate] = useState(defaultRange.start);
+  const [endDate, setEndDate] = useState(defaultRange.end);
 
   // --- Data Fetching Logic ---
   const fetchItemData = useCallback(async (item) => {
@@ -202,9 +263,18 @@ export default function PriceChart({ items = [], colors = [] }) {
     }
   }, [items, engineLoading, fetchItemData, buildChartData]);
 
-  // Calculate target domain
+  // Filter chart data by date range
+  const filteredChartData = useMemo(() => {
+    if (!chartData.length) return [];
+    return chartData.filter(row => {
+      const rowDate = row.date;
+      return rowDate >= startDate && rowDate <= endDate;
+    });
+  }, [chartData, startDate, endDate]);
+
+  // Calculate target domain based on filtered data
   const targetDomain = useMemo(() => {
-    if (!chartData.length || !items.length) return [0, 100];
+    if (!filteredChartData.length || !items.length) return [0, 100];
 
     let min = Infinity;
     let max = -Infinity;
@@ -212,7 +282,7 @@ export default function PriceChart({ items = [], colors = [] }) {
     const activeNames = [...items.map(i => i.name), ...Array.from(removingItems)];
     if (activeNames.length === 0) return [0, 100];
 
-    chartData.forEach(row => {
+    filteredChartData.forEach(row => {
       activeNames.forEach(name => {
         const val = row[name];
         if (val !== undefined) {
@@ -248,11 +318,11 @@ export default function PriceChart({ items = [], colors = [] }) {
     return color;
   }, [colors]);
 
-  // Stats calculation - use persistent colors
+  // Stats calculation - use persistent colors and filtered data
   const stats = useMemo(() => {
-    if (!chartData.length || !items.length) return [];
+    if (!filteredChartData.length || !items.length) return [];
     return items.map((item) => {
-      const prices = chartData.map(d => d[item.name]).filter(p => p !== undefined);
+      const prices = filteredChartData.map(d => d[item.name]).filter(p => p !== undefined);
       if (!prices.length) return null;
       const current = prices[prices.length - 1];
       const prev = prices.length > 1 ? prices[prices.length - 2] : current;
@@ -265,7 +335,7 @@ export default function PriceChart({ items = [], colors = [] }) {
         change: current - prev
       };
     }).filter(Boolean);
-  }, [chartData, items, getItemColor]);
+  }, [filteredChartData, items, getItemColor]);
 
   // Determine animation state for each line
   const getLineState = useCallback((itemName) => {
@@ -320,8 +390,27 @@ export default function PriceChart({ items = [], colors = [] }) {
       <div className="flex flex-wrap justify-between items-start mb-6 gap-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Price Comparison</h3>
-          <p className="text-xs text-slate-400 mt-1">{items.length} item{items.length > 1 ? 's' : ''} • Last 90 days</p>
+          <p className="text-xs text-slate-400 mt-1">
+            {items.length} item{items.length > 1 ? 's' : ''} • {filteredChartData.length} days
+          </p>
         </div>
+
+        {/* Date Range Filter */}
+        <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
+          <Calendar className="w-4 h-4 text-blue-500 flex-shrink-0" />
+          <DateInput
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            label="Start date"
+          />
+          <span className="text-slate-400 text-sm font-medium">to</span>
+          <DateInput
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            label="End date"
+          />
+        </div>
+
         <div className="flex flex-wrap gap-3">
           {stats.map((stat) => {
             const { isRemoving } = getLineState(stat.name);
@@ -348,7 +437,7 @@ export default function PriceChart({ items = [], colors = [] }) {
       {/* Chart */}
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
+          <LineChart data={filteredChartData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
             <XAxis dataKey="dateShort" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} minTickGap={30} />
             <YAxis
