@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
@@ -17,7 +17,6 @@ const useAnimatedDomain = (targetDomain, onAnimationComplete) => {
     const start = currentDomain;
     const end = targetDomain;
 
-    // If difference is very small, snap immediately
     if (Math.abs(start[0] - end[0]) < 1 && Math.abs(start[1] - end[1]) < 1) {
       setCurrentDomain(end);
       return;
@@ -25,12 +24,12 @@ const useAnimatedDomain = (targetDomain, onAnimationComplete) => {
 
     isAnimatingRef.current = true;
     const startTime = performance.now();
-    const duration = 600; // 600ms for Y-axis animation
+    const duration = 600;
 
     const animate = (now) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3); // Cubic ease out
+      const ease = 1 - Math.pow(1 - progress, 3);
 
       const nextMin = start[0] + (end[0] - start[0]) * ease;
       const nextMax = start[1] + (end[1] - start[1]) * ease;
@@ -55,7 +54,7 @@ const useAnimatedDomain = (targetDomain, onAnimationComplete) => {
   return { currentDomain, isAnimating: isAnimatingRef.current };
 };
 
-// Helper to get date string in YYYY-MM-DD format (for input value)
+// Helper to get date string in YYYY-MM-DD format
 const formatDateForInput = (date) => {
   return date.toISOString().split('T')[0];
 };
@@ -66,6 +65,9 @@ const formatDateForDisplay = (dateString) => {
   const [year, month, day] = dateString.split('-');
   return `${day}/${month}/${year}`;
 };
+
+// Get today's date in YYYY-MM-DD format
+const getTodayDate = () => formatDateForInput(new Date());
 
 // Get default date range (last 90 days)
 const getDefaultDateRange = () => {
@@ -78,11 +80,9 @@ const getDefaultDateRange = () => {
   };
 };
 
-// Custom styled date input component  
-const DateInput = ({ value, onChange, label }) => {
+// Custom styled date input component
+const DateInput = ({ value, onChange, label, min, max }) => {
   const inputRef = useRef(null);
-
-  // Format for display (DD/MM/YYYY)
   const displayValue = formatDateForDisplay(value);
 
   const openPicker = () => {
@@ -104,6 +104,8 @@ const DateInput = ({ value, onChange, label }) => {
         type="date"
         value={value}
         onChange={onChange}
+        min={min}
+        max={max}
         aria-label={label}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
       />
@@ -122,22 +124,19 @@ export default function PriceChart({ items = [], colors = [] }) {
   const renderedItemsRef = useRef(new Set());
   const [newlyAddedItems, setNewlyAddedItems] = useState(new Set());
   const [removingItems, setRemovingItems] = useState(new Set());
-
-  // Items waiting for domain animation to complete before line animation starts
   const [pendingLineAnimation, setPendingLineAnimation] = useState(new Set());
 
-  // Persistent color assignments - each item keeps its color even after others are removed
   const colorAssignmentsRef = useRef(new Map());
   const nextColorIndexRef = useRef(0);
-
   const prevItemNamesRef = useRef(new Set());
 
   // Date range filter
   const defaultRange = getDefaultDateRange();
   const [startDate, setStartDate] = useState(defaultRange.start);
   const [endDate, setEndDate] = useState(defaultRange.end);
+  const today = getTodayDate();
 
-  // --- Data Fetching Logic ---
+  // Data fetching
   const fetchItemData = useCallback(async (item) => {
     if (dataCache.current.has(item.name)) {
       return dataCache.current.get(item.name);
@@ -174,8 +173,7 @@ export default function PriceChart({ items = [], colors = [] }) {
         dateMap.get(point.date)[name] = point.price;
       });
     });
-    return Array.from(dateMap.values())
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
+    return Array.from(dateMap.values()).sort((a, b) => new Date(a.date) - new Date(b.date));
   }, []);
 
   useEffect(() => {
@@ -187,18 +185,15 @@ export default function PriceChart({ items = [], colors = [] }) {
     const removed = [...prevNames].filter(name => !currentNames.has(name));
     prevItemNamesRef.current = currentNames;
 
-    // Handle removals
     if (removed.length > 0) {
       setRemovingItems(new Set(removed));
       setTimeout(() => {
         setRemovingItems(new Set());
         removed.forEach(name => renderedItemsRef.current.delete(name));
-        const newData = buildChartData([...currentNames]);
-        setChartData(newData);
+        setChartData(buildChartData([...currentNames]));
       }, 600);
     }
 
-    // Handle additions
     if (added.length > 0) {
       const fetchNew = async () => {
         const isFirstLoad = chartData.length === 0;
@@ -211,30 +206,21 @@ export default function PriceChart({ items = [], colors = [] }) {
         setLoadingItem(null);
         if (isFirstLoad) setLoading(false);
 
-        // Add items to pending - they'll wait for domain animation
         setPendingLineAnimation(new Set(added.map(i => i.name)));
+        setChartData(buildChartData([...currentNames]));
 
-        // Build chart data (this triggers domain recalculation)
-        const newData = buildChartData([...currentNames]);
-        setChartData(newData);
-
-        // After domain animation completes (~600ms), start line animation
         setTimeout(() => {
-          // Move from pending to newlyAdded (triggers line animation)
           setNewlyAddedItems(new Set(added.map(i => i.name)));
           setPendingLineAnimation(new Set());
-
-          // After line animation completes (1200ms), mark as rendered
           setTimeout(() => {
             added.forEach(item => renderedItemsRef.current.add(item.name));
             setNewlyAddedItems(new Set());
           }, 1300);
-        }, 650); // Slightly after domain animation (600ms)
+        }, 650);
       };
       fetchNew();
     }
 
-    // Initial load
     if (added.length === 0 && removed.length === 0 && items.length > 0 && chartData.length === 0) {
       const fetchAll = async () => {
         setLoading(true);
@@ -246,13 +232,11 @@ export default function PriceChart({ items = [], colors = [] }) {
         setLoading(false);
 
         setPendingLineAnimation(new Set(items.map(i => i.name)));
-        const newData = buildChartData([...currentNames]);
-        setChartData(newData);
+        setChartData(buildChartData([...currentNames]));
 
         setTimeout(() => {
           setNewlyAddedItems(new Set(items.map(i => i.name)));
           setPendingLineAnimation(new Set());
-
           setTimeout(() => {
             items.forEach(item => renderedItemsRef.current.add(item.name));
             setNewlyAddedItems(new Set());
@@ -263,24 +247,117 @@ export default function PriceChart({ items = [], colors = [] }) {
     }
   }, [items, engineLoading, fetchItemData, buildChartData]);
 
-  // Filter chart data by date range
+  // Generate all dates in range and fill with data
+  // Edge behavior: extend first/last values horizontally to edges
+  // Middle gaps: connect with straight line (via connectNulls)
   const filteredChartData = useMemo(() => {
-    if (!chartData.length) return [];
-    return chartData.filter(row => {
-      const rowDate = row.date;
-      return rowDate >= startDate && rowDate <= endDate;
-    });
-  }, [chartData, startDate, endDate]);
+    if (!startDate || !endDate || !items.length) return [];
 
-  // Calculate target domain based on filtered data
+    // Generate all dates in the range (avoiding timezone issues)
+    const allDates = [];
+    const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+    const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+
+    const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNamesLong = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    // Check if range spans multiple years
+    const multiYear = startYear !== endYear;
+
+    // Use UTC to avoid timezone shifts
+    let current = Date.UTC(startYear, startMonth - 1, startDay);
+    const endTime = Date.UTC(endYear, endMonth - 1, endDay);
+
+    while (current <= endTime) {
+      const d = new Date(current);
+      const year = d.getUTCFullYear();
+      const monthIndex = d.getUTCMonth();
+      const day = d.getUTCDate();
+      const dateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+      allDates.push({
+        date: dateStr,
+        // Include year in short format if multi-year range to avoid confusion
+        dateShort: multiYear
+          ? `${day} ${monthNamesShort[monthIndex]} '${String(year).slice(-2)}`
+          : `${day} ${monthNamesShort[monthIndex]}`,
+        fullDate: `${day} ${monthNamesLong[monthIndex]} ${year}`
+      });
+
+      // Move to next day (add 24 hours in milliseconds)
+      current += 24 * 60 * 60 * 1000;
+    }
+
+    // Create a map of existing data
+    const dataMap = new Map();
+    chartData.forEach(row => {
+      dataMap.set(row.date, row);
+    });
+
+    // For each item, find first and last data points
+    const itemBounds = {};
+    items.forEach(item => {
+      const name = item.name;
+      const itemDates = chartData
+        .filter(row => row[name] !== undefined)
+        .map(row => row.date)
+        .sort();
+
+      if (itemDates.length > 0) {
+        itemBounds[name] = {
+          firstDate: itemDates[0],
+          lastDate: itemDates[itemDates.length - 1],
+          firstValue: chartData.find(r => r.date === itemDates[0])?.[name],
+          lastValue: chartData.find(r => r.date === itemDates[itemDates.length - 1])?.[name]
+        };
+      }
+    });
+
+    // Build the result with separate keys for real data vs extended data
+    // Format: itemName = actual data, itemName_ext = extended/interpolated line
+    return allDates.map(dateEntry => {
+      const existing = dataMap.get(dateEntry.date);
+      const result = { ...dateEntry };
+
+      items.forEach(item => {
+        const name = item.name;
+        const extKey = `${name}_ext`;
+        const bounds = itemBounds[name];
+
+        if (!bounds) {
+          // No data for this item at all
+          result[name] = undefined;
+          result[extKey] = undefined;
+        } else if (existing && existing[name] !== undefined) {
+          // We have actual data for this date - put in both keys for connection
+          result[name] = existing[name];
+          result[extKey] = existing[name]; // Also in ext for continuous dashed line
+        } else if (dateEntry.date < bounds.firstDate) {
+          // Before first data point - only in extended key
+          result[name] = undefined;
+          result[extKey] = bounds.firstValue;
+        } else if (dateEntry.date > bounds.lastDate) {
+          // After last data point - only in extended key
+          result[name] = undefined;
+          result[extKey] = bounds.lastValue;
+        } else {
+          // Gap in the middle - only in extended key for interpolation
+          result[name] = undefined;
+          result[extKey] = undefined; // Will be connected by connectNulls
+        }
+      });
+
+      return result;
+    });
+  }, [chartData, startDate, endDate, items]);
+
+  // Calculate target domain
   const targetDomain = useMemo(() => {
     if (!filteredChartData.length || !items.length) return [0, 100];
 
     let min = Infinity;
     let max = -Infinity;
-
     const activeNames = [...items.map(i => i.name), ...Array.from(removingItems)];
-    if (activeNames.length === 0) return [0, 100];
 
     filteredChartData.forEach(row => {
       activeNames.forEach(name => {
@@ -297,28 +374,21 @@ export default function PriceChart({ items = [], colors = [] }) {
 
     const padding = Math.max((max - min) * 0.1, 5);
     return [Math.floor(min - padding), Math.ceil(max + padding)];
-  }, [chartData, items, removingItems]);
+  }, [filteredChartData, items, removingItems]);
 
-  // Animate domain
   const { currentDomain } = useAnimatedDomain(targetDomain);
 
-  // Get or assign a persistent color for an item
   const getItemColor = useCallback((itemName) => {
-    // If already assigned, return the stored color
     if (colorAssignmentsRef.current.has(itemName)) {
       return colorAssignmentsRef.current.get(itemName);
     }
-
-    // Assign next available color
     const colorIndex = nextColorIndexRef.current % colors.length;
     const color = colors[colorIndex]?.stroke || '#3B82F6';
     colorAssignmentsRef.current.set(itemName, color);
     nextColorIndexRef.current++;
-
     return color;
   }, [colors]);
 
-  // Stats calculation - use persistent colors and filtered data
   const stats = useMemo(() => {
     if (!filteredChartData.length || !items.length) return [];
     return items.map((item) => {
@@ -337,7 +407,6 @@ export default function PriceChart({ items = [], colors = [] }) {
     }).filter(Boolean);
   }, [filteredChartData, items, getItemColor]);
 
-  // Determine animation state for each line
   const getLineState = useCallback((itemName) => {
     const isPending = pendingLineAnimation.has(itemName);
     const isNew = newlyAddedItems.has(itemName) && !renderedItemsRef.current.has(itemName);
@@ -345,8 +414,7 @@ export default function PriceChart({ items = [], colors = [] }) {
     return { isPending, isNew, isRemoving };
   }, [pendingLineAnimation, newlyAddedItems, removingItems]);
 
-  // --- RENDER ---
-
+  // Loading state
   if (loading && chartData.length === 0) {
     return (
       <div className="h-[500px] flex flex-col items-center justify-center bg-white rounded-2xl border border-slate-200">
@@ -367,9 +435,6 @@ export default function PriceChart({ items = [], colors = [] }) {
 
   if (items.length === 0 && removingItems.size === 0) return null;
 
-  // Build list of items to render:
-  // - Exclude items that are pending (waiting for Y-axis animation) 
-  // - Include items being removed (for fade out animation)
   const itemsToRender = items.filter(item => !pendingLineAnimation.has(item.name));
   removingItems.forEach(name => {
     if (!itemsToRender.some(i => i.name === name)) {
@@ -386,7 +451,7 @@ export default function PriceChart({ items = [], colors = [] }) {
         </div>
       )}
 
-      {/* Header / Stats */}
+      {/* Header */}
       <div className="flex flex-wrap justify-between items-start mb-6 gap-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Price Comparison</h3>
@@ -402,12 +467,15 @@ export default function PriceChart({ items = [], colors = [] }) {
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             label="Start date"
+            max={endDate}
           />
           <span className="text-slate-400 text-sm font-medium">to</span>
           <DateInput
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
             label="End date"
+            min={startDate}
+            max={today}
           />
         </div>
 
@@ -449,8 +517,17 @@ export default function PriceChart({ items = [], colors = [] }) {
             />
             <Tooltip
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
-              labelFormatter={(label, payload) => payload[0]?.payload.fullDate || label}
-              formatter={(value, name) => [`৳${value}`, name]}
+              labelFormatter={(label, payload) => {
+                // Find a payload entry that has fullDate (prefer non-ext entries)
+                const entry = payload?.find(p => p.payload?.fullDate);
+                return entry?.payload?.fullDate || label;
+              }}
+              formatter={(value, name) => {
+                // Hide extended line entries from tooltip
+                if (name.endsWith('_ext')) return null;
+                return [`৳${value}`, name];
+              }}
+              filterNull={true}
             />
             <Legend
               verticalAlign="top"
@@ -466,26 +543,46 @@ export default function PriceChart({ items = [], colors = [] }) {
               const color = getItemColor(item.name);
 
               return (
-                <Line
-                  key={item.name}
-                  type="monotone"
-                  dataKey={item.name}
-                  name={item.name}
-                  stroke={color}
-                  strokeWidth={2.5}
-                  dot={false}
-                  activeDot={isRemoving ? false : { r: 6, strokeWidth: 2, fill: 'white' }}
-                  // Animate when line first appears (after domain animation)
-                  isAnimationActive={isNew}
-                  animationDuration={1200}
-                  animationBegin={0}
-                  animationEasing="ease-in-out"
-                  animationId={`line-${item.name}`}
-                  style={{
-                    opacity: isRemoving ? 0 : 1,
-                    transition: 'opacity 600ms ease-out',
-                  }}
-                />
+                <React.Fragment key={item.name}>
+                  {/* Dashed line for extended/missing data - renders first (background) */}
+                  <Line
+                    type="monotone"
+                    dataKey={`${item.name}_ext`}
+                    name={`${item.name}_ext`}
+                    stroke={color}
+                    strokeWidth={1.5}
+                    strokeDasharray="6 4"
+                    dot={false}
+                    activeDot={false}
+                    connectNulls={true}
+                    isAnimationActive={false}
+                    legendType="none"
+                    style={{
+                      opacity: isRemoving ? 0 : 0.4,
+                      transition: 'opacity 600ms ease-out',
+                    }}
+                  />
+                  {/* Solid line for actual data - renders on top */}
+                  <Line
+                    type="monotone"
+                    dataKey={item.name}
+                    name={item.name}
+                    stroke={color}
+                    strokeWidth={2.5}
+                    dot={false}
+                    activeDot={isRemoving ? false : { r: 6, strokeWidth: 2, fill: 'white' }}
+                    isAnimationActive={isNew}
+                    animationDuration={1200}
+                    animationBegin={0}
+                    animationEasing="ease-in-out"
+                    animationId={`line-${item.name}`}
+                    connectNulls={true}
+                    style={{
+                      opacity: isRemoving ? 0 : 1,
+                      transition: 'opacity 600ms ease-out',
+                    }}
+                  />
+                </React.Fragment>
               );
             })}
           </LineChart>
