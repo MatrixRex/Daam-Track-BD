@@ -27,6 +27,23 @@ function App() {
   // Array for multi-item comparison (no limit)
   const [selectedItems, setSelectedItems] = useState([]);
   const [hoveredItem, setHoveredItem] = useState(null);
+  const [itemStats, setItemStats] = useState({});
+
+  // Optimize stats update to prevent infinite loops if reference unstable
+  const handleStatsUpdate = (newStats) => {
+    // Convert array to object for easier lookup: { name: stat }
+    const statsMap = newStats.reduce((acc, stat) => {
+      acc[stat.name] = stat;
+      return acc;
+    }, {});
+
+    // Only update if changed (deep comparison or length check + key check?)
+    // JSON stringify is cheap enough for small number of items
+    setItemStats(prev => {
+      if (JSON.stringify(prev) === JSON.stringify(statsMap)) return prev;
+      return statsMap;
+    });
+  };
 
   // Persistent color assignments - each item keeps its color even after others are removed
   const colorAssignmentsRef = useRef(new Map());
@@ -117,6 +134,7 @@ function App() {
                 colors={COLORS}
                 hoveredItem={hoveredItem}
                 setHoveredItem={setHoveredItem}
+                onStatsUpdate={handleStatsUpdate}
               />
             </div>
 
@@ -180,7 +198,17 @@ function App() {
                             </h4>
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-slate-400">{item.category}</span>
-                              <span className="text-xs font-semibold text-slate-700">৳{item.price}</span>
+                              {itemStats[item.name] ? (
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm font-bold text-slate-900">৳{itemStats[item.name].current}</span>
+                                  <span className={`text-xs font-medium flex items-center ${itemStats[item.name].change > 0 ? 'text-red-500' : itemStats[item.name].change < 0 ? 'text-green-500' : 'text-slate-400'}`}>
+                                    {itemStats[item.name].change > 0 ? '▲' : itemStats[item.name].change < 0 ? '▼' : ''}
+                                    {Math.abs(itemStats[item.name].change)}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-xs font-semibold text-slate-700">৳{item.price}</span>
+                              )}
                             </div>
                           </div>
 

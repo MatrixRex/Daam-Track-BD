@@ -169,7 +169,49 @@ const CustomXAxisTick = ({ x, y, payload, mode }) => {
   );
 };
 
-export default function PriceChart({ items = [], colors = [], hoveredItem, setHoveredItem }) {
+// Custom Cursor to ensure vertical line renders correctly regardless of axis type
+const CustomCursor = (props) => {
+  const { x, y, width, height, stroke, strokeWidth, strokeDasharray, strokeOpacity, points } = props;
+
+  // For continuous axis (Recharts passes points)
+  if (points && points.length >= 2) {
+    return (
+      <line
+        x1={points[0].x}
+        y1={points[0].y}
+        x2={points[1].x}
+        y2={points[1].y}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        strokeDasharray={strokeDasharray}
+        strokeOpacity={strokeOpacity}
+      />
+    );
+  }
+
+  // For categorical axis (Recharts passes x, y, width, height)
+  // We draw a line down the middle of the band
+  if (typeof x === 'number' && typeof y === 'number' && typeof height === 'number') {
+    // If width is provided, center it. If not, just use x (it might be a point).
+    const midX = typeof width === 'number' ? x + width / 2 : x;
+    return (
+      <line
+        x1={midX}
+        y1={y}
+        x2={midX}
+        y2={y + height}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        strokeDasharray={strokeDasharray}
+        strokeOpacity={strokeOpacity}
+      />
+    );
+  }
+
+  return null;
+};
+
+export default function PriceChart({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate }) {
   const { runQuery, loading: engineLoading } = useDuckDB();
   const dataCache = useRef(new Map());
 
@@ -485,6 +527,13 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
     }).filter(Boolean);
   }, [filteredChartData, items, getItemColor]);
 
+  // Notify parent of stats updates
+  useEffect(() => {
+    if (onStatsUpdate) {
+      onStatsUpdate(stats);
+    }
+  }, [stats, onStatsUpdate]);
+
   const getLineState = useCallback((itemName) => {
     const isPending = pendingLineAnimation.has(itemName);
     const isNew = newlyAddedItems.has(itemName) && !renderedItemsRef.current.has(itemName);
@@ -557,30 +606,6 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
           />
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          {stats.map((stat) => {
-            const { isRemoving } = getLineState(stat.name);
-            const isNew = newlyAddedItems.has(stat.name);
-            const isPending = pendingLineAnimation.has(stat.name);
-            const isHovered = hoveredItem === stat.name;
-            return (
-              <div
-                key={stat.name}
-                onMouseEnter={() => setHoveredItem(stat.name)}
-                onMouseLeave={() => setHoveredItem(null)}
-                className={`flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg transition-all duration-300 cursor-pointer ${isRemoving ? 'opacity-0 scale-90 -translate-x-2' : 'opacity-100 scale-100'
-                  } ${isNew || isPending ? 'ring-2 ring-blue-300 ring-offset-1' : ''} ${isHovered ? 'ring-2 ring-blue-100 bg-blue-50/80 shadow-sm' : ''}`}
-              >
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stat.color }} />
-                <span className="text-xs font-medium text-slate-600 max-w-[100px] truncate">{stat.name}</span>
-                <span className="text-sm font-bold text-slate-900">৳{stat.current}</span>
-                <span className={`text-xs font-medium ${stat.change > 0 ? 'text-red-500' : stat.change < 0 ? 'text-green-500' : 'text-slate-400'}`}>
-                  {stat.change > 0 ? '▲' : stat.change < 0 ? '▼' : ''} {Math.abs(stat.change)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
       </div>
 
       {/* Chart */}
@@ -606,7 +631,7 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
             />
             <Tooltip
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
-              cursor={<line stroke="#cbd5e1" strokeWidth={1} strokeDasharray="4 4" />}
+              cursor={<CustomCursor stroke="#4b4f54" strokeWidth={1} strokeDasharray="5 5" strokeOpacity={0.4} />}
               labelFormatter={(label, payload) => {
                 // Find a payload entry that has fullDate (prefer non-ext entries)
                 const entry = payload?.find(p => p.payload?.fullDate);
@@ -696,10 +721,10 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
             })}
           </ComposedChart>
         </ResponsiveContainer>
-      </div>
+      </div >
 
       {/* Footer Summary */}
-      <div className="mt-4 pt-4 border-t border-slate-100">
+      < div className="mt-4 pt-4 border-t border-slate-100" >
         <div className="flex flex-wrap gap-3 justify-center">
           {stats.map((stat) => {
             const { isRemoving } = getLineState(stat.name);
@@ -713,7 +738,7 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
             );
           })}
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
