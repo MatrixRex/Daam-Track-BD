@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+  ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import { useDuckDB } from '../hooks/useDuckDB';
 import { Loader2, AlertCircle, Calendar } from 'lucide-react';
@@ -80,6 +80,8 @@ const getDefaultDateRange = () => {
   };
 };
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 // Custom styled date input component
 const DateInput = ({ value, onChange, label, min, max }) => {
   const inputRef = useRef(null);
@@ -113,7 +115,61 @@ const DateInput = ({ value, onChange, label, min, max }) => {
   );
 };
 
-export default function PriceChart({ items = [], colors = [] }) {
+// Custom X Axis Tick Component for Cascading Labels
+const CustomXAxisTick = ({ x, y, payload, mode }) => {
+  if (!payload || !payload.value) return null;
+
+  // Manual parsing to avoid timezone issues: YYYY-MM-DD
+  const [yearStr, monthStr, dayStr] = payload.value.split('-');
+  const day = parseInt(dayStr, 10);
+  const monthIndex = parseInt(monthStr, 10) - 1;
+  const yearShort = `'${yearStr.slice(-2)}`;
+  const yearFull = yearStr;
+
+  const monthName = MONTH_NAMES[monthIndex];
+
+  // Mode Logic:
+  // 'detailed': Day (top), Month (mid), Year (bot)
+  // 'monthly': Month (top), Year (bot)
+  // 'yearly': Year (top)
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      {mode === 'detailed' && (
+        <React.Fragment>
+          <text x={0} y={0} dy={14} textAnchor="middle" fill="#64748b" fontSize={11} fontWeight={500}>
+            {day}
+          </text>
+          <text x={0} y={0} dy={28} textAnchor="middle" fill="#94a3b8" fontSize={10}>
+            {monthName}
+          </text>
+          <text x={0} y={0} dy={42} textAnchor="middle" fill="#cbd5e1" fontSize={10}>
+            {yearShort}
+          </text>
+        </React.Fragment>
+      )}
+
+      {mode === 'monthly' && (
+        <React.Fragment>
+          <text x={0} y={0} dy={14} textAnchor="middle" fill="#64748b" fontSize={11} fontWeight={500}>
+            {monthName}
+          </text>
+          <text x={0} y={0} dy={28} textAnchor="middle" fill="#94a3b8" fontSize={10}>
+            {yearFull}
+          </text>
+        </React.Fragment>
+      )}
+
+      {mode === 'yearly' && (
+        <text x={0} y={0} dy={14} textAnchor="middle" fill="#64748b" fontSize={11} fontWeight={500}>
+          {yearFull}
+        </text>
+      )}
+    </g>
+  );
+};
+
+export default function PriceChart({ items = [], colors = [], hoveredItem, setHoveredItem }) {
   const { runQuery, loading: engineLoading } = useDuckDB();
   const dataCache = useRef(new Map());
 
@@ -135,6 +191,24 @@ export default function PriceChart({ items = [], colors = [] }) {
   const [startDate, setStartDate] = useState(defaultRange.start);
   const [endDate, setEndDate] = useState(defaultRange.end);
   const today = getTodayDate();
+
+  // Determine X-Axis Mode based on range duration
+  const { xAxisMode, xAxisHeight } = useMemo(() => {
+    if (!startDate || !endDate) return { xAxisMode: 'detailed', xAxisHeight: 60 };
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 270) { // ~9 months
+      return { xAxisMode: 'detailed', xAxisHeight: 60 };
+    } else if (diffDays <= 365 * 3) { // ~3 years
+      return { xAxisMode: 'monthly', xAxisHeight: 45 };
+    } else {
+      return { xAxisMode: 'yearly', xAxisHeight: 30 };
+    }
+  }, [startDate, endDate]);
 
   // Data fetching
   const fetchItemData = useCallback(async (item) => {
@@ -332,18 +406,22 @@ export default function PriceChart({ items = [], colors = [] }) {
           // We have actual data for this date - put in both keys for connection
           result[name] = existing[name];
           result[extKey] = existing[name]; // Also in ext for continuous dashed line
+          result[`${name}_area`] = existing[name]; // For area chart
         } else if (dateEntry.date < bounds.firstDate) {
           // Before first data point - only in extended key
           result[name] = undefined;
           result[extKey] = bounds.firstValue;
+          result[`${name}_area`] = bounds.firstValue; // Extended area
         } else if (dateEntry.date > bounds.lastDate) {
           // After last data point - only in extended key
           result[name] = undefined;
           result[extKey] = bounds.lastValue;
+          result[`${name}_area`] = bounds.lastValue; // Extended area
         } else {
           // Gap in the middle - only in extended key for interpolation
           result[name] = undefined;
           result[extKey] = undefined; // Will be connected by connectNulls
+          result[`${name}_area`] = undefined;
         }
       });
 
@@ -484,11 +562,14 @@ export default function PriceChart({ items = [], colors = [] }) {
             const { isRemoving } = getLineState(stat.name);
             const isNew = newlyAddedItems.has(stat.name);
             const isPending = pendingLineAnimation.has(stat.name);
+            const isHovered = hoveredItem === stat.name;
             return (
               <div
                 key={stat.name}
-                className={`flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg transition-all duration-500 ${isRemoving ? 'opacity-0 scale-90 -translate-x-2' : 'opacity-100 scale-100'
-                  } ${isNew || isPending ? 'ring-2 ring-blue-300 ring-offset-1' : ''}`}
+                onMouseEnter={() => setHoveredItem(stat.name)}
+                onMouseLeave={() => setHoveredItem(null)}
+                className={`flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg transition-all duration-300 cursor-pointer ${isRemoving ? 'opacity-0 scale-90 -translate-x-2' : 'opacity-100 scale-100'
+                  } ${isNew || isPending ? 'ring-2 ring-blue-300 ring-offset-1' : ''} ${isHovered ? 'ring-2 ring-blue-100 bg-blue-50/80 shadow-sm' : ''}`}
               >
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stat.color }} />
                 <span className="text-xs font-medium text-slate-600 max-w-[100px] truncate">{stat.name}</span>
@@ -505,9 +586,17 @@ export default function PriceChart({ items = [], colors = [] }) {
       {/* Chart */}
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={filteredChartData}>
+          <ComposedChart data={filteredChartData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-            <XAxis dataKey="dateShort" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} minTickGap={30} />
+            <XAxis
+              dataKey="date"
+              axisLine={false}
+              tickLine={false}
+              tick={<CustomXAxisTick mode={xAxisMode} />}
+              minTickGap={30}
+              height={xAxisHeight}
+              interval="preserveStartEnd"
+            />
             <YAxis
               axisLine={false}
               tickLine={false}
@@ -517,14 +606,15 @@ export default function PriceChart({ items = [], colors = [] }) {
             />
             <Tooltip
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
+              cursor={<line stroke="#cbd5e1" strokeWidth={1} strokeDasharray="4 4" />}
               labelFormatter={(label, payload) => {
                 // Find a payload entry that has fullDate (prefer non-ext entries)
                 const entry = payload?.find(p => p.payload?.fullDate);
                 return entry?.payload?.fullDate || label;
               }}
               formatter={(value, name) => {
-                // Hide extended line entries from tooltip
-                if (name.endsWith('_ext')) return null;
+                // Hide extended line entries and Area entries from tooltip
+                if (name.endsWith('_ext') || name.endsWith('_area')) return null;
                 return [`৳${value}`, name];
               }}
               filterNull={true}
@@ -532,8 +622,10 @@ export default function PriceChart({ items = [], colors = [] }) {
             <Legend
               verticalAlign="top"
               height={36}
+              onMouseEnter={(e) => setHoveredItem(e.value)}
+              onMouseLeave={() => setHoveredItem(null)}
               formatter={(value) => (
-                <span className={`text-sm transition-opacity duration-500 ${removingItems.has(value) ? 'opacity-20 line-through' : 'text-slate-600'}`}>
+                <span className={`text-sm transition-opacity duration-500 ${removingItems.has(value) ? 'opacity-20 line-through' : 'text-slate-600'} ${hoveredItem === value ? 'font-medium text-slate-900' : ''}`}>
                   {value}
                 </span>
               )}
@@ -541,16 +633,33 @@ export default function PriceChart({ items = [], colors = [] }) {
             {itemsToRender.map((item) => {
               const { isNew, isRemoving } = getLineState(item.name);
               const color = getItemColor(item.name);
+              const isHovered = hoveredItem === item.name;
 
               return (
                 <React.Fragment key={item.name}>
+                  {/* Area for hover fill highlight */}
+                  <Area
+                    type="monotone"
+                    dataKey={`${item.name}_area`}
+                    name={`${item.name}_area`}
+                    stroke="none"
+                    fill={color}
+                    fillOpacity={isHovered ? 0.15 : 0}
+                    connectNulls={true}
+                    isAnimationActive={false}
+                    activeDot={false}
+                    legendType="none"
+                    style={{
+                      transition: 'fill-opacity 300ms ease-in-out',
+                    }}
+                  />
                   {/* Dashed line for extended/missing data - renders first (background) */}
                   <Line
                     type="monotone"
                     dataKey={`${item.name}_ext`}
                     name={`${item.name}_ext`}
                     stroke={color}
-                    strokeWidth={1.5}
+                    strokeWidth={isHovered ? 3 : 1.5}
                     strokeDasharray="6 4"
                     dot={false}
                     activeDot={false}
@@ -568,7 +677,7 @@ export default function PriceChart({ items = [], colors = [] }) {
                     dataKey={item.name}
                     name={item.name}
                     stroke={color}
-                    strokeWidth={2.5}
+                    strokeWidth={isHovered ? 4 : 2.5}
                     dot={false}
                     activeDot={isRemoving ? false : { r: 6, strokeWidth: 2, fill: 'white' }}
                     isAnimationActive={isNew}
@@ -585,7 +694,7 @@ export default function PriceChart({ items = [], colors = [] }) {
                 </React.Fragment>
               );
             })}
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
 

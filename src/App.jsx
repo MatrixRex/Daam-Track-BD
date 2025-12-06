@@ -26,6 +26,7 @@ function App() {
 
   // Array for multi-item comparison (no limit)
   const [selectedItems, setSelectedItems] = useState([]);
+  const [hoveredItem, setHoveredItem] = useState(null);
 
   // Persistent color assignments - each item keeps its color even after others are removed
   const colorAssignmentsRef = useRef(new Map());
@@ -111,7 +112,12 @@ function App() {
 
             {/* Left Column: Chart (3/4 width) */}
             <div className="lg:col-span-3">
-              <PriceChart items={selectedItems} colors={COLORS} />
+              <PriceChart
+                items={selectedItems}
+                colors={COLORS}
+                hoveredItem={hoveredItem}
+                setHoveredItem={setHoveredItem}
+              />
             </div>
 
             {/* Right Column: Selected Items List (1/4 width) */}
@@ -141,7 +147,9 @@ function App() {
                     return (
                       <li
                         key={item.name}
-                        className="p-3 hover:bg-slate-50 transition-colors group"
+                        onMouseEnter={() => setHoveredItem(item.name)}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        className={`p-3 transition-colors group cursor-pointer ${hoveredItem === item.name ? 'bg-blue-50/80 shadow-sm border-l-4 border-l-blue-500' : 'hover:bg-slate-50 border-l-4 border-l-transparent'}`}
                       >
                         <div className="flex items-center gap-3">
                           {/* Color Indicator */}

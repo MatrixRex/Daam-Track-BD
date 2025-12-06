@@ -67,3 +67,18 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Recharts overrides */
+.recharts-wrapper *:focus,
+.recharts-surface *:focus,
+.recharts-layer *:focus,
+.recharts-tooltip-cursor:focus {
+  outline: none !important;
+}
+
+/* Ensure no default browser outline on any SVG elements in the chart */
+.recharts-surface path:focus,
+.recharts-surface rect:focus,
+.recharts-surface g:focus {
+  outline: none !important;
+}
