@@ -49,19 +49,39 @@ export const useDuckDB = () => {
           await newDb.instantiate(bundle.mainModule, bundle.pthreadWorker);
 
           // Register the Parquet file (Virtual File System)
+          // We load the last 10 years of data (+1 for range coverage)
           const currentYear = new Date().getFullYear();
-          const parquetUrl = `/data/prices/year=${currentYear}/data.parquet`;
+          const startYear = currentYear - 10; 
           
-          console.log("🦆 Fetching Parquet from:", parquetUrl);
+          console.log(`🦆 Fetching Parquet files from ${startYear} to ${currentYear}...`);
           
-          // Fetch the parquet file as a blob and register it directly
-          // This is more reliable than HTTP protocol registration
-          const response = await fetch(parquetUrl);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch parquet file: ${response.status} ${response.statusText}`);
+          const years = [];
+          for (let y = startYear; y <= currentYear; y++) {
+            years.push(y);
           }
-          const buffer = await response.arrayBuffer();
-          await newDb.registerFileBuffer('data.parquet', new Uint8Array(buffer));
+
+          // Parallel fetch for all years
+          await Promise.all(years.map(async (year) => {
+            const parquetUrl = `/data/prices/year=${year}/data.parquet`;
+            try {
+              const response = await fetch(parquetUrl);
+              if (response.ok) {
+                const buffer = await response.arrayBuffer();
+                // We register each file into a virtual path pattern DuckDB can glob
+                // e.g., "years/2023.parquet" or just keep the structure "data/prices/year=2023/data.parquet"
+                // To make the glob easy, let's mirror the structure.
+                // DuckDB WASM supports recursive directory creation? maybe not easily with registerFileBuffer
+                // It's easier to register them as flat files with unique names and use a list in the query
+                // OR register nicely.
+                // Let's simplfy: register as "prices/year_{year}.parquet"
+                await newDb.registerFileBuffer(`prices/year_${year}.parquet`, new Uint8Array(buffer));
+              } else {
+                 // console.warn(`Skipping missing year: ${year}`);
+              }
+            } catch (err) {
+              console.warn(`Failed to load data for year ${year}`, err);
+            }
+          }));
 
           // Warm up connection
           const conn = await newDb.connect();
