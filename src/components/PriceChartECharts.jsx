@@ -368,45 +368,66 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
         const series = [];
         activeNames.forEach(name => {
             const color = getItemColor(name);
+            const mainData = processedData.map(d => d[name]);
+            const extData = processedData.map(d => d[`${name}_ext`]);
 
-            // Main Line
-            series.push({
-                name: name,
-                type: 'line',
-                data: processedData.map(d => d[name]),
-                itemStyle: { color: color },
-                lineStyle: { width: 2 },
-                showSymbol: false,
-                smooth: true,
-                emphasis: {
-                    disabled: true
-                },
-                // Area filling on specific hover or if active?
-                areaStyle: {
-                    opacity: hoveredItem === name ? 0.2 : 0,
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 0, color: color },
-                        { offset: 1, color: 'rgba(255, 255, 255, 0)' }
-                    ])
-                },
-                connectNulls: true,
-                z: 2
-            });
+            // Only add series if data exists (forces entrance animation on load)
+            const hasMainData = mainData.some(v => v !== undefined && v !== null);
+            const hasExtData = extData.some(v => v !== undefined && v !== null);
 
-            // Extended Line (Dashed)
-            series.push({
-                name: `${name}_ext`,
-                type: 'line',
-                data: processedData.map(d => d[`${name}_ext`]),
-                itemStyle: { color: color },
-                lineStyle: { type: 'dashed', opacity: 0.5, width: 2 },
-                showSymbol: false,
-                smooth: true,
-                connectNulls: true,
-                z: 1,
-                silent: true,
-                emphasis: { disabled: true }
-            });
+            if (hasMainData) {
+                // Main Line
+                series.push({
+                    id: name,
+                    name: name,
+                    type: 'line',
+                    data: mainData,
+                    itemStyle: { color: color },
+                    lineStyle: {
+                        width: 2,
+                        opacity: hoveredItem && hoveredItem !== name ? 0.2 : 1 // Dim if not hovered
+                    },
+                    showSymbol: false,
+                    smooth: true,
+                    animation: true, // Force animation
+                    emphasis: {
+                        disabled: true
+                    },
+                    // Area filling on specific hover or if active?
+                    areaStyle: {
+                        opacity: hoveredItem === name ? 0.2 : 0,
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: color },
+                            { offset: 1, color: 'rgba(255, 255, 255, 0)' }
+                        ])
+                    },
+                    connectNulls: true,
+                    z: 2
+                });
+            }
+
+            if (hasExtData) {
+                // Extended Line (Dashed)
+                series.push({
+                    id: `${name}_ext`,
+                    name: `${name}_ext`,
+                    type: 'line',
+                    data: extData,
+                    itemStyle: { color: color },
+                    lineStyle: {
+                        type: 'dashed',
+                        opacity: hoveredItem && hoveredItem !== name ? 0.1 : 0.5, // Dim even more if not focused
+                        width: 2
+                    },
+                    showSymbol: false,
+                    smooth: true,
+                    animation: true, // Force animation here too
+                    connectNulls: true,
+                    z: 1,
+                    silent: true,
+                    emphasis: { disabled: true }
+                });
+            }
         });
 
         const isMultiYear = (new Date(endDate).getFullYear() - new Date(startDate).getFullYear()) > 0;
@@ -497,14 +518,26 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                 }
             },
             series: series,
-            animationDuration: 500,
-            animationEasing: 'cubicOut'
+            animationDuration: 1500, // Slower entrance animation
+            animationDurationUpdate: 1000, // Slower update animation
+            animationEasing: 'cubicOut',
+            animationEasingUpdate: 'cubicOut', // Smooth updates
         };
     }, [items, processedData, getItemColor, hoveredItem, startDate, endDate, getEffectiveResolution]);
 
 
-    // Handle Hover from external list
-    // Sync chart highlight with hoveredItem prop (declarative in options)
+    // Manual Option Management for 'replaceMerge'
+    // We use this to ensure that adding/removing items animates correctly (new items grow in, removed items fade out)
+    // and avoids "ghost" series or full re-renders.
+    useEffect(() => {
+        const chart = echartsRef.current?.getEchartsInstance();
+        if (chart && option) {
+            chart.setOption(option, {
+                replaceMerge: ['series'],
+                // NOT merge: false (we want to merge, but replace series list)
+            });
+        }
+    }, [option]);
 
     if (loading && items.length > 0 && chartData.length === 0) {
         return (
@@ -598,10 +631,9 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
             <div className="h-[400px] w-full mt-6">
                 <ReactECharts
                     ref={echartsRef}
-                    option={option}
+                    option={{}} // Controlled manually via useEffect
                     style={{ height: '100%', width: '100%' }}
-                    notMerge={true} // Important for series updates
-                    lazyUpdate={true}
+                // notMerge prop removed to rely on manual setOption
                 />
             </div>
         </div>
