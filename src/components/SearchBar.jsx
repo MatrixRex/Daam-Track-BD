@@ -43,11 +43,19 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
         }
 
         // Perform the search
-        const searchResults = fuse.search(query);
+        // 1. Exact/Prefix Matches (Higher Priority)
+        const lowerQuery = query.toLowerCase();
+        const prefixMatches = items.filter(item =>
+            item.name.toLowerCase().startsWith(lowerQuery)
+        );
 
-        // Transform Fuse results back to item objects & limit to 8
-        const topResults = searchResults.slice(0, 8).map(r => r.item);
-        setResults(topResults);
+        // 2. Fuzzy Matches (Fuse.js)
+        const fuseResults = fuse.search(query).map(res => res.item);
+
+        // 3. Merge: Prefix + Fuzzy (Deduplicate using Set)
+        const finalResults = Array.from(new Set([...prefixMatches, ...fuseResults])).slice(0, 8);
+
+        setResults(finalResults);
         setIsOpen(true);
     }, [query, fuse]);
 
