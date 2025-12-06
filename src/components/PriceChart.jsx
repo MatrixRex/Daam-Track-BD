@@ -211,7 +211,7 @@ const CustomCursor = (props) => {
   return null;
 };
 
-export default function PriceChart({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate }) {
+const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate }) => {
   const { runQuery, loading: engineLoading } = useDuckDB();
   const dataCache = useRef(new Map());
 
@@ -233,6 +233,10 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
   const [startDate, setStartDate] = useState(defaultRange.start);
   const [endDate, setEndDate] = useState(defaultRange.end);
   const today = getTodayDate();
+
+  // Resolution & Aggregation State
+  const [resolution, setResolution] = useState('auto'); // 'auto', 'daily', 'weekly', 'monthly', 'yearly'
+  const [aggregation, setAggregation] = useState('avg'); // 'avg', 'max', 'min'
 
   // Determine X-Axis Mode based on range duration
   const { xAxisMode, xAxisHeight } = useMemo(() => {
@@ -471,15 +475,132 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
     });
   }, [chartData, startDate, endDate, items]);
 
-  // Calculate target domain
-  const targetDomain = useMemo(() => {
-    if (!filteredChartData.length || !items.length) return [0, 100];
+  // --- Aggregation Logic ---
 
+  const getEffectiveResolution = useCallback(() => {
+    if (resolution !== 'auto') return resolution;
+
+    // Auto-detect based on duration
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 60) return 'daily';
+    if (diffDays <= 365 * 2) return 'weekly';
+    return 'monthly';
+  }, [resolution, startDate, endDate]);
+
+  const processedData = useMemo(() => {
+    const effectiveRes = getEffectiveResolution();
+
+    // Pass specific X-Axis mode to parent/render mapping usually, 
+    // but here we just downsample the data.
+
+    if (effectiveRes === 'daily' || !filteredChartData.length) {
+      return filteredChartData;
+    }
+
+    // Helper to get group key
+    const getGroupKey = (dateStr) => {
+      const date = new Date(dateStr);
+      if (effectiveRes === 'yearly') return `${date.getFullYear()}`;
+      if (effectiveRes === 'monthly') return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      if (effectiveRes === 'weekly') {
+        // ISO Week approximation
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+        const monday = new Date(date.setDate(diff));
+        return monday.toISOString().split('T')[0]; // Group by Monday's date
+      }
+      return dateStr;
+    };
+
+    // Grouping
+    const groups = new Map();
+    filteredChartData.forEach(item => {
+      const key = getGroupKey(item.date);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(item);
+    });
+
+    // Aggregating
+    const aggregated = [];
+    const activeNames = items.map(i => i.name);
+
+    groups.forEach((groupItems, key) => {
+      const dateObj = new Date(groupItems[0].date); // Use first date for display properties
+      // Re-construct display dates based on resolution
+      let dateShort = groupItems[0].dateShort;
+      let fullDate = groupItems[0].fullDate;
+
+      if (effectiveRes === 'monthly') {
+        dateShort = dateObj.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
+        fullDate = dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+      } else if (effectiveRes === 'yearly') {
+        dateShort = dateObj.getFullYear().toString();
+        fullDate = dateObj.getFullYear().toString();
+      }
+
+      const entry = {
+        date: key, // The group key acts as the new date ID
+        dateShort,
+        fullDate,
+      };
+
+      // Calculate stats for each item
+      activeNames.forEach(name => {
+        const values = groupItems
+          .map(d => d[name])
+          .filter(v => v !== undefined && v !== null); // Only consider actual data points
+
+        if (values.length === 0) {
+          // Check if we have extended data
+          const extValues = groupItems.map(d => d[`${name}_ext`]).filter(v => v !== undefined);
+          if (extValues.length > 0) {
+            // For extended lines, just take the first one (it's usually constant or linear)
+            entry[`${name}_ext`] = extValues[0];
+          }
+          return;
+        }
+
+        let resultVal;
+        if (aggregation === 'max') resultVal = Math.max(...values);
+        else if (aggregation === 'min') resultVal = Math.min(...values);
+        else resultVal = values.reduce((a, b) => a + b, 0) / values.length; // Average
+
+        entry[name] = Math.round(resultVal); // Round to integer for cleaner UI
+        entry[`${name}_area`] = Math.round(resultVal);
+
+        // Also set ext for continuity if needed, but usually real data supercedes
+        entry[`${name}_ext`] = Math.round(resultVal);
+      });
+
+      aggregated.push(entry);
+    });
+
+    return aggregated; // Groups are usually naturally sorted if inserted in order, but safe to sort?
+    // filteredChartData is sorted, map insertion order is preserved in foreach, so yes.
+  }, [filteredChartData, getEffectiveResolution, aggregation, items]);
+
+  // Determine X-Axis Mode based on effective resolution now, not just dates
+  const xAxisModeInner = useMemo(() => {
+    const res = getEffectiveResolution();
+    if (res === 'yearly') return 'yearly';
+    if (res === 'monthly') return 'monthly';
+    return xAxisMode; // Fallback to original logic for daily/weekly
+  }, [getEffectiveResolution, xAxisMode]);
+
+  // Calculate target domain from PROCESSED data
+  const targetDomain = useMemo(() => {
+    if (!processedData.length || !items.length) return [0, 100];
+
+    // ... existing logic but using processedData ...
     let min = Infinity;
     let max = -Infinity;
     const activeNames = [...items.map(i => i.name), ...Array.from(removingItems)];
 
-    filteredChartData.forEach(row => {
+    processedData.forEach(row => {
       activeNames.forEach(name => {
         const val = row[name];
         if (val !== undefined) {
@@ -494,7 +615,7 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
 
     const padding = Math.max((max - min) * 0.1, 5);
     return [Math.floor(min - padding), Math.ceil(max + padding)];
-  }, [filteredChartData, items, removingItems]);
+  }, [processedData, items, removingItems]);
 
   const { currentDomain } = useAnimatedDomain(targetDomain);
 
@@ -583,9 +704,44 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
         <div>
           <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Price Comparison</h3>
           <p className="text-xs text-slate-400 mt-1">
-            {items.length} item{items.length > 1 ? 's' : ''} • {filteredChartData.length} days
+            {items.length} item{items.length > 1 ? 's' : ''} • {processedData.length} data points
           </p>
         </div>
+
+      </div>
+
+      {/* Resolution Controls */}
+      <div className="flex items-center gap-4">
+        {/* Aggregation Selection (Only if not Daily) */}
+        {getEffectiveResolution() !== 'daily' && (
+          <div className="flex bg-slate-100 rounded-lg p-1">
+            {['avg', 'min', 'max'].map(mode => (
+              <button
+                key={mode}
+                onClick={() => setAggregation(mode)}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${aggregation === mode
+                  ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-900/5'
+                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                  }`}
+              >
+                {mode === 'avg' ? 'Avg' : mode === 'min' ? 'Low' : 'High'}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Resolution dropdown/tabs */}
+        <select
+          value={resolution}
+          onChange={(e) => setResolution(e.target.value)}
+          className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+        >
+          <option value="auto">Auto ({getEffectiveResolution()})</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
 
         {/* Date Range Filter */}
         <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
@@ -605,19 +761,20 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
             max={today}
           />
         </div>
-
       </div>
 
+
+
       {/* Chart */}
-      <div className="h-[400px] w-full">
+      <div className="h-[400px] w-full mt-6">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={filteredChartData}>
+          <ComposedChart data={processedData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
             <XAxis
               dataKey="date"
               axisLine={false}
               tickLine={false}
-              tick={<CustomXAxisTick mode={xAxisMode} />}
+              tick={<CustomXAxisTick mode={xAxisModeInner} />}
               minTickGap={30}
               height={xAxisHeight}
               interval="preserveStartEnd"
@@ -644,40 +801,32 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
               }}
               filterNull={true}
             />
-            <Legend
-              verticalAlign="top"
-              height={36}
-              onMouseEnter={(e) => setHoveredItem(e.value)}
-              onMouseLeave={() => setHoveredItem(null)}
-              formatter={(value) => (
-                <span className={`text-sm transition-opacity duration-500 ${removingItems.has(value) ? 'opacity-20 line-through' : 'text-slate-600'} ${hoveredItem === value ? 'font-medium text-slate-900' : ''}`}>
-                  {value}
-                </span>
-              )}
-            />
+
             {itemsToRender.map((item) => {
               const { isNew, isRemoving } = getLineState(item.name);
               const color = getItemColor(item.name);
               const isHovered = hoveredItem === item.name;
+              // Performance: heavy animations only for small datasets
+              const enableAnimation = items.length <= 10;
 
               return (
                 <React.Fragment key={item.name}>
-                  {/* Area for hover fill highlight */}
-                  <Area
-                    type="monotone"
-                    dataKey={`${item.name}_area`}
-                    name={`${item.name}_area`}
-                    stroke="none"
-                    fill={color}
-                    fillOpacity={isHovered ? 0.15 : 0}
-                    connectNulls={true}
-                    isAnimationActive={false}
-                    activeDot={false}
-                    legendType="none"
-                    style={{
-                      transition: 'fill-opacity 300ms ease-in-out',
-                    }}
-                  />
+                  {/* Area for hover fill highlight - OPTIMIZED: Only render if hovered */}
+                  {isHovered && (
+                    <Area
+                      type="monotone"
+                      dataKey={`${item.name}_area`}
+                      name={`${item.name}_area`}
+                      stroke="none"
+                      fill={color}
+                      fillOpacity={0.15}
+                      connectNulls={true}
+                      isAnimationActive={false}
+                      activeDot={false}
+                      legendType="none"
+                    />
+                  )}
+
                   {/* Dashed line for extended/missing data - renders first (background) */}
                   <Line
                     type="monotone"
@@ -705,7 +854,7 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
                     strokeWidth={isHovered ? 4 : 2.5}
                     dot={false}
                     activeDot={isRemoving ? false : { r: 6, strokeWidth: 2, fill: 'white' }}
-                    isAnimationActive={isNew}
+                    isAnimationActive={enableAnimation && isNew}
                     animationDuration={1200}
                     animationBegin={0}
                     animationEasing="ease-in-out"
@@ -721,24 +870,9 @@ export default function PriceChart({ items = [], colors = [], hoveredItem, setHo
             })}
           </ComposedChart>
         </ResponsiveContainer>
-      </div >
-
-      {/* Footer Summary */}
-      < div className="mt-4 pt-4 border-t border-slate-100" >
-        <div className="flex flex-wrap gap-3 justify-center">
-          {stats.map((stat) => {
-            const { isRemoving } = getLineState(stat.name);
-            return (
-              <div key={stat.name} className={`flex items-center gap-2 px-2 py-1 bg-slate-50 rounded-lg transition-all duration-500 ${isRemoving ? 'opacity-0 scale-75' : ''}`}>
-                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: stat.color }} />
-                <span className="text-xs text-slate-500 truncate max-w-[100px]">{stat.name}</span>
-                <span className="text-xs text-green-600">L:৳{stat.min}</span>
-                <span className="text-xs text-red-600">H:৳{stat.max}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
-}
+});
+
+export default PriceChart;

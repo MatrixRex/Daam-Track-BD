@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import SearchBar from './components/SearchBar';
 import PriceChart from './components/PriceChart';
 import { useDuckDB } from './hooks/useDuckDB';
@@ -30,7 +30,7 @@ function App() {
   const [itemStats, setItemStats] = useState({});
 
   // Optimize stats update to prevent infinite loops if reference unstable
-  const handleStatsUpdate = (newStats) => {
+  const handleStatsUpdate = useCallback((newStats) => {
     // Convert array to object for easier lookup: { name: stat }
     const statsMap = newStats.reduce((acc, stat) => {
       acc[stat.name] = stat;
@@ -43,14 +43,14 @@ function App() {
       if (JSON.stringify(prev) === JSON.stringify(statsMap)) return prev;
       return statsMap;
     });
-  };
+  }, []);
 
   // Persistent color assignments - each item keeps its color even after others are removed
   const colorAssignmentsRef = useRef(new Map());
   const nextColorIndexRef = useRef(0);
 
   // Get or assign a persistent color for an item
-  const getItemColor = (itemName) => {
+  const getItemColor = useCallback((itemName) => {
     if (colorAssignmentsRef.current.has(itemName)) {
       return colorAssignmentsRef.current.get(itemName);
     }
@@ -60,30 +60,32 @@ function App() {
     colorAssignmentsRef.current.set(itemName, color);
     nextColorIndexRef.current++;
     return color;
-  };
+  }, []);
 
   // Add item to comparison (no limit)
-  const handleAddItem = (item) => {
+  const handleAddItem = useCallback((item) => {
     if (!item) return;
     // Check if already selected
-    if (selectedItems.some(i => i.name === item.name)) return;
-    // Pre-assign color when item is added
-    getItemColor(item.name);
-    setSelectedItems([...selectedItems, item]);
-  };
+    setSelectedItems(prev => {
+      if (prev.some(i => i.name === item.name)) return prev;
+      // Pre-assign color when item is added
+      getItemColor(item.name);
+      return [...prev, item];
+    });
+  }, [getItemColor]);
 
   // Remove item from comparison
-  const handleRemoveItem = (itemName) => {
-    setSelectedItems(selectedItems.filter(i => i.name !== itemName));
-  };
+  const handleRemoveItem = useCallback((itemName) => {
+    setSelectedItems(prev => prev.filter(i => i.name !== itemName));
+  }, []);
 
   // Clear all items
-  const handleClearAll = () => {
+  const handleClearAll = useCallback(() => {
     setSelectedItems([]);
     // Reset color assignments when all items are cleared
     colorAssignmentsRef.current.clear();
     nextColorIndexRef.current = 0;
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
@@ -150,7 +152,7 @@ function App() {
                   {selectedItems.length > 1 && (
                     <button
                       onClick={handleClearAll}
-                      className="text-xs text-slate-400 hover:text-red-500 flex items-center gap-1 transition-colors"
+                      className="text-xs px-2 py-1 rounded-md text-slate-500 bg-white border border-slate-200 hover:text-red-600 hover:border-red-200 hover:bg-red-50 flex items-center gap-1.5 transition-all shadow-sm"
                     >
                       <Trash2 size={12} />
                       Clear all
@@ -159,7 +161,7 @@ function App() {
                 </div>
 
                 {/* Items List */}
-                <ul className="max-h-[60vh] overflow-y-auto divide-y divide-slate-50">
+                <ul className="max-h-[60vh] overflow-y-auto divide-y divide-slate-50 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent hover:scrollbar-thumb-slate-300 pr-1">
                   {selectedItems.map((item) => {
                     const itemColor = getItemColor(item.name);
                     return (
@@ -196,16 +198,23 @@ function App() {
                             <h4 className="text-sm font-medium text-slate-900 truncate">
                               {item.name}
                             </h4>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-slate-400">{item.category}</span>
+                            <div className="flex flex-col gap-0.5">
+                              {/* Current Price and Change */}
                               {itemStats[item.name] ? (
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-sm font-bold text-slate-900">৳{itemStats[item.name].current}</span>
-                                  <span className={`text-xs font-medium flex items-center ${itemStats[item.name].change > 0 ? 'text-red-500' : itemStats[item.name].change < 0 ? 'text-green-500' : 'text-slate-400'}`}>
-                                    {itemStats[item.name].change > 0 ? '▲' : itemStats[item.name].change < 0 ? '▼' : ''}
-                                    {Math.abs(itemStats[item.name].change)}
-                                  </span>
-                                </div>
+                                <>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-bold text-slate-900">৳{itemStats[item.name].current}</span>
+                                    <span className={`text-xs font-medium flex items-center ${itemStats[item.name].change > 0 ? 'text-red-500' : itemStats[item.name].change < 0 ? 'text-green-500' : 'text-slate-400'}`}>
+                                      {itemStats[item.name].change > 0 ? '▲' : itemStats[item.name].change < 0 ? '▼' : ''}
+                                      {Math.abs(itemStats[item.name].change)}
+                                    </span>
+                                  </div>
+                                  {/* High / Low Stats */}
+                                  <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
+                                    <span className="text-green-600 bg-green-50 px-1 py-0.5 rounded">L: {itemStats[item.name].min}</span>
+                                    <span className="text-red-600 bg-red-50 px-1 py-0.5 rounded">H: {itemStats[item.name].max}</span>
+                                  </div>
+                                </>
                               ) : (
                                 <span className="text-xs font-semibold text-slate-700">৳{item.price}</span>
                               )}
@@ -214,10 +223,14 @@ function App() {
 
                           {/* Remove Button */}
                           <button
-                            onClick={() => handleRemoveItem(item.name)}
-                            className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all p-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveItem(item.name);
+                            }}
+                            className="text-slate-400 hover:bg-red-100 hover:text-red-600 transition-all p-1.5 rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100"
+                            title="Remove item"
                           >
-                            <X size={16} />
+                            <X size={14} />
                           </button>
                         </div>
                       </li>
