@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import * as duckdb from '@duckdb/duckdb-wasm';
 
 // GLOBAL VARIABLES (Singleton Pattern)
@@ -112,7 +112,7 @@ export const useDuckDB = () => {
   }, []);
 
   // Helper to run SQL queries easily
-  const runQuery = async (query) => {
+  const runQuery = useCallback(async (query) => {
     if (!db) return [];
     const conn = await db.connect();
     try {
@@ -125,7 +125,7 @@ export const useDuckDB = () => {
     } finally {
       await conn.close();
     }
-  };
+  }, [db]);
 
   return { db, loading, error, runQuery };
 };

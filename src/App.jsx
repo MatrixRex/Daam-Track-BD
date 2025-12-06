@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import SearchBar from './components/SearchBar';
-import PriceChart from './components/PriceChart';
+import PriceChart from './components/PriceChartECharts';
 import { useDuckDB } from './hooks/useDuckDB';
 import { TrendingUp, X, Trash2 } from 'lucide-react';
 
