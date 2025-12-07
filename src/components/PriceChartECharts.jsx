@@ -42,8 +42,8 @@ const getTodayDate = () => formatDateForInput(new Date());
 // Get default date range (last 90 days)
 const getDefaultDateRange = () => {
     const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - 90);
+    end.setDate(end.getDate() - 1);
+    const start = new Date('2025-11-30');
     return {
         start: formatDateForInput(start),
         end: formatDateForInput(end)
