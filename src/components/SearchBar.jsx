@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import Fuse from 'fuse.js';
 import { Search, X, ChevronRight, Check } from 'lucide-react';
 import clsx from 'clsx';
+import { DATA_BASE_URL } from '../config';
 
 export default function SearchBar({ onSelect, selectedItems = [] }) {
     const [items, setItems] = useState([]);
@@ -15,7 +16,7 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
 
     // 1. Fetch the Meta Index (Runs once on mount)
     useEffect(() => {
-        fetch('/data/meta.json')
+        fetch(`${DATA_BASE_URL}/data/meta.json`)
             .then(res => res.json())
             .then(data => {
                 setItems(data);
@@ -136,7 +137,7 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                                     {/* Product Image (With smart fallback) */}
                                     <div className="w-12 h-12 rounded-lg bg-gray-100 p-1 flex-shrink-0 border border-gray-200 overflow-hidden">
                                         <img
-                                            src={`/images/${item.image}`}
+                                            src={`${DATA_BASE_URL}/images/${item.image}`}
                                             alt={item.name}
                                             className="w-full h-full object-contain mix-blend-multiply"
                                             loading="lazy"

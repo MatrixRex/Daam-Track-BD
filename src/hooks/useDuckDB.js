@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as duckdb from '@duckdb/duckdb-wasm';
 
+import { DATA_BASE_URL, DATA_START_YEAR } from '../config';
+
 // GLOBAL VARIABLES (Singleton Pattern)
 // These live outside the component lifecycle so they persist
 let dbInstance = null;
@@ -37,6 +39,7 @@ export const useDuckDB = () => {
       initPromise = (async () => {
         try {
           console.log("🦆 Starting DuckDB Engine...");
+          console.log(DATA_BASE_URL ? `🦆 Using Remote Data Source: ${DATA_BASE_URL}` : "🦆 Using Local Data Source (public folder)");
           
           const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
           const bundle = await duckdb.selectBundle(JSDELIVR_BUNDLES);
@@ -51,7 +54,7 @@ export const useDuckDB = () => {
           // Register the Parquet file (Virtual File System)
           // We load the last 10 years of data (+1 for range coverage)
           const currentYear = new Date().getFullYear();
-          const startYear = currentYear - 10; 
+          const startYear = DATA_START_YEAR; 
           
           console.log(`🦆 Fetching Parquet files from ${startYear} to ${currentYear}...`);
           
@@ -62,7 +65,7 @@ export const useDuckDB = () => {
 
           // Parallel fetch for all years
           await Promise.all(years.map(async (year) => {
-            const parquetUrl = `/data/prices/year=${year}/data.parquet`;
+            const parquetUrl = `${DATA_BASE_URL}/data/prices/year=${year}/data.parquet`;
             try {
               const response = await fetch(parquetUrl);
               if (response.ok) {

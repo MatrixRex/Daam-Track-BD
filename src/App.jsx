@@ -1,8 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
 import SearchBar from './components/SearchBar';
 import PriceChart from './components/PriceChartECharts';
+import DevSourceToggle from './components/DevSourceToggle';
 import { useDuckDB } from './hooks/useDuckDB';
 import { TrendingUp, X, Trash2 } from 'lucide-react';
+import { DATA_BASE_URL } from './config';
 
 // Extended color palette for unlimited comparisons
 const COLORS = [
@@ -95,13 +97,18 @@ function App() {
         <div className="mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="bg-blue-600 p-2 rounded-lg text-white">
-              <TrendingUp size={24} />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="bg-blue-600 p-2 rounded-lg text-white">
+                <TrendingUp size={24} />
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                DaamTrack<span className="text-blue-600">BD</span>
+              </h1>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-              DaamTrack<span className="text-blue-600">BD</span>
-            </h1>
+
+            {/* Dev Data Source Toggle */}
+            <DevSourceToggle />
           </div>
 
           {/* Search Bar in Header (Right Side) */}
@@ -184,7 +191,7 @@ function App() {
                           {/* Small Image */}
                           <div className="w-10 h-10 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200">
                             <img
-                              src={`/images/${item.image}`}
+                              src={`${DATA_BASE_URL}/images/${item.image}`}
                               alt={item.name}
                               className="w-full h-full object-contain mix-blend-multiply"
                               onError={(e) => {
