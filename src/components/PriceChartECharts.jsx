@@ -137,8 +137,8 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 }
             });
 
-            // Get Data URL
-            const url = chart.getDataURL({
+            // Get Data URL (Raw)
+            const rawUrl = chart.getDataURL({
                 type: 'png',
                 pixelRatio: 2,
                 backgroundColor: isDark ? '#2A2442' : '#FFFDF8'
@@ -150,24 +150,66 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 grid: { bottom: currentBottom }
             });
 
-            if (mode === 'copy') {
-                try {
-                    const res = await fetch(url);
-                    const blob = await res.blob();
+            // Post-process for rounded corners
+            const addRoundedCorners = (url, radius = 20) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const w = img.width;
+                        const h = img.height;
+                        canvas.width = w;
+                        canvas.height = h;
+
+                        // Create rounded clipping path
+                        ctx.beginPath();
+                        ctx.moveTo(radius, 0);
+                        ctx.lineTo(w - radius, 0);
+                        ctx.quadraticCurveTo(w, 0, w, radius);
+                        ctx.lineTo(w, h - radius);
+                        ctx.quadraticCurveTo(w, h, w - radius, h);
+                        ctx.lineTo(radius, h);
+                        ctx.quadraticCurveTo(0, h, 0, h - radius);
+                        ctx.lineTo(0, radius);
+                        ctx.quadraticCurveTo(0, 0, radius, 0);
+                        ctx.closePath();
+                        ctx.clip();
+
+                        // Draw image
+                        ctx.drawImage(img, 0, 0);
+
+                        // Return blob
+                        canvas.toBlob((blob) => {
+                            if (blob) resolve(blob);
+                            else reject(new Error('Canvas to Blob failed'));
+                        }, 'image/png');
+                    };
+                    img.onerror = (e) => reject(e);
+                    img.src = url;
+                });
+            };
+
+            try {
+                const blob = await addRoundedCorners(rawUrl);
+
+                if (mode === 'copy') {
                     await navigator.clipboard.write([
                         new ClipboardItem({ 'image/png': blob })
                     ]);
                     toast.success('Image copied to clipboard');
-                } catch (err) {
-                    console.error("Failed to copy image:", err);
-                    toast.error('Failed to copy image');
+                } else {
+                    // Trigger download
+                    const newUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = `price-chart-${new Date().toISOString().split('T')[0]}.png`;
+                    link.href = newUrl;
+                    link.click();
+                    URL.revokeObjectURL(newUrl);
                 }
-            } else {
-                // Trigger download
-                const link = document.createElement('a');
-                link.download = `price-chart-${new Date().toISOString().split('T')[0]}.png`;
-                link.href = url;
-                link.click();
+            } catch (err) {
+                console.error("Failed to export image:", err);
+                toast.error('Failed to export image');
             }
         },
         exportData: async (format, mode = 'download') => { // format: 'json' | 'csv' | 'xlsx', mode: 'download' | 'copy'
