@@ -1,5 +1,44 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind CSS v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Custom theme colors */
+@theme {
+  /* Light mode - Warm Cream & Sage */
+  --color-cream-bg: #F5E6D3;
+  --color-cream-card: #FFFDF8;
+  --color-cream-elevated: #FFF9F0;
+  --color-mint-border: #D4E6DC;
+  --color-sage-muted: #97B897;
+  --color-sage-accent: #7A9F7A;
+  --color-cream-text: #5C5247;
+  --color-cream-text-muted: #8B7E6B;
+
+  /* Dark mode - Purple */
+  --color-purple-dark-bg: #1E1A2E;
+  --color-purple-dark-card: #2A2442;
+  --color-purple-dark-elevated: #3D3460;
+  --color-purple-dark-border: #4A3F6B;
+  --color-purple-dark-muted: #6B5B95;
+  --color-purple-dark-text: #B8AED0;
+  --color-purple-dark-accent: #9D8EC9;
+}
+
+/* Dark mode support */
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+  --tw-bg-opacity: 1;
+}
+
+/* Smooth transitions for theme changes */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
 /* Custom Scrollbar for Webkit (Chrome/Safari/Edge) */
 ::-webkit-scrollbar {
@@ -10,11 +49,19 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1; /* slate-300 */
+  background: #D4E6DC; /* mint-border */
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8; /* slate-400 */
+  background: #97B897; /* sage-muted */
+}
+
+/* Dark mode scrollbar - purple theme */
+.dark ::-webkit-scrollbar-thumb {
+  background: #4A3F6B; /* purple-dark-border */
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6B5B95; /* purple-dark-muted */
 }
 
 /* Recharts overrides */

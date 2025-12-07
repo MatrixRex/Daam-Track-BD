@@ -3,8 +3,9 @@ import SearchBar from './components/SearchBar';
 import PriceChart from './components/PriceChartECharts';
 import DevSourceToggle from './components/DevSourceToggle';
 import EmptyStateSkeleton from './components/EmptyStateSkeleton';
+import ThemeToggle from './components/ThemeToggle';
 import { useDuckDB } from './hooks/useDuckDB';
-import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown } from 'lucide-react';
+import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown, Download, FileJson, FileSpreadsheet, Image as ImageIcon, FileText } from 'lucide-react';
 import { useMemo } from 'react';
 import { DATA_BASE_URL } from './config';
 
@@ -34,6 +35,8 @@ function App() {
   const [itemStats, setItemStats] = useState({});
   const [isSorted, setIsSorted] = useState(false);
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
+
+  const chartRef = useRef(null);
 
   // Optimize stats update to prevent infinite loops if reference unstable
   const handleStatsUpdate = useCallback((newStats) => {
@@ -106,20 +109,20 @@ function App() {
   }, [selectedItems, isSorted, sortDirection, itemStats]);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-[#F5E6D3] dark:bg-[#1E1A2E] font-sans text-[#5C5247] dark:text-[#B8AED0] transition-colors duration-300">
 
       {/* --- HEADER SECTION --- */}
-      <div className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30">
+      <div className="bg-[#FFFDF8] dark:bg-[#2A2442] border-b border-[#D4E6DC] dark:border-[#4A3F6B] shadow-sm sticky top-0 z-30 transition-colors duration-300">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
           {/* Logo */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="bg-blue-600 p-2 rounded-lg text-white">
+              <div className="bg-[#97B897] dark:bg-[#6B5B95] p-2 rounded-lg text-white">
                 <TrendingUp size={24} />
               </div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                DaamTrack<span className="text-blue-600">BD</span>
+              <h1 className="text-2xl font-bold tracking-tight text-[#5C5247] dark:text-white">
+                DaamTrack<span className="text-[#7A9F7A] dark:text-[#9D8EC9]">BD</span>
               </h1>
             </div>
 
@@ -127,19 +130,68 @@ function App() {
             <DevSourceToggle />
           </div>
 
-          {/* Search Bar in Header (Right Side) */}
-          <div className="hidden md:block w-96">
-            <SearchBar
-              onSelect={handleAddItem}
-              selectedItems={selectedItems}
-            />
+          {/* Search Bar and Theme Toggle (Right Side) */}
+          <div className="flex items-center gap-3">
+            <div className="hidden md:block w-96">
+              <SearchBar
+                onSelect={handleAddItem}
+                selectedItems={selectedItems}
+              />
+            </div>
+
+            {/* Export Button */}
+            <div className="relative group">
+              <button
+                className="p-2 rounded-lg bg-[#FFFDF8] dark:bg-[#3D3460] border border-[#D4E6DC] dark:border-[#4A3F6B] text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#4A3F6B] transition-colors"
+                title="Export Chart & Data"
+              >
+                <Download size={20} />
+              </button>
+
+              {/* Export Dropdown */}
+              <div className="absolute right-0 top-full mt-2 w-48 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-xl shadow-xl dark:shadow-[#1E1A2E]/50 border border-[#D4E6DC] dark:border-[#4A3F6B] py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right">
+                <div className="px-3 py-2 border-b border-[#D4E6DC]/50 dark:border-[#3D3460]">
+                  <span className="text-xs font-semibold text-[#8B7E6B] dark:text-[#6B5B95] uppercase tracking-wider">Export As</span>
+                </div>
+                <button
+                  onClick={() => chartRef.current?.exportImage()}
+                  className="w-full text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] flex items-center gap-2 transition-colors"
+                >
+                  <ImageIcon size={14} className="text-[#3B82F6]" />
+                  <span>Image (PNG)</span>
+                </button>
+                <button
+                  onClick={() => chartRef.current?.exportData('xlsx')}
+                  className="w-full text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] flex items-center gap-2 transition-colors"
+                >
+                  <FileSpreadsheet size={14} className="text-[#10B981]" />
+                  <span>Excel (XLSX)</span>
+                </button>
+                <button
+                  onClick={() => chartRef.current?.exportData('csv')}
+                  className="w-full text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] flex items-center gap-2 transition-colors"
+                >
+                  <FileText size={14} className="text-[#F59E0B]" />
+                  <span>CSV File</span>
+                </button>
+                <button
+                  onClick={() => chartRef.current?.exportData('json')}
+                  className="w-full text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] flex items-center gap-2 transition-colors"
+                >
+                  <FileJson size={14} className="text-[#8B5CF6]" />
+                  <span>JSON Data</span>
+                </button>
+              </div>
+            </div>
+
+            <ThemeToggle />
           </div>
 
         </div>
       </div>
 
       {/* --- MOBILE SEARCH (Visible only on small screens) --- */}
-      <div className="md:hidden p-4 bg-white border-b border-slate-200">
+      <div className="md:hidden p-4 bg-[#FFFDF8] dark:bg-[#2A2442] border-b border-[#D4E6DC] dark:border-[#4A3F6B] transition-colors duration-300">
         <SearchBar
           onSelect={handleAddItem}
           selectedItems={selectedItems}
@@ -155,6 +207,7 @@ function App() {
             {/* Left Column: Chart (3/4 width) */}
             <div className="lg:col-span-3">
               <PriceChart
+                ref={chartRef}
                 items={selectedItems}
                 colors={COLORS}
                 hoveredItem={hoveredItem}
@@ -165,20 +218,20 @@ function App() {
 
             {/* Right Column: Selected Items List (1/4 width) */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 sticky top-24">
+              <div className="bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl shadow-sm border border-[#D4E6DC] dark:border-[#4A3F6B] sticky top-24 transition-colors duration-300">
                 {/* Header */}
-                <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="p-4 border-b border-[#D4E6DC]/50 dark:border-[#3D3460] flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-900">Comparing</h3>
-                    <p className="text-xs text-slate-400">{selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''}</p>
+                    <h3 className="font-semibold text-[#5C5247] dark:text-white">Comparing</h3>
+                    <p className="text-xs text-[#8B7E6B] dark:text-[#6B5B95]">{selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''}</p>
                   </div>
                   {selectedItems.length > 1 && (
                     <div className="flex items-center gap-2">
                       {/* Sort Controls */}
-                      <div className="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200">
+                      <div className="flex items-center bg-[#F5E6D3] dark:bg-[#3D3460] rounded-lg p-0.5 border border-[#D4E6DC] dark:border-[#4A3F6B]">
                         <button
                           onClick={() => setIsSorted(!isSorted)}
-                          className={`p-1.5 rounded-md transition-all ${isSorted ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                          className={`p-1.5 rounded-md transition-all ${isSorted ? 'bg-[#FFFDF8] dark:bg-[#6B5B95] text-[#7A9F7A] dark:text-white shadow-sm' : 'text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0]'}`}
                           title={isSorted ? "Turn sort off" : "Sort by price"}
                         >
                           <ArrowDownWideNarrow size={14} />
@@ -187,7 +240,7 @@ function App() {
                         {isSorted && (
                           <button
                             onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                            className="p-1.5 rounded-md text-slate-500 hover:text-blue-600 hover:bg-white/50 transition-all"
+                            className="p-1.5 rounded-md text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] hover:bg-[#FFFDF8]/50 dark:hover:bg-[#3D3460] transition-all"
                             title={sortDirection === 'asc' ? "Lowest first" : "Highest first"}
                           >
                             {sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
@@ -195,11 +248,11 @@ function App() {
                         )}
                       </div>
 
-                      <div className="w-px h-4 bg-slate-200 mx-1"></div>
+                      <div className="w-px h-4 bg-[#D4E6DC] dark:bg-[#4A3F6B] mx-1"></div>
 
                       <button
                         onClick={handleClearAll}
-                        className="text-xs px-2 py-1.5 rounded-md text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all"
+                        className="text-xs px-2 py-1.5 rounded-md text-[#8B7E6B] dark:text-[#6B5B95] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all"
                         title="Clear all items"
                       >
                         <Trash2 size={14} />
@@ -209,7 +262,7 @@ function App() {
                 </div>
 
                 {/* Items List */}
-                <ul className="max-h-[60vh] overflow-y-auto divide-y divide-slate-50 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent hover:scrollbar-thumb-slate-300 pr-1">
+                <ul className="max-h-[60vh] overflow-y-auto divide-y divide-[#D4E6DC]/30 dark:divide-[#3D3460] scrollbar-thin scrollbar-thumb-[#D4E6DC] dark:scrollbar-thumb-[#4A3F6B] scrollbar-track-transparent hover:scrollbar-thumb-[#97B897] dark:hover:scrollbar-thumb-[#6B5B95] pr-1">
                   {sortedItems.map((item) => {
                     const itemColor = getItemColor(item.name);
                     return (
@@ -217,7 +270,7 @@ function App() {
                         key={item.name}
                         onMouseEnter={() => setHoveredItem(item.name)}
                         onMouseLeave={() => setHoveredItem(null)}
-                        className={`p-3 transition-colors group cursor-pointer ${hoveredItem === item.name ? 'bg-blue-50/80 shadow-sm border-l-4 border-l-blue-500' : 'hover:bg-slate-50 border-l-4 border-l-transparent'}`}
+                        className={`p-3 transition-colors group cursor-pointer ${hoveredItem === item.name ? 'bg-[#D4E6DC]/50 dark:bg-[#3D3460] shadow-sm border-l-4 border-l-[#97B897] dark:border-l-[#6B5B95]' : 'hover:bg-[#F5E6D3]/50 dark:hover:bg-[#3D3460]/50 border-l-4 border-l-transparent'}`}
                       >
                         <div className="flex items-center gap-3">
                           {/* Color Indicator */}
@@ -230,11 +283,11 @@ function App() {
                           />
 
                           {/* Small Image */}
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-200">
+                          <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3D3460] flex-shrink-0 overflow-hidden border border-[#D4E6DC] dark:border-[#4A3F6B]">
                             <img
                               src={`${DATA_BASE_URL}/images/${item.image}`}
                               alt={item.name}
-                              className="w-full h-full object-contain mix-blend-multiply"
+                              className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-90"
                               onError={(e) => {
                                 e.target.style.display = 'none';
                               }}
@@ -243,7 +296,7 @@ function App() {
 
                           {/* Item Info */}
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-medium text-slate-900 truncate">
+                            <h4 className="text-sm font-medium text-[#5C5247] dark:text-white truncate">
                               {item.name}
                             </h4>
                             <div className="flex flex-col gap-0.5">
@@ -251,20 +304,20 @@ function App() {
                               {itemStats[item.name] ? (
                                 <>
                                   <div className="flex items-center gap-2">
-                                    <span className="text-sm font-bold text-slate-900">৳{itemStats[item.name].current}</span>
-                                    <span className={`text-xs font-medium flex items-center ${itemStats[item.name].change > 0 ? 'text-red-500' : itemStats[item.name].change < 0 ? 'text-green-500' : 'text-slate-400'}`}>
+                                    <span className="text-sm font-bold text-[#5C5247] dark:text-white">৳{itemStats[item.name].current}</span>
+                                    <span className={`text-xs font-medium flex items-center ${itemStats[item.name].change > 0 ? 'text-red-500 dark:text-red-400' : itemStats[item.name].change < 0 ? 'text-[#7A9F7A] dark:text-green-400' : 'text-[#8B7E6B] dark:text-[#6B5B95]'}`}>
                                       {itemStats[item.name].change > 0 ? '▲' : itemStats[item.name].change < 0 ? '▼' : ''}
                                       {Math.abs(itemStats[item.name].change)}
                                     </span>
                                   </div>
                                   {/* High / Low Stats */}
-                                  <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
-                                    <span className="text-green-600 bg-green-50 px-1 py-0.5 rounded">L: {itemStats[item.name].min}</span>
-                                    <span className="text-red-600 bg-red-50 px-1 py-0.5 rounded">H: {itemStats[item.name].max}</span>
+                                  <div className="flex items-center gap-2 text-[10px] text-[#8B7E6B] dark:text-[#6B5B95] font-medium">
+                                    <span className="text-[#7A9F7A] dark:text-green-400 bg-[#D4E6DC] dark:bg-green-900/40 px-1 py-0.5 rounded">L: {itemStats[item.name].min}</span>
+                                    <span className="text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/40 px-1 py-0.5 rounded">H: {itemStats[item.name].max}</span>
                                   </div>
                                 </>
                               ) : (
-                                <span className="text-xs font-semibold text-slate-700">৳{item.price}</span>
+                                <span className="text-xs font-semibold text-[#8B7E6B] dark:text-[#B8AED0]">৳{item.price}</span>
                               )}
                             </div>
                           </div>
@@ -275,7 +328,7 @@ function App() {
                               e.stopPropagation();
                               handleRemoveItem(item.name);
                             }}
-                            className="text-slate-400 hover:bg-red-100 hover:text-red-600 transition-all p-1.5 rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100"
+                            className="text-[#8B7E6B] dark:text-[#6B5B95] hover:bg-red-100 dark:hover:bg-red-900/40 hover:text-red-600 dark:hover:text-red-400 transition-all p-1.5 rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100"
                             title="Remove item"
                           >
                             <X size={14} />
@@ -287,8 +340,8 @@ function App() {
                 </ul>
 
                 {/* Footer hint */}
-                <div className="p-3 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl">
-                  <p className="text-xs text-slate-400 text-center">
+                <div className="p-3 border-t border-[#D4E6DC]/50 dark:border-[#3D3460] bg-[#F5E6D3]/30 dark:bg-[#1E1A2E]/50 rounded-b-2xl transition-colors duration-300">
+                  <p className="text-xs text-[#8B7E6B] dark:text-[#6B5B95] text-center">
                     Search to add more items
                   </p>
                 </div>

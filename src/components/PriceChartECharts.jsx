@@ -4,6 +4,24 @@ import * as echarts from 'echarts';
 import { useDuckDB } from '../hooks/useDuckDB';
 import { Loader2, AlertCircle, Calendar, ChevronDown } from 'lucide-react';
 import Tooltip from './Tooltip';
+import * as XLSX from 'xlsx';
+
+// Hook to detect dark mode
+const useDarkMode = () => {
+    const [isDark, setIsDark] = useState(() =>
+        document.documentElement.classList.contains('dark')
+    );
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setIsDark(document.documentElement.classList.contains('dark'));
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        return () => observer.disconnect();
+    }, []);
+
+    return isDark;
+};
 
 // Helper to get date string in YYYY-MM-DD format
 const formatDateForInput = (date) => {
@@ -47,10 +65,10 @@ const DateInput = ({ value, onChange, label, min, max }) => {
 
     return (
         <div
-            className="relative flex items-center bg-white border border-slate-200 rounded-lg px-3 py-1.5 hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer"
+            className="relative flex items-center bg-[#FFFDF8] dark:bg-[#3D3460] border border-[#D4E6DC] dark:border-[#4A3F6B] rounded-lg px-3 py-1.5 hover:border-[#97B897] dark:hover:border-[#6B5B95] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#4A3F6B] transition-colors cursor-pointer"
             onClick={openPicker}
         >
-            <span className="text-sm font-medium text-slate-700 pointer-events-none">
+            <span className="text-sm font-medium text-[#5C5247] dark:text-[#B8AED0] pointer-events-none">
                 {displayValue}
             </span>
             <input
@@ -67,10 +85,11 @@ const DateInput = ({ value, onChange, label, min, max }) => {
     );
 };
 
-const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate }) => {
+const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate }, ref) => {
     const { runQuery, loading: engineLoading } = useDuckDB();
     const echartsRef = useRef(null);
     const dataCache = useRef(new Map());
+    const isDark = useDarkMode();
 
     const [chartData, setChartData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -90,6 +109,92 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
     const [resolution, setResolution] = useState('auto'); // 'auto', 'daily', 'weekly', 'monthly', 'yearly'
     const [aggregation, setAggregation] = useState('avg'); // 'avg', 'max', 'min'
     const [isDensityOpen, setIsDensityOpen] = useState(false);
+
+    // Expose methods to parent
+    React.useImperativeHandle(ref, () => ({
+        exportImage: () => {
+            const chart = echartsRef.current?.getEchartsInstance();
+            if (!chart) return;
+
+            // Show legend temporarily for the screenshot
+            chart.setOption({
+                legend: {
+                    show: true,
+                    bottom: 10,
+                    left: 'center',
+                    data: items.map(i => i.name),
+                    textStyle: { color: isDark ? '#B8AED0' : '#5C5247' }
+                }
+            });
+
+            // Get Data URL
+            const url = chart.getDataURL({
+                type: 'png',
+                pixelRatio: 2,
+                backgroundColor: isDark ? '#2A2442' : '#FFFDF8'
+            });
+
+            // Revert legend
+            chart.setOption({ legend: { show: false } });
+
+            // Trigger download
+            const link = document.createElement('a');
+            link.download = `price-chart-${new Date().toISOString().split('T')[0]}.png`;
+            link.href = url;
+            link.click();
+        },
+        exportData: (format) => {
+            if (!items.length || !processedData.length) return;
+
+            // Prepare clean data for export
+            const dataToExport = processedData.map(row => {
+                const rowData = {
+                    Date: row.fullDate,
+                    'Date (Short)': row.dateShort,
+                    'ISO Date': row.date,
+                };
+                items.forEach(item => {
+                    rowData[item.name] = row[item.name] !== undefined ? row[item.name] : '';
+                });
+                return rowData;
+            });
+
+            const filename = `price-data-${new Date().toISOString().split('T')[0]}`;
+
+            if (format === 'json') {
+                const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${filename}.json`;
+                link.click();
+            } else if (format === 'csv') {
+                // Generate CSV manually
+                const headers = ['Date', 'Date (Short)', 'ISO Date', ...items.map(i => i.name)];
+                const csvContent = [
+                    headers.join(','),
+                    ...dataToExport.map(row => headers.map(fieldName => {
+                        const val = row[fieldName] !== undefined ? row[fieldName] : '';
+                        // Handle commas in content if needed, though simpler here
+                        return JSON.stringify(val); // quick way to handle escaping
+                    }).join(','))
+                ].join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${filename}.csv`;
+                link.click();
+            } else if (format === 'xlsx') {
+                // Use xlsx library
+                const ws = XLSX.utils.json_to_sheet(dataToExport);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Price Data");
+                XLSX.writeFile(wb, `${filename}.xlsx`);
+            }
+        }
+    }));
 
     // Data fetching logic (Same as original)
     const fetchItemData = useCallback(async (item) => {
@@ -445,16 +550,18 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
             },
             tooltip: {
                 trigger: 'axis',
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                backgroundColor: isDark ? 'rgba(42, 36, 66, 0.95)' : 'rgba(255, 253, 248, 0.95)',
                 borderRadius: 12,
                 borderWidth: 0,
                 padding: 12,
-                textStyle: { color: '#1e293b' },
-                extraCssText: 'box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);',
+                textStyle: { color: isDark ? '#B8AED0' : '#5C5247' },
+                extraCssText: isDark
+                    ? 'box-shadow: 0 10px 15px -3px rgb(30 26 46 / 0.5);'
+                    : 'box-shadow: 0 10px 15px -3px rgb(92 82 71 / 0.1);',
                 axisPointer: {
                     type: 'line', // Ensure we use a line
                     lineStyle: {
-                        color: '#4b4f54',
+                        color: isDark ? '#4b4f54' : '#97B897',
                         width: 1,
                         type: 'dashed',
                         opacity: 0.4
@@ -467,7 +574,7 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                     const dateItem = processedData[dateIndex];
                     if (!dateItem) return '';
 
-                    let html = `<div class="font-medium text-slate-500 mb-2">${dateItem.fullDate}</div>`;
+                    let html = `<div class="font-medium ${isDark ? 'text-[#6B5B95]' : 'text-[#8B7E6B]'} mb-2">${dateItem.fullDate}</div>`;
 
                     params.forEach(p => {
                         if (p.seriesName.endsWith('_ext') || p.value === undefined) return;
@@ -480,8 +587,8 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                         html += `
                         <div class="flex items-center gap-2 text-sm">
                             <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${color};"></span>
-                            <span class="text-slate-600">${name}:</span>
-                            <span class="font-bold text-slate-900">৳${value}</span>
+                            <span class="${isDark ? 'text-[#B8AED0]' : 'text-[#8B7E6B]'}">${name}:</span>
+                            <span class="font-bold ${isDark ? 'text-white' : 'text-[#5C5247]'}">৳${value}</span>
                         </div>
                     `;
                     });
@@ -495,7 +602,7 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                 axisLine: { show: false },
                 axisTick: { show: false },
                 axisLabel: {
-                    color: '#64748b',
+                    color: isDark ? '#6B5B95' : '#8B7E6B',
                     interval: 'auto', // Let ECharts decide density
                     formatter: (value, index) => {
                         return value.replace(' ', '\n');
@@ -509,10 +616,10 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                 scale: true, // Auto-scale
                 axisLine: { show: false },
                 axisTick: { show: false },
-                splitLine: { show: true, lineStyle: { color: '#f1f5f9' } },
+                splitLine: { show: true, lineStyle: { color: isDark ? '#3D3460' : '#D4E6DC' } },
                 axisLabel: {
                     formatter: '৳{value}',
-                    color: '#94a3b8',
+                    color: isDark ? '#6B5B95' : '#8B7E6B',
                     fontSize: 12
                 }
             },
@@ -522,7 +629,7 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
             animationEasing: 'cubicOut',
             animationEasingUpdate: 'cubicOut', // Smooth updates
         };
-    }, [items, processedData, getItemColor, hoveredItem, startDate, endDate, getEffectiveResolution]);
+    }, [items, processedData, getItemColor, hoveredItem, startDate, endDate, getEffectiveResolution, isDark]);
 
 
     // Manual Option Management for 'replaceMerge'
@@ -552,16 +659,16 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
 
     if (loading && items.length > 0 && chartData.length === 0) {
         return (
-            <div className="h-[500px] flex flex-col items-center justify-center bg-white rounded-2xl border border-slate-200">
-                <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-2" />
-                <span className="text-sm text-gray-400">{loadingItem ? `Loading ${loadingItem}...` : 'Loading...'}</span>
+            <div className="h-[500px] flex flex-col items-center justify-center bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl border border-[#D4E6DC] dark:border-[#4A3F6B] transition-colors duration-300">
+                <Loader2 className="w-8 h-8 text-[#7A9F7A] dark:text-[#9D8EC9] animate-spin mb-2" />
+                <span className="text-sm text-[#8B7E6B] dark:text-[#6B5B95]">{loadingItem ? `Loading ${loadingItem}...` : 'Loading...'}</span>
             </div>
         );
     }
 
     if (items.length > 0 && chartData.length === 0 && !loading) {
         return (
-            <div className="h-[500px] flex flex-col items-center justify-center bg-white rounded-2xl border border-slate-200 text-red-400">
+            <div className="h-[500px] flex flex-col items-center justify-center bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl border border-[#D4E6DC] dark:border-[#4A3F6B] text-red-400 dark:text-red-500 transition-colors duration-300">
                 <AlertCircle className="w-8 h-8 mb-2" />
                 <span className="text-sm">No history found.</span>
             </div>
@@ -571,9 +678,9 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
     if (items.length === 0) return null;
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative">
+        <div className="bg-[#FFFDF8] dark:bg-[#2A2442] p-6 rounded-2xl shadow-sm border border-[#D4E6DC] dark:border-[#4A3F6B] relative transition-colors duration-300">
             {loadingItem && chartData.length > 0 && (
-                <div className="absolute top-4 right-4 flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-xs font-medium z-10 animate-pulse">
+                <div className="absolute top-4 right-4 flex items-center gap-2 bg-[#D4E6DC] dark:bg-[#3D3460] text-[#7A9F7A] dark:text-[#9D8EC9] px-3 py-1.5 rounded-full text-xs font-medium z-10 animate-pulse">
                     <Loader2 className="w-3 h-3 animate-spin" />
                     Adding {loadingItem}...
                 </div>
@@ -595,22 +702,22 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                                         resolution === 'monthly' ? 'One point per month' :
                                             'One point per year'
                         }>
-                            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider cursor-help border-b border-dashed border-slate-300">Density:</span>
+                            <span className="text-xs font-medium text-[#8B7E6B] dark:text-[#6B5B95] uppercase tracking-wider cursor-help border-b border-dashed border-[#D4E6DC] dark:border-[#4A3F6B]">Density:</span>
                         </Tooltip>
 
                         <div className="relative">
                             <button
                                 onClick={() => setIsDensityOpen(!isDensityOpen)}
                                 onBlur={() => setTimeout(() => setIsDensityOpen(false), 200)}
-                                className="flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg hover:border-blue-400 hover:bg-blue-50/50 px-3 py-1.5 transition-all w-32 justify-between"
+                                className="flex items-center gap-2 bg-[#F5E6D3] dark:bg-[#3D3460] border border-[#D4E6DC] dark:border-[#4A3F6B] text-[#5C5247] dark:text-[#B8AED0] text-sm rounded-lg hover:border-[#97B897] dark:hover:border-[#6B5B95] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#4A3F6B] px-3 py-1.5 transition-all w-32 justify-between"
                             >
                                 <span className="truncate">{getDensityLabel()}</span>
-                                <ChevronDown size={14} className="text-slate-400 flex-shrink-0" />
+                                <ChevronDown size={14} className="text-[#8B7E6B] dark:text-[#6B5B95] flex-shrink-0" />
                             </button>
 
                             {/* Custom Dropdown Menu */}
                             {isDensityOpen && (
-                                <div className="absolute top-full left-0 mt-1 w-32 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="absolute top-full left-0 mt-1 w-32 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-lg shadow-xl dark:shadow-[#1E1A2E]/50 border border-[#D4E6DC] dark:border-[#4A3F6B] py-1 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
                                     {['auto', 'daily', 'weekly', 'monthly', 'yearly'].map(opt => (
                                         <button
                                             key={opt}
@@ -618,7 +725,7 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                                                 setResolution(opt);
                                                 setIsDensityOpen(false);
                                             }}
-                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 transition-colors ${resolution === opt ? 'text-blue-600 font-medium bg-blue-50/50' : 'text-slate-700'}`}
+                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] transition-colors ${resolution === opt ? 'text-[#7A9F7A] dark:text-[#9D8EC9] font-medium bg-[#D4E6DC]/30 dark:bg-[#3D3460]' : 'text-[#5C5247] dark:text-[#B8AED0]'}`}
                                         >
                                             {opt === 'auto' ? 'Auto' : opt.charAt(0).toUpperCase() + opt.slice(1)}
                                         </button>
@@ -630,14 +737,14 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
 
                     {/* Aggregation (MOVED RIGHT OF DENSITY) */}
                     {getEffectiveResolution() !== 'daily' && (
-                        <div className="flex bg-slate-100 rounded-lg p-1">
+                        <div className="flex bg-[#F5E6D3] dark:bg-[#3D3460] rounded-lg p-1">
                             {['avg', 'min', 'max'].map(mode => (
                                 <Tooltip key={mode} content={mode === 'avg' ? 'Average Price' : mode === 'min' ? 'Lowest Price' : 'Highest Price'}>
                                     <button
                                         onClick={() => setAggregation(mode)}
                                         className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${aggregation === mode
-                                            ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-900/5'
-                                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                                            ? 'bg-[#FFFDF8] dark:bg-[#6B5B95] text-[#7A9F7A] dark:text-white shadow-sm ring-1 ring-[#D4E6DC] dark:ring-[#4A3F6B]'
+                                            : 'text-[#8B7E6B] dark:text-[#B8AED0] hover:text-[#5C5247] dark:hover:text-white hover:bg-[#D4E6DC]/30 dark:hover:bg-[#4A3F6B]'
                                             }`}
                                     >
                                         {mode === 'avg' ? 'Avg' : mode === 'min' ? 'Low' : 'High'}
@@ -650,8 +757,8 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                 </div>
 
                 {/* Right Side: Date Range */}
-                <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
-                    <Calendar className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                <div className="flex items-center gap-2 bg-[#F5E6D3] dark:bg-[#3D3460] rounded-xl px-3 py-2 border border-[#D4E6DC] dark:border-[#4A3F6B]">
+                    <Calendar className="w-4 h-4 text-[#7A9F7A] dark:text-[#9D8EC9] flex-shrink-0" />
                     <Tooltip content="Select start date">
                         <DateInput
                             value={startDate}
@@ -660,7 +767,7 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                             max={endDate}
                         />
                     </Tooltip>
-                    <span className="text-slate-400 text-sm font-medium">to</span>
+                    <span className="text-[#8B7E6B] dark:text-[#6B5B95] text-sm font-medium">to</span>
                     <Tooltip content="Select end date">
                         <DateInput
                             value={endDate}
@@ -686,7 +793,7 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
             </div>
 
             {/* Footer Info */}
-            <div className="mt-4 flex justify-between items-center text-xs text-slate-400 border-t border-slate-100 pt-3">
+            <div className="mt-4 flex justify-between items-center text-xs text-[#8B7E6B] dark:text-[#6B5B95] border-t border-[#D4E6DC]/50 dark:border-[#3D3460] pt-3">
                 <p>{items.length} item{items.length > 1 ? 's' : ''} active</p>
                 <p>{processedData.length} data points shown</p>
             </div>

@@ -77,17 +77,17 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
             {/* Search Input Area */}
             <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                    <Search className="h-5 w-5 text-[#8B7E6B] dark:text-[#6B5B95] group-focus-within:text-[#7A9F7A] dark:group-focus-within:text-[#9D8EC9] transition-colors" />
                 </div>
 
                 <input
                     type="text"
                     className={clsx(
-                        "block w-full pl-11 pr-12 py-4 bg-white border border-gray-200 rounded-xl",
-                        "text-gray-900 placeholder-gray-400",
-                        "focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
-                        "shadow-sm hover:shadow-md transition-all duration-200",
-                        "disabled:bg-gray-50 disabled:cursor-not-allowed"
+                        "block w-full pl-11 pr-12 py-4 bg-[#FFFDF8] dark:bg-[#2A2442] border border-[#D4E6DC] dark:border-[#4A3F6B] rounded-xl",
+                        "text-[#5C5247] dark:text-[#B8AED0] placeholder-[#8B7E6B] dark:placeholder-[#6B5B95]",
+                        "focus:outline-none focus:ring-2 focus:ring-[#97B897]/30 dark:focus:ring-[#6B5B95]/30 focus:border-[#97B897] dark:focus:border-[#6B5B95]",
+                        "shadow-sm hover:shadow-md dark:shadow-[#1E1A2E]/50 transition-all duration-200",
+                        "disabled:bg-[#F5E6D3] dark:disabled:bg-[#1E1A2E] disabled:cursor-not-allowed"
                     )}
                     placeholder={loading ? "Loading products..." : "Search for eggs, rice, beef..."}
                     value={query}
@@ -106,14 +106,14 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                         }}
                         className="absolute inset-y-0 right-0 pr-4 flex items-center"
                     >
-                        <X className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
+                        <X className="h-5 w-5 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] cursor-pointer" />
                     </button>
                 )}
             </div>
 
             {/* Dropdown Results */}
             {isOpen && results.length > 0 && (
-                <div className="absolute w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute w-full mt-2 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-xl shadow-xl dark:shadow-[#1E1A2E]/50 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     <ul className="max-h-[60vh] overflow-y-auto">
                         {results.map((item, index) => {
                             const isSelected = selectedItems.some(i => i.name === item.name);
@@ -128,18 +128,18 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                                         }
                                     }}
                                     className={clsx(
-                                        "flex items-center gap-4 p-3 border-b border-gray-50 last:border-none transition-colors group",
+                                        "flex items-center gap-4 p-3 border-b border-[#D4E6DC]/30 dark:border-[#3D3460] last:border-none transition-colors group",
                                         isSelected
-                                            ? "bg-blue-50 cursor-default opacity-60"
-                                            : "hover:bg-blue-50 cursor-pointer"
+                                            ? "bg-[#D4E6DC]/50 dark:bg-[#3D3460] cursor-default opacity-60"
+                                            : "hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460]/50 cursor-pointer"
                                     )}
                                 >
                                     {/* Product Image (With smart fallback) */}
-                                    <div className="w-12 h-12 rounded-lg bg-gray-100 p-1 flex-shrink-0 border border-gray-200 overflow-hidden">
+                                    <div className="w-12 h-12 rounded-lg bg-[#F5E6D3] dark:bg-[#3D3460] p-1 flex-shrink-0 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden">
                                         <img
                                             src={`${DATA_BASE_URL}/images/${item.image}`}
                                             alt={item.name}
-                                            className="w-full h-full object-contain mix-blend-multiply"
+                                            className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-90"
                                             loading="lazy"
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
@@ -147,34 +147,34 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                                             }}
                                         />
                                         {/* Fallback Icon if image fails */}
-                                        <div className="hidden w-full h-full items-center justify-center bg-gray-100 text-gray-400 text-xs font-bold">
+                                        <div className="hidden w-full h-full items-center justify-center bg-[#F5E6D3] dark:bg-[#3D3460] text-[#8B7E6B] dark:text-[#6B5B95] text-xs font-bold">
                                             {item.name.charAt(0)}
                                         </div>
                                     </div>
 
                                     {/* Text Info */}
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-semibold text-gray-900 truncate group-hover:text-blue-700">
+                                        <h4 className="text-sm font-semibold text-[#5C5247] dark:text-white truncate group-hover:text-[#7A9F7A] dark:group-hover:text-[#9D8EC9]">
                                             {item.name}
                                         </h4>
                                         <div className="flex items-center gap-2 mt-0.5">
-                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#F5E6D3] dark:bg-[#3D3460] text-[#8B7E6B] dark:text-[#B8AED0]">
                                                 {item.category}
                                             </span>
-                                            <span className="text-xs text-gray-400">•</span>
-                                            <span className="text-xs text-gray-500">{item.unit}</span>
+                                            <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95]">•</span>
+                                            <span className="text-xs text-[#8B7E6B] dark:text-[#B8AED0]">{item.unit}</span>
                                         </div>
                                     </div>
 
                                     {/* Price & Arrow/Check */}
                                     <div className="text-right flex items-center gap-3">
                                         <div className="flex flex-col items-end">
-                                            <span className="text-sm font-bold text-gray-900">৳{item.price}</span>
-                                            <span className="text-[10px] text-gray-400">{isSelected ? 'Selected' : 'Latest'}</span>
+                                            <span className="text-sm font-bold text-[#5C5247] dark:text-white">৳{item.price}</span>
+                                            <span className="text-[10px] text-[#8B7E6B] dark:text-[#6B5B95]">{isSelected ? 'Selected' : 'Latest'}</span>
                                         </div>
                                         {isSelected
-                                            ? <Check className="w-4 h-4 text-blue-500" />
-                                            : <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500" />
+                                            ? <Check className="w-4 h-4 text-[#7A9F7A] dark:text-[#9D8EC9]" />
+                                            : <ChevronRight className="w-4 h-4 text-[#D4E6DC] dark:text-[#4A3F6B] group-hover:text-[#7A9F7A] dark:group-hover:text-[#9D8EC9]" />
                                         }
                                     </div>
                                 </li>
@@ -186,8 +186,8 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
 
             {/* "No Results" State */}
             {isOpen && query && results.length === 0 && (
-                <div className="absolute w-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 p-8 text-center">
-                    <p className="text-gray-500">No items found for "{query}"</p>
+                <div className="absolute w-full mt-2 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-xl shadow-lg dark:shadow-[#1E1A2E]/50 border border-[#D4E6DC] dark:border-[#4A3F6B] p-8 text-center">
+                    <p className="text-[#8B7E6B] dark:text-[#B8AED0]">No items found for "{query}"</p>
                 </div>
             )}
         </div>
