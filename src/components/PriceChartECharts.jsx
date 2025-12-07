@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import { useDuckDB } from '../hooks/useDuckDB';
-import { Loader2, AlertCircle, Calendar } from 'lucide-react';
+import { Loader2, AlertCircle, Calendar, ChevronDown } from 'lucide-react';
+import Tooltip from './Tooltip';
 
 // Helper to get date string in YYYY-MM-DD format
 const formatDateForInput = (date) => {
@@ -88,6 +89,7 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
     // Resolution & Aggregation State
     const [resolution, setResolution] = useState('auto'); // 'auto', 'daily', 'weekly', 'monthly', 'yearly'
     const [aggregation, setAggregation] = useState('avg'); // 'avg', 'max', 'min'
+    const [isDensityOpen, setIsDensityOpen] = useState(false);
 
     // Data fetching logic (Same as original)
     const fetchItemData = useCallback(async (item) => {
@@ -238,14 +240,14 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
         });
     }, [chartData, startDate, endDate, items]);
 
-    // Aggregation Logic (Same or simplified)
+    // Aggregation Logic - RELAXED
     const getEffectiveResolution = useCallback(() => {
         if (resolution !== 'auto') return resolution;
         const start = new Date(startDate);
         const end = new Date(endDate);
         const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24));
-        if (diffDays <= 60) return 'daily';
-        if (diffDays <= 365 * 2) return 'weekly';
+        if (diffDays <= 365) return 'daily'; // Up to 1 year
+        if (diffDays <= 365 * 5) return 'weekly'; // Up to 5 years
         return 'monthly';
     }, [resolution, startDate, endDate]);
 
@@ -254,9 +256,6 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
         if (effectiveRes === 'daily' || !filteredChartData.length) return filteredChartData;
 
         // ... (Aggregation logic implementation similar to original) ...
-        // For brevity, using simplified version assuming filteredChartData is enough if performant, 
-        // but USER asked for performance, so let's keep aggregation.
-
         const getGroupKey = (dateStr) => {
             const date = new Date(dateStr);
             if (effectiveRes === 'yearly') return `${date.getFullYear()}`;
@@ -345,7 +344,7 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
             };
         }).filter(Boolean);
         if (onStatsUpdate) onStatsUpdate(newStats);
-    }, [filteredChartData, items]); // removed getItemColor dependency warning
+    }, [filteredChartData, items]);
 
 
     // Determine Colors
@@ -519,7 +518,7 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
             },
             series: series,
             animationDuration: 1500, // Slower entrance animation
-            animationDurationUpdate: 1000, // Slower update animation
+            animationDurationUpdate: 0, // Instant updates to prevent axis sliding/morphing
             animationEasing: 'cubicOut',
             animationEasingUpdate: 'cubicOut', // Smooth updates
         };
@@ -538,6 +537,18 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
             });
         }
     }, [option]);
+
+    // Helper for dropdown text
+    const getDensityLabel = () => {
+        if (resolution === 'auto') {
+            const effective = getEffectiveResolution();
+            // Capitalize effective
+            const cap = effective.charAt(0).toUpperCase() + effective.slice(1);
+            return `Auto (${cap})`;
+        }
+        // Capitalize first letter
+        return resolution.charAt(0).toUpperCase() + resolution.slice(1);
+    };
 
     if (loading && items.length > 0 && chartData.length === 0) {
         return (
@@ -569,66 +580,101 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
             )}
 
             {/* Header */}
-            <div className="flex flex-wrap justify-between items-start mb-6 gap-4">
-                <div>
-                    <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Price Comparison</h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                        {items.length} item{items.length > 1 ? 's' : ''} • {processedData.length} data points
-                    </p>
-                </div>
-            </div>
+            {/* UPDATED LAYOUT: Left = Density | Aggregation, Right = Date Range */}
+            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
 
-            {/* Controls */}
-            <div className="flex items-center gap-4 mb-4">
-                {getEffectiveResolution() !== 'daily' && (
-                    <div className="flex bg-slate-100 rounded-lg p-1">
-                        {['avg', 'min', 'max'].map(mode => (
+                {/* Left Side: Density & Aggregation */}
+                <div className="flex items-center gap-4">
+
+                    {/* Density Dropdown (MOVED LEFT) */}
+                    <div className="flex items-center gap-2">
+                        <Tooltip content={
+                            resolution === 'auto' ? 'Frequency adjusts based on range' :
+                                resolution === 'daily' ? 'One point per day' :
+                                    resolution === 'weekly' ? 'One point per week' :
+                                        resolution === 'monthly' ? 'One point per month' :
+                                            'One point per year'
+                        }>
+                            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider cursor-help border-b border-dashed border-slate-300">Density:</span>
+                        </Tooltip>
+
+                        <div className="relative">
                             <button
-                                key={mode}
-                                onClick={() => setAggregation(mode)}
-                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${aggregation === mode
-                                    ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-900/5'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-                                    }`}
+                                onClick={() => setIsDensityOpen(!isDensityOpen)}
+                                onBlur={() => setTimeout(() => setIsDensityOpen(false), 200)}
+                                className="flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg hover:border-blue-400 hover:bg-blue-50/50 px-3 py-1.5 transition-all w-32 justify-between"
                             >
-                                {mode === 'avg' ? 'Avg' : mode === 'min' ? 'Low' : 'High'}
+                                <span className="truncate">{getDensityLabel()}</span>
+                                <ChevronDown size={14} className="text-slate-400 flex-shrink-0" />
                             </button>
-                        ))}
+
+                            {/* Custom Dropdown Menu */}
+                            {isDensityOpen && (
+                                <div className="absolute top-full left-0 mt-1 w-32 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    {['auto', 'daily', 'weekly', 'monthly', 'yearly'].map(opt => (
+                                        <button
+                                            key={opt}
+                                            onClick={() => {
+                                                setResolution(opt);
+                                                setIsDensityOpen(false);
+                                            }}
+                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 transition-colors ${resolution === opt ? 'text-blue-600 font-medium bg-blue-50/50' : 'text-slate-700'}`}
+                                        >
+                                            {opt === 'auto' ? 'Auto' : opt.charAt(0).toUpperCase() + opt.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                )}
 
-                <select
-                    value={resolution}
-                    onChange={(e) => setResolution(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
-                >
-                    <option value="auto">Auto ({getEffectiveResolution()})</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                </select>
+                    {/* Aggregation (MOVED RIGHT OF DENSITY) */}
+                    {getEffectiveResolution() !== 'daily' && (
+                        <div className="flex bg-slate-100 rounded-lg p-1">
+                            {['avg', 'min', 'max'].map(mode => (
+                                <Tooltip key={mode} content={mode === 'avg' ? 'Average Price' : mode === 'min' ? 'Lowest Price' : 'Highest Price'}>
+                                    <button
+                                        onClick={() => setAggregation(mode)}
+                                        className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${aggregation === mode
+                                            ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-900/5'
+                                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                                            }`}
+                                    >
+                                        {mode === 'avg' ? 'Avg' : mode === 'min' ? 'Low' : 'High'}
+                                    </button>
+                                </Tooltip>
+                            ))}
+                        </div>
+                    )}
 
+                </div>
+
+                {/* Right Side: Date Range */}
                 <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
                     <Calendar className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                    <DateInput
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        label="Start date"
-                        max={endDate}
-                    />
+                    <Tooltip content="Select start date">
+                        <DateInput
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            label="Start date"
+                            max={endDate}
+                        />
+                    </Tooltip>
                     <span className="text-slate-400 text-sm font-medium">to</span>
-                    <DateInput
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        label="End date"
-                        min={startDate}
-                        max={today}
-                    />
+                    <Tooltip content="Select end date">
+                        <DateInput
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            label="End date"
+                            min={startDate}
+                            max={today}
+                        />
+                    </Tooltip>
                 </div>
+
             </div>
 
-            <div className="h-[400px] w-full mt-6">
+            <div className="h-[400px] w-full">
                 <ReactECharts
                     ref={echartsRef}
                     option={{}} // Controlled manually via useEffect
@@ -638,6 +684,13 @@ const PriceChartECharts = React.memo(({ items = [], colors = [], hoveredItem, se
                     }}
                 />
             </div>
+
+            {/* Footer Info */}
+            <div className="mt-4 flex justify-between items-center text-xs text-slate-400 border-t border-slate-100 pt-3">
+                <p>{items.length} item{items.length > 1 ? 's' : ''} active</p>
+                <p>{processedData.length} data points shown</p>
+            </div>
+
         </div>
     );
 });

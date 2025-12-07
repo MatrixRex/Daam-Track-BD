@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import SearchBar from './components/SearchBar';
 import PriceChart from './components/PriceChartECharts';
 import DevSourceToggle from './components/DevSourceToggle';
+import EmptyStateSkeleton from './components/EmptyStateSkeleton';
 import { useDuckDB } from './hooks/useDuckDB';
 import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown } from 'lucide-react';
 import { useMemo } from 'react';
@@ -297,17 +298,7 @@ function App() {
           </div>
         ) : (
           /* Empty State */
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="bg-blue-50 p-6 rounded-full mb-6">
-              <TrendingUp className="w-12 h-12 text-blue-500" />
-            </div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Start by searching for an item</h2>
-            <p className="text-slate-500 max-w-md">
-              Search and select multiple items to compare their price trends side by side.
-              <br />
-              <span className="text-slate-400 text-sm">Try "Rice", "Egg", or "Beef"</span>
-            </p>
-          </div>
+          <EmptyStateSkeleton />
         )}
 
       </div>
