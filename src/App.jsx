@@ -5,9 +5,10 @@ import DevSourceToggle from './components/DevSourceToggle';
 import EmptyStateSkeleton from './components/EmptyStateSkeleton';
 import ThemeToggle from './components/ThemeToggle';
 import { useDuckDB } from './hooks/useDuckDB';
-import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown, Download, FileJson, FileSpreadsheet, Image as ImageIcon, FileText } from 'lucide-react';
+import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown, Download, FileJson, FileSpreadsheet, Image as ImageIcon, FileText, Copy } from 'lucide-react';
 import { useMemo } from 'react';
 import { DATA_BASE_URL } from './config';
+import { Toaster } from 'sonner';
 
 // Extended color palette for unlimited comparisons
 const COLORS = [
@@ -149,38 +150,83 @@ function App() {
               </button>
 
               {/* Export Dropdown */}
-              <div className="absolute right-0 top-full mt-2 w-48 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-xl shadow-xl dark:shadow-[#1E1A2E]/50 border border-[#D4E6DC] dark:border-[#4A3F6B] py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right">
+              <div className="absolute right-0 top-full mt-2 w-56 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-xl shadow-xl dark:shadow-[#1E1A2E]/50 border border-[#D4E6DC] dark:border-[#4A3F6B] py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right">
                 <div className="px-3 py-2 border-b border-[#D4E6DC]/50 dark:border-[#3D3460]">
                   <span className="text-xs font-semibold text-[#8B7E6B] dark:text-[#6B5B95] uppercase tracking-wider">Export As</span>
                 </div>
-                <button
-                  onClick={() => chartRef.current?.exportImage()}
-                  className="w-full text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] flex items-center gap-2 transition-colors"
-                >
-                  <ImageIcon size={14} className="text-[#3B82F6]" />
-                  <span>Image (PNG)</span>
-                </button>
-                <button
-                  onClick={() => chartRef.current?.exportData('xlsx')}
-                  className="w-full text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] flex items-center gap-2 transition-colors"
-                >
-                  <FileSpreadsheet size={14} className="text-[#10B981]" />
-                  <span>Excel (XLSX)</span>
-                </button>
-                <button
-                  onClick={() => chartRef.current?.exportData('csv')}
-                  className="w-full text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] flex items-center gap-2 transition-colors"
-                >
-                  <FileText size={14} className="text-[#F59E0B]" />
-                  <span>CSV File</span>
-                </button>
-                <button
-                  onClick={() => chartRef.current?.exportData('json')}
-                  className="w-full text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] flex items-center gap-2 transition-colors"
-                >
-                  <FileJson size={14} className="text-[#8B5CF6]" />
-                  <span>JSON Data</span>
-                </button>
+
+                {/* Image (PNG) */}
+                <div className="flex items-center hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] transition-colors group/item">
+                  <button
+                    onClick={() => chartRef.current?.exportImage('download')}
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] flex items-center gap-2"
+                  >
+                    <ImageIcon size={14} className="text-[#3B82F6]" />
+                    <span>Image (PNG)</span>
+                  </button>
+                  <button
+                    onClick={() => chartRef.current?.exportImage('copy')}
+                    className="p-2 mr-2 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    title="Copy Image to Clipboard"
+                  >
+                    <Copy size={14} />
+                  </button>
+                </div>
+
+                {/* Excel (XLSX) */}
+                <div className="flex items-center hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] transition-colors group/item">
+                  <button
+                    onClick={() => chartRef.current?.exportData('xlsx', 'download')}
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] flex items-center gap-2"
+                  >
+                    <FileSpreadsheet size={14} className="text-[#10B981]" />
+                    <span>Excel (XLSX)</span>
+                  </button>
+                  <button
+                    onClick={() => chartRef.current?.exportData('xlsx', 'copy')}
+                    className="p-2 mr-2 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    title="Copy Data (TSV) to Clipboard"
+                  >
+                    <Copy size={14} />
+                  </button>
+                </div>
+
+                {/* CSV File */}
+                <div className="flex items-center hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] transition-colors group/item">
+                  <button
+                    onClick={() => chartRef.current?.exportData('csv', 'download')}
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] flex items-center gap-2"
+                  >
+                    <FileText size={14} className="text-[#F59E0B]" />
+                    <span>CSV File</span>
+                  </button>
+                  <button
+                    onClick={() => chartRef.current?.exportData('csv', 'copy')}
+                    className="p-2 mr-2 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    title="Copy CSV to Clipboard"
+                  >
+                    <Copy size={14} />
+                  </button>
+                </div>
+
+                {/* JSON Data */}
+                <div className="flex items-center hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] transition-colors group/item">
+                  <button
+                    onClick={() => chartRef.current?.exportData('json', 'download')}
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] flex items-center gap-2"
+                  >
+                    <FileJson size={14} className="text-[#8B5CF6]" />
+                    <span>JSON Data</span>
+                  </button>
+                  <button
+                    onClick={() => chartRef.current?.exportData('json', 'copy')}
+                    className="p-2 mr-2 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    title="Copy JSON to Clipboard"
+                  >
+                    <Copy size={14} />
+                  </button>
+                </div>
+
               </div>
             </div>
 
@@ -355,6 +401,7 @@ function App() {
         )}
 
       </div>
+      <Toaster position="bottom-right" theme="system" />
     </div>
   );
 }

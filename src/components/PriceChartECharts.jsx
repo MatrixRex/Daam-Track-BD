@@ -5,6 +5,7 @@ import { useDuckDB } from '../hooks/useDuckDB';
 import { Loader2, AlertCircle, Calendar, ChevronDown } from 'lucide-react';
 import Tooltip from './Tooltip';
 import * as XLSX from 'xlsx';
+import { toast } from 'sonner';
 
 // Hook to detect dark mode
 const useDarkMode = () => {
@@ -112,7 +113,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
     // Expose methods to parent
     React.useImperativeHandle(ref, () => ({
-        exportImage: () => {
+        exportImage: async (mode = 'download') => { // mode: 'download' | 'copy'
             const chart = echartsRef.current?.getEchartsInstance();
             if (!chart) return;
 
@@ -137,13 +138,27 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             // Revert legend
             chart.setOption({ legend: { show: false } });
 
-            // Trigger download
-            const link = document.createElement('a');
-            link.download = `price-chart-${new Date().toISOString().split('T')[0]}.png`;
-            link.href = url;
-            link.click();
+            if (mode === 'copy') {
+                try {
+                    const res = await fetch(url);
+                    const blob = await res.blob();
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    toast.success('Image copied to clipboard');
+                } catch (err) {
+                    console.error("Failed to copy image:", err);
+                    toast.error('Failed to copy image');
+                }
+            } else {
+                // Trigger download
+                const link = document.createElement('a');
+                link.download = `price-chart-${new Date().toISOString().split('T')[0]}.png`;
+                link.href = url;
+                link.click();
+            }
         },
-        exportData: (format) => {
+        exportData: async (format, mode = 'download') => { // format: 'json' | 'csv' | 'xlsx', mode: 'download' | 'copy'
             if (!items.length || !processedData.length) return;
 
             // Prepare clean data for export
@@ -162,41 +177,63 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             const filename = `price-data-${new Date().toISOString().split('T')[0]}`;
 
             if (format === 'json') {
-                const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${filename}.json`;
-                link.click();
+                const jsonString = JSON.stringify(dataToExport, null, 2);
+                if (mode === 'copy') {
+                    await navigator.clipboard.writeText(jsonString);
+                    toast.success('JSON data copied to clipboard');
+                } else {
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${filename}.json`;
+                    link.click();
+                }
             } else if (format === 'csv') {
-                // Generate CSV manually
                 const headers = ['Date', 'Date (Short)', 'ISO Date', ...items.map(i => i.name)];
                 const csvContent = [
                     headers.join(','),
                     ...dataToExport.map(row => headers.map(fieldName => {
                         const val = row[fieldName] !== undefined ? row[fieldName] : '';
-                        // Handle commas in content if needed, though simpler here
-                        return JSON.stringify(val); // quick way to handle escaping
+                        return JSON.stringify(val);
                     }).join(','))
                 ].join('\n');
 
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${filename}.csv`;
-                link.click();
+                if (mode === 'copy') {
+                    await navigator.clipboard.writeText(csvContent);
+                    toast.success('CSV data copied to clipboard');
+                } else {
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${filename}.csv`;
+                    link.click();
+                }
             } else if (format === 'xlsx') {
-                // Use xlsx library
-                const ws = XLSX.utils.json_to_sheet(dataToExport);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Price Data");
-                XLSX.writeFile(wb, `${filename}.xlsx`);
+                if (mode === 'copy') {
+                    // For Excel Copy, we copy TSV
+                    const headers = ['Date', 'Date (Short)', 'ISO Date', ...items.map(i => i.name)];
+                    const tsvContent = [
+                        headers.join('\t'),
+                        ...dataToExport.map(row => headers.map(fieldName => {
+                            const val = row[fieldName] !== undefined ? row[fieldName] : '';
+                            return val;
+                        }).join('\t'))
+                    ].join('\n');
+                    await navigator.clipboard.writeText(tsvContent);
+                    toast.success('Excel-compatible data copied to clipboard');
+                } else {
+                    // Use xlsx library
+                    const ws = XLSX.utils.json_to_sheet(dataToExport);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Price Data");
+                    XLSX.writeFile(wb, `${filename}.xlsx`);
+                }
             }
         }
     }));
 
-    // Data fetching logic (Same as original)
     const fetchItemData = useCallback(async (item) => {
         if (dataCache.current.has(item.name)) {
             return dataCache.current.get(item.name);
