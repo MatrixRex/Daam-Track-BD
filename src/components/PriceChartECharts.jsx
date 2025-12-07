@@ -118,12 +118,21 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             if (!chart) return;
 
             // Show legend temporarily for the screenshot
+            const currentOption = chart.getOption();
+            const currentBottom = currentOption.grid[0]?.bottom || 40;
+            const legendHeight = Math.ceil(items.length / 3) * 30 + 20; // Approx 30px per row + padding
+
             chart.setOption({
+                grid: { bottom: currentBottom + legendHeight },
                 legend: {
                     show: true,
                     bottom: 10,
                     left: 'center',
                     data: items.map(i => i.name),
+                    formatter: (name) => {
+                        const item = items.find(i => i.name === name);
+                        return item ? `${name} (${item.unit})` : name;
+                    },
                     textStyle: { color: isDark ? '#B8AED0' : '#5C5247' }
                 }
             });
@@ -135,8 +144,11 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 backgroundColor: isDark ? '#2A2442' : '#FFFDF8'
             });
 
-            // Revert legend
-            chart.setOption({ legend: { show: false } });
+            // Revert legend AND grid
+            chart.setOption({
+                legend: { show: false },
+                grid: { bottom: currentBottom }
+            });
 
             if (mode === 'copy') {
                 try {
@@ -169,12 +181,14 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     'ISO Date': row.date,
                 };
                 items.forEach(item => {
-                    rowData[item.name] = row[item.name] !== undefined ? row[item.name] : '';
+                    const header = `${item.name} (${item.unit})`;
+                    rowData[header] = row[item.name] !== undefined ? row[item.name] : '';
                 });
                 return rowData;
             });
 
             const filename = `price-data-${new Date().toISOString().split('T')[0]}`;
+            const itemHeaders = items.map(i => `${i.name} (${i.unit})`);
 
             if (format === 'json') {
                 const jsonString = JSON.stringify(dataToExport, null, 2);
@@ -190,11 +204,20 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     link.click();
                 }
             } else if (format === 'csv') {
-                const headers = ['Date', 'Date (Short)', 'ISO Date', ...items.map(i => i.name)];
+                const headers = ['Date', 'Date (Short)', 'ISO Date', ...itemHeaders];
+                const keyMap = {
+                    'Date': 'Date',
+                    'Date (Short)': 'Date (Short)',
+                    'ISO Date': 'ISO Date',
+                };
+                items.forEach(i => {
+                    keyMap[`${i.name} (${i.unit})`] = `${i.name} (${i.unit})`;
+                });
+
                 const csvContent = [
                     headers.join(','),
-                    ...dataToExport.map(row => headers.map(fieldName => {
-                        const val = row[fieldName] !== undefined ? row[fieldName] : '';
+                    ...dataToExport.map(row => headers.map(header => {
+                        const val = row[header] !== undefined ? row[header] : '';
                         return JSON.stringify(val);
                     }).join(','))
                 ].join('\n');
@@ -213,11 +236,11 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             } else if (format === 'xlsx') {
                 if (mode === 'copy') {
                     // For Excel Copy, we copy TSV
-                    const headers = ['Date', 'Date (Short)', 'ISO Date', ...items.map(i => i.name)];
+                    const headers = ['Date', 'Date (Short)', 'ISO Date', ...itemHeaders];
                     const tsvContent = [
                         headers.join('\t'),
-                        ...dataToExport.map(row => headers.map(fieldName => {
-                            const val = row[fieldName] !== undefined ? row[fieldName] : '';
+                        ...dataToExport.map(row => headers.map(header => {
+                            const val = row[header] !== undefined ? row[header] : '';
                             return val;
                         }).join('\t'))
                     ].join('\n');
