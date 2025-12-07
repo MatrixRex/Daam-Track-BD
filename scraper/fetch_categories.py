@@ -18,7 +18,7 @@ def fetch_categories():
 
     with sync_playwright() as p:
         print("Launching browser...")
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         context = browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             permissions=['geolocation'], 
@@ -74,36 +74,51 @@ def fetch_categories():
 
             # 5. Process Level 2
             for l2_text in new_level_2:
+                # Refetch items to get fresh handles and current state (Dynamic Baseline)
+                state_before_l2 = get_sidebar_items()
+                
+                if l2_text not in state_before_l2:
+                    print(f"    Skipping {l2_text} (Not visible)")
+                    continue
+
                 # Click Level 2 to see if Level 3 exists
                 try:
-                    after_items[l2_text].click()
+                    state_before_l2[l2_text].click()
                     time.sleep(1)
                     
                     # Check for Level 3 (Did new items appear?)
-                    l3_check_items = get_sidebar_items()
-                    new_level_3 = [key for key in l3_check_items if key not in after_items]
+                    state_after_l2 = get_sidebar_items()
+                    new_level_3 = [key for key in state_after_l2 if key not in state_before_l2]
                     
                     if new_level_3:
                         print(f"    > Found Leaves (L3): {new_level_3}")
                         # These are likely the final categories.
-                        # Since we can't get URLs from DIVs easily, we use the URL bar!
                         
                         for l3_text in new_level_3:
-                            # Click the leaf to load the page
-                            l3_check_items[l3_text].click()
-                            time.sleep(2) # Wait for URL update
+                            # Re-fetch sidebar to ensure we have a fresh handle
+                            # content updates or navigation can make handles stale
+                            current_sidebar_l3 = get_sidebar_items()
                             
-                            curr_url = page.url
-                            if "chaldal.com/" in curr_url and "-" in curr_url:
-                                if curr_url not in seen_urls:
-                                    final_links.append({"category": l3_text, "url": curr_url})
-                                    seen_urls.add(curr_url)
-                                    print(f"      + Saved: {curr_url}")
+                            if l3_text in current_sidebar_l3:
+                                try:
+                                    current_sidebar_l3[l3_text].click()
+                                    time.sleep(2) # Wait for URL update
+                                    
+                                    curr_url = page.url
+                                    # Removed strictly requiring '-' as some categories are single words like 'rice'
+                                    if "chaldal.com/" in curr_url:
+                                        if curr_url not in seen_urls:
+                                            final_links.append({"category": l3_text, "url": curr_url})
+                                            seen_urls.add(curr_url)
+                                            print(f"      + Saved: {curr_url}")
+                                except Exception as e:
+                                    print(f"      Error iterating L3 {l3_text}: {e}")
+
                     else:
                         # No new items appeared? Then L2 was the leaf!
                         # We are already on the page (since we clicked it)
                         curr_url = page.url
-                        if "chaldal.com/" in curr_url and "-" in curr_url:
+                        if "chaldal.com/" in curr_url:
                              if curr_url not in seen_urls:
                                 final_links.append({"category": l2_text, "url": curr_url})
                                 seen_urls.add(curr_url)

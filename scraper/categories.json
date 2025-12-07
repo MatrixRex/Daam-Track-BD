@@ -32,8 +32,16 @@
     "url": "https://chaldal.com/dried-fish"
   },
   {
+    "category": "Spices",
+    "url": "https://chaldal.com/spices"
+  },
+  {
     "category": "Salt & Sugar",
     "url": "https://chaldal.com/salt-sugar"
+  },
+  {
+    "category": "Rice",
+    "url": "https://chaldal.com/rices"
   },
   {
     "category": "Dal or Lentil",
@@ -48,16 +56,268 @@
     "url": "https://chaldal.com/shemai-suji"
   },
   {
+    "category": "Special Ingredients",
+    "url": "https://chaldal.com/miscellaneous"
+  },
+  {
+    "category": "Oil",
+    "url": "https://chaldal.com/oil"
+  },
+  {
     "category": "Colors & Flavours",
     "url": "https://chaldal.com/colors-flavours"
+  },
+  {
+    "category": "Ghee",
+    "url": "https://chaldal.com/ghee"
   },
   {
     "category": "Premium Ingredients",
     "url": "https://chaldal.com/premium-ingredients"
   },
   {
+    "category": "Tomato Sauces",
+    "url": "https://chaldal.com/tomato-sauces"
+  },
+  {
+    "category": "Pickles",
+    "url": "https://chaldal.com/pickles"
+  },
+  {
+    "category": "Cooking Sauces",
+    "url": "https://chaldal.com/cooking-sauces"
+  },
+  {
+    "category": "Other Table Sauces",
+    "url": "https://chaldal.com/other-sauces"
+  },
+  {
+    "category": "Eggs",
+    "url": "https://chaldal.com/eggs"
+  },
+  {
+    "category": "Powder Milk",
+    "url": "https://chaldal.com/powder-milk"
+  },
+  {
+    "category": "Liquid & UHT Milk",
+    "url": "https://chaldal.com/liquid-uht-milk"
+  },
+  {
+    "category": "Yogurt & Sweets",
+    "url": "https://chaldal.com/yogurt"
+  },
+  {
+    "category": "Cheese",
+    "url": "https://chaldal.com/cheeses"
+  },
+  {
+    "category": "Condensed Milk & Cream",
+    "url": "https://chaldal.com/condensed-milk-cream"
+  },
+  {
+    "category": "Butter & Sour Cream",
+    "url": "https://chaldal.com/butter-sour-cream"
+  },
+  {
+    "category": "Breads",
+    "url": "https://chaldal.com/breads"
+  },
+  {
+    "category": "Tea & Coffee",
+    "url": "https://chaldal.com/tea-coffee-2"
+  },
+  {
+    "category": "Local Breakfast",
+    "url": "https://chaldal.com/local-breakfast"
+  },
+  {
+    "category": "Cereals",
+    "url": "https://chaldal.com/cereals"
+  },
+  {
+    "category": "Honey",
+    "url": "https://chaldal.com/honey"
+  },
+  {
+    "category": "Dips, Spreads & Syrups",
+    "url": "https://chaldal.com/spreads-syrups"
+  },
+  {
+    "category": "Energy Boosters",
+    "url": "https://chaldal.com/energy-boosters"
+  },
+  {
+    "category": "Jams & Jellies",
+    "url": "https://chaldal.com/jams-jellies"
+  },
+  {
+    "category": "Chocolates",
+    "url": "https://chaldal.com/chocolates"
+  },
+  {
+    "category": "Wafers",
+    "url": "https://chaldal.com/wafers"
+  },
+  {
+    "category": "Candies",
+    "url": "https://chaldal.com/candies"
+  },
+  {
+    "category": "Gums, Mints & Mouth Fresheners",
+    "url": "https://chaldal.com/mints-mouth-fresheners"
+  },
+  {
+    "category": "Jellies & Marshmallows",
+    "url": "https://chaldal.com/halal-marshmallows"
+  },
+  {
+    "category": "Noodles",
+    "url": "https://chaldal.com/noodles"
+  },
+  {
+    "category": "Cookies",
+    "url": "https://chaldal.com/cookies-2"
+  },
+  {
+    "category": "Local Snacks",
+    "url": "https://chaldal.com/local-snacks"
+  },
+  {
+    "category": "Chips & Pretzels",
+    "url": "https://chaldal.com/chips-pretzels"
+  },
+  {
+    "category": "Plain Biscuits",
+    "url": "https://chaldal.com/plain-biscuits"
+  },
+  {
+    "category": "Toast & Bakery Biscuits",
+    "url": "https://chaldal.com/toast-biscuits"
+  },
+  {
+    "category": "Cream Biscuits",
+    "url": "https://chaldal.com/cream-biscuits"
+  },
+  {
+    "category": "Pasta & Macaroni",
+    "url": "https://chaldal.com/pasta-macaroni"
+  },
+  {
+    "category": "Soups",
+    "url": "https://chaldal.com/soups"
+  },
+  {
+    "category": "Popcorn & Nuts",
+    "url": "https://chaldal.com/popcorn-nuts"
+  },
+  {
+    "category": "Salted Biscuits",
+    "url": "https://chaldal.com/salted-biscuits"
+  },
+  {
+    "category": "Cakes",
+    "url": "https://chaldal.com/cakes"
+  },
+  {
+    "category": "Salad Dressing",
+    "url": "https://chaldal.com/salad-dressing"
+  },
+  {
+    "category": "Tea",
+    "url": "https://chaldal.com/beverages-tea"
+  },
+  {
+    "category": "Soft Drinks",
+    "url": "https://chaldal.com/soft-drinks"
+  },
+  {
+    "category": "Coffee",
+    "url": "https://chaldal.com/coffees"
+  },
+  {
+    "category": "Syrups & Powder Drinks",
+    "url": "https://chaldal.com/powder-mixes"
+  },
+  {
+    "category": "Juice",
+    "url": "https://chaldal.com/juice"
+  },
+  {
+    "category": "Water",
+    "url": "https://chaldal.com/water"
+  },
+  {
+    "category": "Flour",
+    "url": "https://chaldal.com/flour"
+  },
+  {
+    "category": "Nuts & Dried Fruits",
+    "url": "https://chaldal.com/nuts-dried-fruits"
+  },
+  {
+    "category": "Baking Ingredients",
+    "url": "https://chaldal.com/baking-ingredients"
+  },
+  {
+    "category": "Baking Tools",
+    "url": "https://chaldal.com/baking-tools"
+  },
+  {
+    "category": "Baking & Dessert Mixes",
+    "url": "https://chaldal.com/baking-mixes"
+  },
+  {
+    "category": "Chicken Snacks",
+    "url": "https://chaldal.com/chicken-snacks"
+  },
+  {
+    "category": "Frozen Parathas & Roti",
+    "url": "https://chaldal.com/frozen-parathas-roti"
+  },
+  {
+    "category": "Vegetable Snacks",
+    "url": "https://chaldal.com/vegetable-snacks"
+  },
+  {
+    "category": "Mushroom Cans",
+    "url": "https://chaldal.com/mushroom-cans"
+  },
+  {
+    "category": "Beef Snacks",
+    "url": "https://chaldal.com/beef-snacks"
+  },
+  {
+    "category": "Vegetable Cans",
+    "url": "https://chaldal.com/vegetable-cans"
+  },
+  {
+    "category": "Fish Cans",
+    "url": "https://chaldal.com/fish-cans"
+  },
+  {
+    "category": "Canned Fruits & Sweets",
+    "url": "https://chaldal.com/canned-fruits"
+  },
+  {
+    "category": "Fish Snacks",
+    "url": "https://chaldal.com/fish-snacks"
+  },
+  {
+    "category": "Diabetic Food",
+    "url": "https://chaldal.com/diabetic-food"
+  },
+  {
+    "category": "Ice Cream",
+    "url": "https://chaldal.com/ice-cream"
+  },
+  {
     "category": "Dishwashing Supplies",
     "url": "https://chaldal.com/dish-wash"
+  },
+  {
+    "category": "Laundry",
+    "url": "https://chaldal.com/laundry"
   },
   {
     "category": "Toilet Cleaners",
@@ -140,8 +400,116 @@
     "url": "https://chaldal.com/serum-oil-toners"
   },
   {
+    "category": "Men's Soaps",
+    "url": "https://chaldal.com/mens-soaps"
+  },
+  {
+    "category": "Men's Perfume",
+    "url": "https://chaldal.com/mens-perfume"
+  },
+  {
+    "category": "Men's Shampoos & Conditioners",
+    "url": "https://chaldal.com/shampoo"
+  },
+  {
+    "category": "Shaving Needs",
+    "url": "https://chaldal.com/shaving-needs"
+  },
+  {
+    "category": "Beard Grooming",
+    "url": "https://chaldal.com/beard-grooming"
+  },
+  {
+    "category": "Men's Deodorants",
+    "url": "https://chaldal.com/deodorants"
+  },
+  {
+    "category": "Razors & Blades",
+    "url": "https://chaldal.com/razors-blades"
+  },
+  {
+    "category": "Men's Hair Care",
+    "url": "https://chaldal.com/mens-hair-care"
+  },
+  {
+    "category": "Cream & Lotion",
+    "url": "https://chaldal.com/lotion-cream"
+  },
+  {
+    "category": "Men's Facewash",
+    "url": "https://chaldal.com/mens-facewash"
+  },
+  {
+    "category": "Men's Shower Gels",
+    "url": "https://chaldal.com/mens-shower-gels"
+  },
+  {
+    "category": "Liquid Handwash",
+    "url": "https://chaldal.com/liquid-handwash"
+  },
+  {
+    "category": "Hand Sanitizer",
+    "url": "https://chaldal.com/hand-sanitizer"
+  },
+  {
+    "category": "Tissue & Wipes",
+    "url": "https://chaldal.com/tissue-wipes"
+  },
+  {
+    "category": "Toothpastes",
+    "url": "https://chaldal.com/toothpastes"
+  },
+  {
+    "category": "Toothbrushes",
+    "url": "https://chaldal.com/toothbrushes"
+  },
+  {
+    "category": "Mouthwash & Others",
+    "url": "https://chaldal.com/mouthwash-others"
+  },
+  {
+    "category": "Soaps",
+    "url": "https://chaldal.com/soaps"
+  },
+  {
+    "category": "Lotions",
+    "url": "https://chaldal.com/lotions"
+  },
+  {
+    "category": "Petroleum Jelly",
+    "url": "https://chaldal.com/petroleum-jelly"
+  },
+  {
+    "category": "Creams",
+    "url": "https://chaldal.com/creams"
+  },
+  {
+    "category": "Face Wash & Mask",
+    "url": "https://chaldal.com/face-wash-mask"
+  },
+  {
+    "category": "Body & Hair Oil",
+    "url": "https://chaldal.com/body-hair-oil"
+  },
+  {
+    "category": "Lipsticks & Lip Balm",
+    "url": "https://chaldal.com/lipsticks-lip-balm"
+  },
+  {
+    "category": "Talcom Powder",
+    "url": "https://chaldal.com/talcom-powder"
+  },
+  {
+    "category": "Hair Color",
+    "url": "https://chaldal.com/hair-color"
+  },
+  {
     "category": "Keto Food",
     "url": "https://chaldal.com/keto-food"
+  },
+  {
+    "category": "Antiseptics",
+    "url": "https://chaldal.com/antiseptics"
   },
   {
     "category": "Handwash & Handrub",
@@ -162,6 +530,10 @@
   {
     "category": "Family Planning",
     "url": "https://chaldal.com/family-planning"
+  },
+  {
+    "category": "Mouthwashes, Inhaler & Balm",
+    "url": "https://chaldal.com/mouthwashes"
   },
   {
     "category": "Adult Diapers",
@@ -200,8 +572,32 @@
     "url": "https://chaldal.com/toddler-food"
   },
   {
-    "category": "Feeders",
+    "category": "Formula",
+    "url": "https://chaldal.com/formula"
+  },
+  {
+    "category": "Baby Skincare",
+    "url": "https://chaldal.com/bath-skincare"
+  },
+  {
+    "category": "Wipes",
+    "url": "https://chaldal.com/wipes"
+  },
+  {
+    "category": "Baby Oral Care",
     "url": "https://chaldal.com/baby-oral-care"
+  },
+  {
+    "category": "Newborn Essentials",
+    "url": "https://chaldal.com/newborn-essentials"
+  },
+  {
+    "category": "Baby Accessories",
+    "url": "https://chaldal.com/baby-accessories"
+  },
+  {
+    "category": "Feeders",
+    "url": "https://chaldal.com/feeders"
   },
   {
     "category": "Kitchen Accessories",
@@ -212,6 +608,10 @@
     "url": "https://chaldal.com/kitchen-appliances"
   },
   {
+    "category": "Lights",
+    "url": "https://chaldal.com/lights"
+  },
+  {
     "category": "Mosquito Swatter",
     "url": "https://chaldal.com/mosquito-swatter"
   },
@@ -220,8 +620,40 @@
     "url": "https://chaldal.com/electric-multiplug"
   },
   {
-    "category": "Rack & Organizer",
+    "category": "Electronics",
+    "url": "https://chaldal.com/electronics"
+  },
+  {
+    "category": "Tools & Hardware",
     "url": "https://chaldal.com/tools-hardware"
+  },
+  {
+    "category": "Basket & Bucket",
+    "url": "https://chaldal.com/baskets-buckets"
+  },
+  {
+    "category": "Box & Container",
+    "url": "https://chaldal.com/box-container"
+  },
+  {
+    "category": "Gardening",
+    "url": "https://chaldal.com/gardening"
+  },
+  {
+    "category": "Rack & Organizer",
+    "url": "https://chaldal.com/rack-organizer"
+  },
+  {
+    "category": "Disposables",
+    "url": "https://chaldal.com/disposables"
+  },
+  {
+    "category": "Batteries",
+    "url": "https://chaldal.com/batteries"
+  },
+  {
+    "category": "Calculators",
+    "url": "https://chaldal.com/calculators"
   },
   {
     "category": "Tapes, Glues & Adhesive",
@@ -244,8 +676,48 @@
     "url": "https://chaldal.com/file-folder"
   },
   {
+    "category": "Measuring Tools",
+    "url": "https://chaldal.com/measuring"
+  },
+  {
     "category": "Desk Organizers",
     "url": "https://chaldal.com/desk-organizers"
+  },
+  {
+    "category": "Pens",
+    "url": "https://chaldal.com/pens"
+  },
+  {
+    "category": "Highlighters & Markers",
+    "url": "https://chaldal.com/highlighters"
+  },
+  {
+    "category": "Toner & Ink",
+    "url": "https://chaldal.com/printer-ink"
+  },
+  {
+    "category": "Pencils",
+    "url": "https://chaldal.com/pencils"
+  },
+  {
+    "category": "Erasers & Correction Fluid",
+    "url": "https://chaldal.com/erasers-correction-fluid"
+  },
+  {
+    "category": "Printing Paper",
+    "url": "https://chaldal.com/printing-paper"
+  },
+  {
+    "category": "Diaries & Notebooks",
+    "url": "https://chaldal.com/notebook-diary"
+  },
+  {
+    "category": "School Supplies",
+    "url": "https://chaldal.com/school-supplies"
+  },
+  {
+    "category": "Color Pencils",
+    "url": "https://chaldal.com/color-pencil"
   },
   {
     "category": "Cat Food",
@@ -270,5 +742,13 @@
   {
     "category": "Bird & Other Pet Food",
     "url": "https://chaldal.com/bird-food"
+  },
+  {
+    "category": "Toys & Sports",
+    "url": "https://chaldal.com/toys-sports"
+  },
+  {
+    "category": "Breakfast",
+    "url": "https://chaldal.com/eggs-2"
   }
 ]
