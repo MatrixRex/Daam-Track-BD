@@ -3,7 +3,8 @@ import SearchBar from './components/SearchBar';
 import PriceChart from './components/PriceChartECharts';
 import DevSourceToggle from './components/DevSourceToggle';
 import { useDuckDB } from './hooks/useDuckDB';
-import { TrendingUp, X, Trash2 } from 'lucide-react';
+import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown } from 'lucide-react';
+import { useMemo } from 'react';
 import { DATA_BASE_URL } from './config';
 
 // Extended color palette for unlimited comparisons
@@ -30,6 +31,8 @@ function App() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [hoveredItem, setHoveredItem] = useState(null);
   const [itemStats, setItemStats] = useState({});
+  const [isSorted, setIsSorted] = useState(false);
+  const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
 
   // Optimize stats update to prevent infinite loops if reference unstable
   const handleStatsUpdate = useCallback((newStats) => {
@@ -88,6 +91,18 @@ function App() {
     colorAssignmentsRef.current.clear();
     nextColorIndexRef.current = 0;
   }, []);
+
+  const sortedItems = useMemo(() => {
+    if (!isSorted) return selectedItems;
+
+    return [...selectedItems].sort((a, b) => {
+      // Use current price from stats if available, otherwise fallback to item price, then 0
+      const priceA = itemStats[a.name]?.current ?? a.price ?? 0;
+      const priceB = itemStats[b.name]?.current ?? b.price ?? 0;
+
+      return sortDirection === 'asc' ? priceA - priceB : priceB - priceA;
+    });
+  }, [selectedItems, isSorted, sortDirection, itemStats]);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
@@ -157,19 +172,44 @@ function App() {
                     <p className="text-xs text-slate-400">{selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''}</p>
                   </div>
                   {selectedItems.length > 1 && (
-                    <button
-                      onClick={handleClearAll}
-                      className="text-xs px-2 py-1 rounded-md text-slate-500 bg-white border border-slate-200 hover:text-red-600 hover:border-red-200 hover:bg-red-50 flex items-center gap-1.5 transition-all shadow-sm"
-                    >
-                      <Trash2 size={12} />
-                      Clear all
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Sort Controls */}
+                      <div className="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200">
+                        <button
+                          onClick={() => setIsSorted(!isSorted)}
+                          className={`p-1.5 rounded-md transition-all ${isSorted ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                          title={isSorted ? "Turn sort off" : "Sort by price"}
+                        >
+                          <ArrowDownWideNarrow size={14} />
+                        </button>
+
+                        {isSorted && (
+                          <button
+                            onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                            className="p-1.5 rounded-md text-slate-500 hover:text-blue-600 hover:bg-white/50 transition-all"
+                            title={sortDirection === 'asc' ? "Lowest first" : "Highest first"}
+                          >
+                            {sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="w-px h-4 bg-slate-200 mx-1"></div>
+
+                      <button
+                        onClick={handleClearAll}
+                        className="text-xs px-2 py-1.5 rounded-md text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all"
+                        title="Clear all items"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   )}
                 </div>
 
                 {/* Items List */}
                 <ul className="max-h-[60vh] overflow-y-auto divide-y divide-slate-50 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent hover:scrollbar-thumb-slate-300 pr-1">
-                  {selectedItems.map((item) => {
+                  {sortedItems.map((item) => {
                     const itemColor = getItemColor(item.name);
                     return (
                       <li
