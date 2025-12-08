@@ -4,6 +4,7 @@ import PriceChart from './components/PriceChartECharts';
 import DevSourceToggle from './components/DevSourceToggle';
 import EmptyStateSkeleton from './components/EmptyStateSkeleton';
 import ThemeToggle from './components/ThemeToggle';
+import BuildInfo from './components/BuildInfo';
 import { useDuckDB } from './hooks/useDuckDB';
 import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown, Download, FileJson, FileSpreadsheet, Image as ImageIcon, FileText, Copy } from 'lucide-react';
 import { useMemo } from 'react';
@@ -401,6 +402,7 @@ function App() {
         )}
 
       </div>
+      <BuildInfo />
       <Toaster position="bottom-right" theme="system" />
     </div>
   );
