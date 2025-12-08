@@ -27,6 +27,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Generate build version info
+        run: |
+          # Extract full and short commit SHA
+          FULL_SHA=$(git rev-parse HEAD)
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          
+          # Extract build date in "DD Mon YYYY" format
+          BUILD_DATE=$(date -u +'%d %b %Y')
+          
+          # Create .env.production file with build info
+          echo "VITE_BUILD_SHA=${FULL_SHA}" > .env.production
+          echo "VITE_BUILD_DATE=${BUILD_DATE}" >> .env.production
+          
+          # Log for debugging
+          echo "Build SHA: ${SHORT_SHA} (${FULL_SHA})"
+          echo "Build Date: ${BUILD_DATE}"
+
       - name: Build
         run: pnpm run build
 
