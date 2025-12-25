@@ -2,8 +2,9 @@ import React from 'react';
 import { DATA_BASE_URL } from '../config';
 import { X } from 'lucide-react';
 import clsx from 'clsx';
+import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 
-export default function ItemDetailModal({ item, onClose }) {
+export default function ItemDetailModal({ item, onClose, normTargets }) {
     if (!item) return null;
 
     return (
@@ -52,10 +53,20 @@ export default function ItemDetailModal({ item, onClose }) {
 
                     <div className="flex items-center justify-between border-t border-[#D4E6DC]/30 dark:border-[#4A3F6B]/30 pt-6">
                         <div className="flex flex-col">
-                            <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95] uppercase font-bold tracking-tighter mb-1">Current Price</span>
+                            <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95] uppercase font-bold tracking-tighter mb-1">
+                                {normTargets ? 'Normalized Price' : 'Current Price'}
+                            </span>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-2xl sm:text-4xl font-black text-[#7A9F7A] dark:text-[#9D8EC9]">৳{item.price}</span>
-                                <span className="text-sm text-[#8B7E6B] dark:text-[#6B5B95]">/ {item.unit}</span>
+                                <span className="text-2xl sm:text-4xl font-black text-[#7A9F7A] dark:text-[#9D8EC9]">
+                                    ৳{normTargets
+                                        ? Math.round(getNormalizedPrice(item.price, item.unit, normTargets))
+                                        : item.price}
+                                </span>
+                                <span className="text-sm text-[#8B7E6B] dark:text-[#6B5B95]">
+                                    / {normTargets
+                                        ? getTargetUnitLabel(parseUnit(item.unit).type, normTargets[parseUnit(item.unit).type], item.unit)
+                                        : item.unit}
+                                </span>
                             </div>
                         </div>
                     </div>

@@ -6,6 +6,7 @@ import { Loader2, AlertCircle, Calendar, ChevronDown } from 'lucide-react';
 import Tooltip from './Tooltip';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
+import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 
 // Hook to detect dark mode
 const useDarkMode = () => {
@@ -86,7 +87,7 @@ const DateInput = ({ value, onChange, label, min, max }) => {
     );
 };
 
-const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate }, ref) => {
+const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate, normTargets }, ref) => {
     const { runQuery, loading: engineLoading } = useDuckDB();
     const echartsRef = useRef(null);
     const dataCache = useRef(new Map());
@@ -224,7 +225,10 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 };
                 items.forEach(item => {
                     const header = `${item.name} (${item.unit})`;
-                    rowData[header] = row[item.name] !== undefined ? row[item.name] : '';
+                    const val = row[item.name];
+                    rowData[header] = (val !== undefined && val !== null)
+                        ? (normTargets ? Math.round(getNormalizedPrice(val, item.unit, normTargets)) : val)
+                        : '';
                 });
                 return rowData;
             });
@@ -332,6 +336,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         fullDate: point.fullDate
                     });
                 }
+                // Store RAW price in the chart data
                 dateMap.get(point.date)[name] = point.price;
             });
         });
@@ -574,8 +579,18 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
         const series = [];
         activeNames.forEach(name => {
             const color = getItemColor(name);
-            const mainData = processedData.map(d => d[name]);
-            const extData = processedData.map(d => d[`${name}_ext`]);
+            const item = items.find(i => i.name === name);
+
+            // Normalize data on the fly for the series
+            const mainData = processedData.map(d => {
+                if (d[name] === undefined || d[name] === null) return undefined;
+                return normTargets ? getNormalizedPrice(d[name], item.unit, normTargets) : d[name];
+            });
+            const extData = processedData.map(d => {
+                const val = d[`${name}_ext`];
+                if (val === undefined || val === null) return undefined;
+                return normTargets ? getNormalizedPrice(val, item.unit, normTargets) : val;
+            });
 
             // Only add series if data exists (forces entrance animation on load)
             const hasMainData = mainData.some(v => v !== undefined && v !== null);

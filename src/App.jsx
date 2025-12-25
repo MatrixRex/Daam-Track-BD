@@ -12,8 +12,9 @@ import { DATA_BASE_URL } from './config';
 import { Toaster } from 'sonner';
 import ItemHoverCard from './components/ItemHoverCard';
 import ItemDetailModal from './components/ItemDetailModal';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Scale } from 'lucide-react';
 import clsx from 'clsx';
+import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from './utils/quantityUtils';
 
 // Extended color palette for unlimited comparisons
 const COLORS = [
@@ -45,6 +46,12 @@ function App() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [sideRect, setSideRect] = useState(null);
   const [detailItem, setDetailItem] = useState(null);
+  const [normTargets, setNormTargets] = useState({
+    mass: 1,
+    volume: 1,
+    count: 1,
+    enabled: false
+  });
 
   const compareListRef = useRef(null);
   const chartRef = useRef(null);
@@ -120,12 +127,17 @@ function App() {
 
     return [...selectedItems].sort((a, b) => {
       // Use current price from stats if available, otherwise fallback to item price, then 0
-      const priceA = itemStats[a.name]?.current ?? a.price ?? 0;
-      const priceB = itemStats[b.name]?.current ?? b.price ?? 0;
+      let priceA = itemStats[a.name]?.current ?? a.price ?? 0;
+      let priceB = itemStats[b.name]?.current ?? b.price ?? 0;
+
+      if (normTargets.enabled) {
+        priceA = getNormalizedPrice(priceA, a.unit, normTargets);
+        priceB = getNormalizedPrice(priceB, b.unit, normTargets);
+      }
 
       return sortDirection === 'asc' ? priceA - priceB : priceB - priceA;
     });
-  }, [selectedItems, isSorted, sortDirection, itemStats]);
+  }, [selectedItems, isSorted, sortDirection, itemStats, normTargets]);
 
   return (
     <div className="min-h-screen bg-[#F5E6D3] dark:bg-[#1E1A2E] font-sans text-[#5C5247] dark:text-[#B8AED0] transition-colors duration-300">
@@ -277,6 +289,7 @@ function App() {
                 hoveredItem={hoveredItem}
                 setHoveredItem={setHoveredItem}
                 onStatsUpdate={handleStatsUpdate}
+                normTargets={normTargets.enabled ? normTargets : null}
               />
             </div>
 
@@ -321,6 +334,55 @@ function App() {
                       >
                         <Trash2 size={14} />
                       </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Normalization Controls */}
+                <div className="p-4 border-b border-[#D4E6DC]/50 dark:border-[#3D3460] bg-[#F5E6D3]/20 dark:bg-[#1E1A2E]/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Scale size={16} className={normTargets.enabled ? "text-[#7A9F7A] dark:text-[#9D8EC9]" : "text-[#8B7E6B] dark:text-[#6B5B95]"} />
+                      <span className="text-sm font-semibold text-[#5C5247] dark:text-white">Normalize Units</span>
+                    </div>
+                    <button
+                      onClick={() => setNormTargets(prev => ({ ...prev, enabled: !prev.enabled }))}
+                      className={clsx(
+                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
+                        normTargets.enabled ? "bg-[#7A9F7A] dark:bg-[#6B5B95]" : "bg-[#D4E6DC] dark:bg-[#3D3460]"
+                      )}
+                    >
+                      <span
+                        className={clsx(
+                          "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                          normTargets.enabled ? "translate-x-6" : "translate-x-1"
+                        )}
+                      />
+                    </button>
+                  </div>
+
+                  {normTargets.enabled && (
+                    <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                      {[
+                        { label: 'Weight', key: 'mass', unit: 'kg' },
+                        { label: 'Volume', key: 'volume', unit: 'L' },
+                        { label: 'Count', key: 'count', unit: 'pcs' },
+                      ].map((type) => (
+                        <div key={type.key} className="flex items-center justify-between gap-4">
+                          <label className="text-xs font-medium text-[#8B7E6B] dark:text-[#6B5B95]">{type.label}</label>
+                          <div className="flex items-center bg-white dark:bg-[#3D3460] border border-[#D4E6DC] dark:border-[#4A3F6B] rounded-lg px-2 py-1 shadow-sm">
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              value={normTargets[type.key]}
+                              onChange={(e) => setNormTargets(prev => ({ ...prev, [type.key]: parseInt(e.target.value, 10) || 0 }))}
+                              className="w-12 text-right text-xs font-bold bg-transparent border-none focus:ring-0 text-[#5C5247] dark:text-white p-0"
+                            />
+                            <span className="text-[10px] font-bold text-[#8B7E6B] dark:text-[#6B5B95] border-l border-[#D4E6DC] dark:border-[#4A3F6B] ml-2 pl-2">{type.unit}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -390,7 +452,14 @@ function App() {
                               <div className="flex flex-col gap-1 min-w-0">
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className="text-sm sm:text-base font-black text-[#5C5247] dark:text-white">
-                                    ৳{itemStats[item.name]?.current ?? item.price ?? 0}<span className="text-xs opacity-70 font-bold ml-0.5">/{item.unit}</span>
+                                    ৳{normTargets.enabled
+                                      ? Math.round(getNormalizedPrice(itemStats[item.name]?.current ?? item.price ?? 0, item.unit, normTargets))
+                                      : (itemStats[item.name]?.current ?? item.price ?? 0)}
+                                    <span className="text-xs opacity-70 font-bold ml-0.5">
+                                      /{normTargets.enabled
+                                        ? getTargetUnitLabel(parseUnit(item.unit).type, normTargets[parseUnit(item.unit).type], item.unit)
+                                        : item.unit}
+                                    </span>
                                   </span>
                                   {itemStats[item.name] && (
                                     <span className={clsx(
@@ -400,7 +469,9 @@ function App() {
                                           "text-[#8B7E6B] bg-[#F5E6D3]/40"
                                     )}>
                                       {itemStats[item.name].change > 0 ? '▲' : itemStats[item.name].change < 0 ? '▼' : ''}
-                                      {Math.abs(itemStats[item.name].change)}
+                                      {normTargets.enabled
+                                        ? Math.round(getNormalizedPrice(Math.abs(itemStats[item.name].change), item.unit, normTargets))
+                                        : Math.abs(itemStats[item.name].change)}
                                     </span>
                                   )}
                                 </div>
@@ -409,11 +480,19 @@ function App() {
                                   <div className="flex items-center gap-1 flex-wrap">
                                     <div className="flex items-center gap-0.5 h-4 px-1 bg-[#D4E6DC]/40 dark:bg-green-900/30 rounded border border-[#D4E6DC]/60 dark:border-green-800/30 text-[10px] sm:text-xs font-bold">
                                       <span className="text-[#4A6B4A] dark:text-green-400 opacity-70">L</span>
-                                      <span className="text-[#5C5247] dark:text-white">{itemStats[item.name].min}</span>
+                                      <span className="text-[#5C5247] dark:text-white">
+                                        {normTargets.enabled
+                                          ? Math.round(getNormalizedPrice(itemStats[item.name].min, item.unit, normTargets))
+                                          : itemStats[item.name].min}
+                                      </span>
                                     </div>
                                     <div className="flex items-center gap-0.5 h-4 px-1 bg-red-50 dark:bg-red-900/30 rounded border border-red-100 dark:border-red-800/30 text-[10px] sm:text-xs font-bold">
                                       <span className="text-red-500 dark:text-red-400 opacity-70">H</span>
-                                      <span className="text-[#5C5247] dark:text-white">{itemStats[item.name].max}</span>
+                                      <span className="text-[#5C5247] dark:text-white">
+                                        {normTargets.enabled
+                                          ? Math.round(getNormalizedPrice(itemStats[item.name].max, item.unit, normTargets))
+                                          : itemStats[item.name].max}
+                                      </span>
                                     </div>
                                   </div>
                                 )}
@@ -470,8 +549,8 @@ function App() {
       <Toaster position="bottom-right" theme="system" />
 
       {/* Hover & Details Overlay Components */}
-      <ItemHoverCard item={hoveredItemObj} mousePos={mousePos} sideRect={sideRect} />
-      <ItemDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
+      <ItemHoverCard item={hoveredItemObj} mousePos={mousePos} sideRect={sideRect} normTargets={normTargets.enabled ? normTargets : null} />
+      <ItemDetailModal item={detailItem} onClose={() => setDetailItem(null)} normTargets={normTargets.enabled ? normTargets : null} />
     </div>
   );
 }
