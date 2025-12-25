@@ -3,6 +3,8 @@ import Fuse from 'fuse.js';
 import { Search, X, ChevronRight, Check } from 'lucide-react';
 import clsx from 'clsx';
 import { DATA_BASE_URL } from '../config';
+import ItemHoverCard from './ItemHoverCard';
+import ItemDetailModal from './ItemDetailModal';
 
 export default function SearchBar({ onSelect, selectedItems = [] }) {
     const [items, setItems] = useState([]);
@@ -10,6 +12,15 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
     const [results, setResults] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [hoveredItem, setHoveredItem] = useState(null);
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [sideRect, setSideRect] = useState(null);
+    const [detailItem, setDetailItem] = useState(null);
+
+    // Detect touch device to disable hover
+    const isTouchDevice = useMemo(() => {
+        return (typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+    }, []);
 
     // Ref for clicking outside to close dropdown
     const searchRef = useRef(null);
@@ -123,15 +134,32 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                             return (
                                 <li
                                     key={index}
+                                    onMouseEnter={() => {
+                                        if (isTouchDevice) return;
+                                        setHoveredItem(item);
+                                        if (searchRef.current) {
+                                            setSideRect(searchRef.current.getBoundingClientRect());
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (isTouchDevice) return;
+                                        setHoveredItem(null);
+                                        setSideRect(null);
+                                    }}
+                                    onMouseMove={(e) => {
+                                        if (isTouchDevice) return;
+                                        setMousePos({ x: e.clientX, y: e.clientY });
+                                    }}
                                     onClick={() => {
                                         if (!isSelected) {
                                             onSelect(item);
                                             setQuery(''); // Clear input to allow adding more
                                             setIsOpen(false);
+                                            setHoveredItem(null);
                                         }
                                     }}
                                     className={clsx(
-                                        "flex items-center gap-4 p-3 border-b border-[#D4E6DC]/30 dark:border-[#3D3460] last:border-none transition-colors group",
+                                        "flex items-center gap-4 p-3 border-b border-[#D4E6DC]/30 dark:border-[#3D3460] last:border-none transition-colors group relative",
                                         isSelected
                                             ? "bg-[#D4E6DC]/50 dark:bg-[#3D3460] cursor-default opacity-60"
                                             : "hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460]/50 cursor-pointer"
@@ -177,7 +205,18 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                                         </div>
                                         {isSelected
                                             ? <Check className="w-4 h-4 text-[#7A9F7A] dark:text-[#9D8EC9]" />
-                                            : <ChevronRight className="w-4 h-4 text-[#D4E6DC] dark:text-[#4A3F6B] group-hover:text-[#7A9F7A] dark:group-hover:text-[#9D8EC9]" />
+                                            : (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setDetailItem(item);
+                                                    }}
+                                                    className="p-2 rounded-lg hover:bg-[#D4E6DC]/50 dark:hover:bg-[#3D3460] text-[#D4E6DC] dark:text-[#4A3F6B] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] transition-all"
+                                                    title="View Details"
+                                                >
+                                                    <ChevronRight className="w-5 h-5" />
+                                                </button>
+                                            )
                                         }
                                     </div>
                                 </li>
@@ -193,6 +232,11 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                     <p className="text-[#8B7E6B] dark:text-[#B8AED0]">No items found for "{query}"</p>
                 </div>
             )}
+            {/* Hover Details Card */}
+            <ItemHoverCard item={hoveredItem} mousePos={mousePos} sideRect={sideRect} />
+
+            {/* Mobile/Touch Details Modal */}
+            <ItemDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
         </div>
     );
 }
