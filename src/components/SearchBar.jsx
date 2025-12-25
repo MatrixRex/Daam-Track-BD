@@ -185,7 +185,7 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
 
                                     {/* Text Info */}
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm font-semibold text-[#5C5247] dark:text-white truncate group-hover:text-[#7A9F7A] dark:group-hover:text-[#9D8EC9]">
+                                        <h4 className="text-sm sm:text-base font-semibold text-[#5C5247] dark:text-white truncate group-hover:text-[#7A9F7A] dark:group-hover:text-[#9D8EC9]">
                                             {item.name}
                                         </h4>
                                         <div className="flex items-center gap-2 mt-0.5">
@@ -200,8 +200,8 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                                     {/* Price & Arrow/Check */}
                                     <div className="text-right flex items-center gap-3">
                                         <div className="flex flex-col items-end">
-                                            <span className="text-sm font-bold text-[#5C5247] dark:text-white">৳{item.price}</span>
-                                            <span className="text-[10px] text-[#8B7E6B] dark:text-[#6B5B95]">{isSelected ? 'Selected' : 'Latest'}</span>
+                                            <span className="text-sm sm:text-base font-bold text-[#5C5247] dark:text-white">৳{item.price}</span>
+                                            <span className="text-[10px] sm:text-xs text-[#8B7E6B] dark:text-[#6B5B95]">{isSelected ? 'Selected' : 'Latest'}</span>
                                         </div>
                                         {isSelected
                                             ? <Check className="w-4 h-4 text-[#7A9F7A] dark:text-[#9D8EC9]" />

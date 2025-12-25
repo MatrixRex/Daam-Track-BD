@@ -43,7 +43,7 @@ export default function ItemDetailModal({ item, onClose }) {
 
                 {/* Content Section */}
                 <div className="p-8">
-                    <h2 className="text-2xl font-black text-[#5C5247] dark:text-white leading-tight mb-1">
+                    <h2 className="text-xl sm:text-2xl font-black text-[#5C5247] dark:text-white leading-tight mb-1">
                         {item.name}
                     </h2>
                     <div className="text-base text-[#8B7E6B] dark:text-[#B8AED0] mb-8">
@@ -54,7 +54,7 @@ export default function ItemDetailModal({ item, onClose }) {
                         <div className="flex flex-col">
                             <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95] uppercase font-bold tracking-tighter mb-1">Current Price</span>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-[#7A9F7A] dark:text-[#9D8EC9]">৳{item.price}</span>
+                                <span className="text-2xl sm:text-4xl font-black text-[#7A9F7A] dark:text-[#9D8EC9]">৳{item.price}</span>
                                 <span className="text-sm text-[#8B7E6B] dark:text-[#6B5B95]">/ {item.unit}</span>
                             </div>
                         </div>

@@ -140,7 +140,7 @@ function App() {
               <div className="bg-[#97B897] dark:bg-[#6B5B95] p-2 rounded-lg text-white">
                 <TrendingUp size={24} />
               </div>
-              <h1 className="text-2xl font-bold tracking-tight text-[#5C5247] dark:text-white">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#5C5247] dark:text-white">
                 DaamTrack<span className="text-[#7A9F7A] dark:text-[#9D8EC9]">BD</span>
               </h1>
             </div>
@@ -286,7 +286,7 @@ function App() {
                 {/* Header */}
                 <div className="p-4 border-b border-[#D4E6DC]/50 dark:border-[#3D3460] flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-[#5C5247] dark:text-white">Comparing</h3>
+                    <h3 className="text-sm sm:text-base font-semibold text-[#5C5247] dark:text-white">Comparing</h3>
                     <p className="text-xs text-[#8B7E6B] dark:text-[#6B5B95]">{selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''}</p>
                   </div>
                   {selectedItems.length > 1 && (
@@ -389,12 +389,12 @@ function App() {
                               {/* Sub-column 1: Price and Range */}
                               <div className="flex flex-col gap-1 min-w-0">
                                 <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="text-sm font-black text-[#5C5247] dark:text-white">
-                                    ৳{itemStats[item.name]?.current ?? item.price ?? 0}<span className="text-[11px] opacity-70 font-bold ml-0.5">/{item.unit}</span>
+                                  <span className="text-sm sm:text-base font-black text-[#5C5247] dark:text-white">
+                                    ৳{itemStats[item.name]?.current ?? item.price ?? 0}<span className="text-xs opacity-70 font-bold ml-0.5">/{item.unit}</span>
                                   </span>
                                   {itemStats[item.name] && (
                                     <span className={clsx(
-                                      "text-[9px] font-bold px-1 rounded flex items-center h-4",
+                                      "text-[10px] sm:text-xs font-bold px-1 rounded flex items-center h-4",
                                       itemStats[item.name].change > 0 ? "text-red-500 bg-red-50/50 dark:bg-red-900/20" :
                                         itemStats[item.name].change < 0 ? "text-[#7A9F7A] bg-[#D4E6DC]/30 dark:bg-green-900/20" :
                                           "text-[#8B7E6B] bg-[#F5E6D3]/40"
@@ -407,11 +407,11 @@ function App() {
 
                                 {itemStats[item.name] && (
                                   <div className="flex items-center gap-1 flex-wrap">
-                                    <div className="flex items-center gap-0.5 h-4 px-1 bg-[#D4E6DC]/40 dark:bg-green-900/30 rounded border border-[#D4E6DC]/60 dark:border-green-800/30 text-[9px] font-bold">
+                                    <div className="flex items-center gap-0.5 h-4 px-1 bg-[#D4E6DC]/40 dark:bg-green-900/30 rounded border border-[#D4E6DC]/60 dark:border-green-800/30 text-[10px] sm:text-xs font-bold">
                                       <span className="text-[#4A6B4A] dark:text-green-400 opacity-70">L</span>
                                       <span className="text-[#5C5247] dark:text-white">{itemStats[item.name].min}</span>
                                     </div>
-                                    <div className="flex items-center gap-0.5 h-4 px-1 bg-red-50 dark:bg-red-900/30 rounded border border-red-100 dark:border-red-800/30 text-[9px] font-bold">
+                                    <div className="flex items-center gap-0.5 h-4 px-1 bg-red-50 dark:bg-red-900/30 rounded border border-red-100 dark:border-red-800/30 text-[10px] sm:text-xs font-bold">
                                       <span className="text-red-500 dark:text-red-400 opacity-70">H</span>
                                       <span className="text-[#5C5247] dark:text-white">{itemStats[item.name].max}</span>
                                     </div>

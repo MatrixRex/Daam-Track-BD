@@ -5,6 +5,20 @@
 
 /* Custom theme colors */
 @theme {
+  /* Font Family */
+  --font-inter: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Fluid Typography - Scales between 320px and 1280px viewport */
+  --text-xs: clamp(0.7rem, 0.6rem + 0.5vw, 0.8rem);
+  --text-sm: clamp(0.8rem, 0.7rem + 0.5vw, 0.95rem);
+  --text-base: clamp(0.9rem, 0.8rem + 0.5vw, 1.05rem);
+  --text-lg: clamp(1rem, 0.9rem + 0.5vw, 1.2rem);
+  --text-xl: clamp(1.125rem, 1rem + 0.75vw, 1.4rem);
+  --text-2xl: clamp(1.25rem, 1.1rem + 1vw, 1.75rem);
+  --text-3xl: clamp(1.5rem, 1.3rem + 1.25vw, 2.25rem);
+  --text-4xl: clamp(1.875rem, 1.6rem + 1.5vw, 3rem);
+  --text-5xl: clamp(2.25rem, 1.9rem + 2vw, 4rem);
+
   /* Light mode - Warm Cream & Sage */
   --color-cream-bg: #F5E6D3;
   --color-cream-card: #FFFDF8;
@@ -23,6 +37,15 @@
   --color-purple-dark-muted: #6B5B95;
   --color-purple-dark-text: #B8AED0;
   --color-purple-dark-accent: #9D8EC9;
+}
+
+:root {
+  font-family: var(--font-inter);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Dark mode support */

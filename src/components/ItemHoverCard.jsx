@@ -73,7 +73,7 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
                     </div>
 
                     {/* Floating Badge */}
-                    <div className="absolute top-3 right-3 px-2 py-1 bg-[#7A9F7A] dark:bg-[#6B5B95] text-white text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-sm">
+                    <div className="absolute top-3 right-3 px-2 py-1 bg-[#7A9F7A] dark:bg-[#6B5B95] text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
                         {item.category}
                     </div>
                 </div>
@@ -91,7 +91,7 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
                         <div className="flex flex-col">
                             <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95] uppercase font-bold tracking-tighter">Current Price</span>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-2xl font-black text-[#7A9F7A] dark:text-[#9D8EC9]">৳{item.price}</span>
+                                <span className="text-xl sm:text-2xl font-black text-[#7A9F7A] dark:text-[#9D8EC9]">৳{item.price}</span>
                                 <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95]">/ {item.unit}</span>
                             </div>
                         </div>
