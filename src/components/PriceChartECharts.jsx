@@ -734,16 +734,30 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
                     sortedParams.forEach(p => {
                         const color = p.color;
-                        const value = p.value;
+                        const value = Math.round(p.value);
                         const name = p.seriesName;
+                        const item = items.find(i => i.name === name);
+
+                        // Get unit label (normalized if active)
+                        let unitLabel = item?.unit || '';
+                        if (normTargets && item) {
+                            const parsed = parseUnit(item.unit);
+                            unitLabel = getTargetUnitLabel(parsed.type, normTargets[parsed.type], item.unit);
+                        }
+
                         // Use the ref directly for instant, lag-free bolding
                         const isHighlighted = name === hoveredItem || name === localHoveredRef.current;
 
                         html += `
-                        <div class="flex items-center gap-2 text-sm ${isHighlighted ? 'scale-105 origin-left' : ''} transition-all duration-200">
-                            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${color}; box-shadow: ${isHighlighted ? `0 0 8px ${color}` : 'none'}"></span>
-                            <span class="${isHighlighted ? 'font-bold ' + (isDark ? 'text-white' : 'text-[#2A2442]') : 'font-medium ' + (isDark ? 'text-[#B8AED0]' : 'text-[#8B7E6B]')}">${name}:</span>
-                            <span class="font-bold ${isHighlighted ? (isDark ? 'text-white' : 'text-[#2A2442]') : (isDark ? 'text-[#B8AED0]' : 'text-[#5C5247]')}">৳${value}</span>
+                        <div class="flex items-center justify-between gap-4 text-sm ${isHighlighted ? 'scale-105 origin-left' : ''} transition-all duration-200">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${color}; box-shadow: ${isHighlighted ? `0 0 8px ${color}` : 'none'}"></span>
+                                <span class="truncate ${isHighlighted ? 'font-bold ' + (isDark ? 'text-white' : 'text-[#2A2442]') : 'font-medium ' + (isDark ? 'text-[#B8AED0]' : 'text-[#8B7E6B]')}">${name}:</span>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <span class="font-bold ${isHighlighted ? (isDark ? 'text-white' : 'text-[#2A2442]') : (isDark ? 'text-[#B8AED0]' : 'text-[#5C5247]')}">৳${value}</span>
+                                <span class="text-[10px] opacity-70 ${isHighlighted ? 'font-bold' : ''}">/${unitLabel}</span>
+                            </div>
                         </div>
                     `;
                     });
