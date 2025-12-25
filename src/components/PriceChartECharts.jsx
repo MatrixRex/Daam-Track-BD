@@ -96,6 +96,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     const [chartData, setChartData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingItem, setLoadingItem] = useState(null);
+    const localHoveredRef = useRef(null); // Ref for lag-free tooltip updates
 
     // Maintain color consistency
     const colorAssignmentsRef = useRef(new Map());
@@ -606,7 +607,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     itemStyle: { color: color },
                     lineStyle: {
                         width: 2,
-                        opacity: hoveredItem && hoveredItem !== name ? 0.2 : 1 // Dim if not hovered
+                        opacity: hoveredItem && hoveredItem !== name ? 0.2 : 1 // Dim if not hovered from list
                     },
                     showSymbol: false,
                     smooth: true,
@@ -693,19 +694,23 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
                     let html = `<div class="font-medium ${isDark ? 'text-[#6B5B95]' : 'text-[#8B7E6B]'} mb-2">${dateItem.fullDate}</div>`;
 
-                    params.forEach(p => {
-                        if (p.seriesName.endsWith('_ext') || p.value === undefined) return;
-                        // Don't duplicate if both ext and normal exist (normal takes precedence in stats usually)
+                    // Filter and sort items by price (highest first)
+                    const sortedParams = params
+                        .filter(p => !p.seriesName.endsWith('_ext') && p.value !== undefined)
+                        .sort((a, b) => b.value - a.value);
 
+                    sortedParams.forEach(p => {
                         const color = p.color;
                         const value = p.value;
                         const name = p.seriesName;
+                        // Use the ref directly for instant, lag-free bolding
+                        const isHighlighted = name === hoveredItem || name === localHoveredRef.current;
 
                         html += `
-                        <div class="flex items-center gap-2 text-sm">
-                            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${color};"></span>
-                            <span class="${isDark ? 'text-[#B8AED0]' : 'text-[#8B7E6B]'}">${name}:</span>
-                            <span class="font-bold ${isDark ? 'text-white' : 'text-[#5C5247]'}">৳${value}</span>
+                        <div class="flex items-center gap-2 text-sm ${isHighlighted ? 'scale-105 origin-left' : ''} transition-all duration-200">
+                            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${color}; box-shadow: ${isHighlighted ? `0 0 8px ${color}` : 'none'}"></span>
+                            <span class="${isHighlighted ? 'font-bold ' + (isDark ? 'text-white' : 'text-[#2A2442]') : 'font-medium ' + (isDark ? 'text-[#B8AED0]' : 'text-[#8B7E6B]')}">${name}:</span>
+                            <span class="font-bold ${isHighlighted ? (isDark ? 'text-white' : 'text-[#2A2442]') : (isDark ? 'text-[#B8AED0]' : 'text-[#5C5247]')}">৳${value}</span>
                         </div>
                     `;
                     });
@@ -905,6 +910,52 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     style={{ height: '100%', width: '100%' }}
                     onChartReady={(chart) => {
                         chart.setOption(option, { replaceMerge: ['series'] });
+                    }}
+                    onEvents={{
+                        'mousemove': (params) => {
+                            const chart = echartsRef.current?.getEchartsInstance();
+                            if (!chart) return;
+
+                            const pointInPixel = [params.event.zrX, params.event.zrY];
+                            if (chart.containPixel('grid', pointInPixel)) {
+                                const pointInData = chart.convertFromPixel('grid', pointInPixel);
+                                const xIndex = Math.round(pointInData[0]);
+                                const mousePrice = pointInData[1];
+
+                                if (xIndex >= 0 && xIndex < processedData.length) {
+                                    let closestName = null;
+                                    let minDiff = Infinity;
+
+                                    items.forEach(item => {
+                                        const row = processedData[xIndex];
+                                        if (!row) return;
+
+                                        // Check both actual and extended price
+                                        const price = row[item.name] !== undefined ? row[item.name] : row[`${item.name}_ext`];
+                                        if (price === undefined || price === null) return;
+
+                                        const displayPrice = normTargets ? getNormalizedPrice(price, item.unit, normTargets) : price;
+                                        const diff = Math.abs(displayPrice - mousePrice);
+
+                                        // Use a small bias to prefer current hover if distances are nearly identical
+                                        const bias = (item.name === localHoveredRef.current) ? 0.95 : 1.0;
+
+                                        if (diff * bias < minDiff) {
+                                            minDiff = diff;
+                                            closestName = item.name;
+                                        }
+                                    });
+
+                                    // Update Ref immediately - no React re-render needed for tooltip bolding
+                                    localHoveredRef.current = closestName;
+                                }
+                            } else {
+                                localHoveredRef.current = null;
+                            }
+                        },
+                        'globalout': () => {
+                            localHoveredRef.current = null;
+                        }
                     }}
                 />
             </div>
