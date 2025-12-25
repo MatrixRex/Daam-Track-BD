@@ -20,7 +20,7 @@ export const parseUnit = (unitStr) => {
     if (unit.includes('kg') || unit.includes('gm') || unit.includes('gram')) {
         return { value, unit, type: 'mass', baseUnit: 'kg' };
     }
-    if (unit.includes('liter') || unit.includes('litre') || unit.includes('ml')) {
+    if (unit.includes('liter') || unit.includes('litre') || unit === 'l' || unit === 'ltr' || unit.includes('ml')) {
         return { value, unit, type: 'volume', baseUnit: 'liter' };
     }
     if (unit.includes('pcs') || unit.includes('pc') || unit.includes('dozen')) {
