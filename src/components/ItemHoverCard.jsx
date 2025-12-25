@@ -3,7 +3,7 @@ import { DATA_BASE_URL } from '../config';
 import clsx from 'clsx';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 
-export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right', normTargets }) {
+export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right', normTargets, stats }) {
     if (!item) return null;
 
     const cardWidth = 288; // Default width of w-72
@@ -88,24 +88,58 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
                         Per {item.unit}
                     </div>
 
-                    <div className="flex items-end justify-between border-t border-[#D4E6DC]/30 dark:border-[#4A3F6B]/30 pt-4 mt-2">
-                        <div className="flex flex-col">
-                            <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95] uppercase font-bold tracking-tighter">
-                                {normTargets ? 'Normalized Price' : 'Current Price'}
-                            </span>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-xl sm:text-2xl font-black text-[#7A9F7A] dark:text-[#9D8EC9]">
-                                    ৳{normTargets
-                                        ? Math.round(getNormalizedPrice(item.price, item.unit, normTargets))
-                                        : item.price}
+                    <div className="flex flex-col border-t border-[#D4E6DC]/30 dark:border-[#4A3F6B]/30 pt-4 mt-2">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="flex flex-col">
+                                <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95] uppercase font-bold tracking-tighter">
+                                    {normTargets ? 'Normalized Price' : 'Current Price'}
                                 </span>
-                                <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95]">
-                                    / {normTargets
-                                        ? getTargetUnitLabel(parseUnit(item.unit).type, normTargets[parseUnit(item.unit).type], item.unit)
-                                        : item.unit}
-                                </span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-xl sm:text-2xl font-black text-[#7A9F7A] dark:text-[#9D8EC9]">
+                                        ৳{normTargets
+                                            ? Math.round(getNormalizedPrice(stats?.current ?? item.price, item.unit, normTargets))
+                                            : (stats?.current ?? item.price)}
+                                    </span>
+                                    <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95]">
+                                        / {normTargets
+                                            ? getTargetUnitLabel(parseUnit(item.unit).type, normTargets[parseUnit(item.unit).type], item.unit)
+                                            : item.unit}
+                                    </span>
+                                </div>
                             </div>
+
+                            {/* Price Change Chip */}
+                            {stats && stats.change !== 0 && (
+                                <div className={clsx(
+                                    "px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm",
+                                    stats.change > 0 ? "bg-red-50 dark:bg-red-900/40 text-red-600 border border-red-100 dark:border-red-800/30" :
+                                        "bg-[#D4E6DC] dark:bg-green-900/40 text-[#4A6B4A] border border-[#D4E6DC] dark:border-green-800/30"
+                                )}>
+                                    {stats.change > 0 ? '▲' : '▼'}
+                                    ৳{normTargets
+                                        ? Math.round(getNormalizedPrice(Math.abs(stats.change), item.unit, normTargets))
+                                        : Math.abs(stats.change)}
+                                </div>
+                            )}
                         </div>
+
+                        {/* Range Row */}
+                        {stats && (
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-5 h-5 rounded bg-[#D4E6DC]/40 dark:bg-green-900/20 flex items-center justify-center text-[10px] font-black text-[#4A6B4A] dark:text-green-400 border border-[#D4E6DC]/60 dark:border-green-800/20">L</div>
+                                    <span className="text-xs font-bold text-[#5C5247] dark:text-white">
+                                        ৳{normTargets ? Math.round(getNormalizedPrice(stats.min, item.unit, normTargets)) : stats.min}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-5 h-5 rounded bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-[10px] font-black text-red-500 dark:text-red-400 border border-red-100 dark:border-red-800/20">H</div>
+                                    <span className="text-xs font-bold text-[#5C5247] dark:text-white">
+                                        ৳{normTargets ? Math.round(getNormalizedPrice(stats.max, item.unit, normTargets)) : stats.max}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

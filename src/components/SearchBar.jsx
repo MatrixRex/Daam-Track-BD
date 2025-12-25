@@ -6,7 +6,7 @@ import { DATA_BASE_URL } from '../config';
 import ItemHoverCard from './ItemHoverCard';
 import ItemDetailModal from './ItemDetailModal';
 
-export default function SearchBar({ onSelect, selectedItems = [] }) {
+export default function SearchBar({ onSelect, selectedItems = [], normTargets, itemStats = {} }) {
     const [items, setItems] = useState([]);
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
@@ -233,10 +233,22 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                 </div>
             )}
             {/* Hover Details Card */}
-            <ItemHoverCard item={hoveredItem} mousePos={mousePos} sideRect={sideRect} side="left" />
+            <ItemHoverCard
+                item={hoveredItem}
+                mousePos={mousePos}
+                sideRect={sideRect}
+                side="left"
+                normTargets={normTargets}
+                stats={hoveredItem ? itemStats[hoveredItem.name] : null}
+            />
 
             {/* Mobile/Touch Details Modal */}
-            <ItemDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
+            <ItemDetailModal
+                item={detailItem}
+                onClose={() => setDetailItem(null)}
+                normTargets={normTargets}
+                stats={detailItem ? itemStats[detailItem.name] : null}
+            />
         </div>
     );
 }

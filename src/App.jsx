@@ -167,6 +167,8 @@ function App() {
               <SearchBar
                 onSelect={handleAddItem}
                 selectedItems={selectedItems}
+                normTargets={normTargets.enabled ? normTargets : null}
+                itemStats={itemStats}
               />
             </div>
 
@@ -271,6 +273,8 @@ function App() {
         <SearchBar
           onSelect={handleAddItem}
           selectedItems={selectedItems}
+          normTargets={normTargets.enabled ? normTargets : null}
+          itemStats={itemStats}
         />
       </div>
 
@@ -461,14 +465,13 @@ function App() {
                                         : item.unit}
                                     </span>
                                   </span>
-                                  {itemStats[item.name] && (
+                                  {itemStats[item.name] && itemStats[item.name].change !== 0 && (
                                     <span className={clsx(
-                                      "text-[10px] sm:text-xs font-bold px-1 rounded flex items-center h-4",
-                                      itemStats[item.name].change > 0 ? "text-red-500 bg-red-50/50 dark:bg-red-900/20" :
-                                        itemStats[item.name].change < 0 ? "text-[#7A9F7A] bg-[#D4E6DC]/30 dark:bg-green-900/20" :
-                                          "text-[#8B7E6B] bg-[#F5E6D3]/40"
+                                      "text-[10px] sm:text-xs font-bold px-1.5 rounded-md flex items-center h-5 shadow-sm",
+                                      itemStats[item.name].change > 0 ? "text-red-600 bg-red-50 dark:bg-red-900/40 border border-red-100 dark:border-red-800/30" :
+                                        "text-[#4A6B4A] bg-[#D4E6DC] dark:bg-green-900/40 border border-[#D4E6DC] dark:border-green-800/30"
                                     )}>
-                                      {itemStats[item.name].change > 0 ? '▲' : itemStats[item.name].change < 0 ? '▼' : ''}
+                                      {itemStats[item.name].change > 0 ? '▲' : '▼'}
                                       {normTargets.enabled
                                         ? Math.round(getNormalizedPrice(Math.abs(itemStats[item.name].change), item.unit, normTargets))
                                         : Math.abs(itemStats[item.name].change)}
@@ -476,26 +479,6 @@ function App() {
                                   )}
                                 </div>
 
-                                {itemStats[item.name] && (
-                                  <div className="flex items-center gap-1 flex-wrap">
-                                    <div className="flex items-center gap-0.5 h-4 px-1 bg-[#D4E6DC]/40 dark:bg-green-900/30 rounded border border-[#D4E6DC]/60 dark:border-green-800/30 text-[10px] sm:text-xs font-bold">
-                                      <span className="text-[#4A6B4A] dark:text-green-400 opacity-70">L</span>
-                                      <span className="text-[#5C5247] dark:text-white">
-                                        {normTargets.enabled
-                                          ? Math.round(getNormalizedPrice(itemStats[item.name].min, item.unit, normTargets))
-                                          : itemStats[item.name].min}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center gap-0.5 h-4 px-1 bg-red-50 dark:bg-red-900/30 rounded border border-red-100 dark:border-red-800/30 text-[10px] sm:text-xs font-bold">
-                                      <span className="text-red-500 dark:text-red-400 opacity-70">H</span>
-                                      <span className="text-[#5C5247] dark:text-white">
-                                        {normTargets.enabled
-                                          ? Math.round(getNormalizedPrice(itemStats[item.name].max, item.unit, normTargets))
-                                          : itemStats[item.name].max}
-                                      </span>
-                                    </div>
-                                  </div>
-                                )}
                               </div>
 
                               {/* Sub-column 2: Action Buttons */}
@@ -549,8 +532,19 @@ function App() {
       <Toaster position="bottom-right" theme="system" />
 
       {/* Hover & Details Overlay Components */}
-      <ItemHoverCard item={hoveredItemObj} mousePos={mousePos} sideRect={sideRect} normTargets={normTargets.enabled ? normTargets : null} />
-      <ItemDetailModal item={detailItem} onClose={() => setDetailItem(null)} normTargets={normTargets.enabled ? normTargets : null} />
+      <ItemHoverCard
+        item={hoveredItemObj}
+        mousePos={mousePos}
+        sideRect={sideRect}
+        normTargets={normTargets.enabled ? normTargets : null}
+        stats={hoveredItemObj ? itemStats[hoveredItemObj.name] : null}
+      />
+      <ItemDetailModal
+        item={detailItem}
+        onClose={() => setDetailItem(null)}
+        normTargets={normTargets.enabled ? normTargets : null}
+        stats={detailItem ? itemStats[detailItem.name] : null}
+      />
     </div>
   );
 }
