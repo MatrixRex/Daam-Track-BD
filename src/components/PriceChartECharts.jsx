@@ -96,6 +96,8 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     const [chartData, setChartData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingItem, setLoadingItem] = useState(null);
+    const [isNormalizing, setIsNormalizing] = useState(false);
+    const [finalChartData, setFinalChartData] = useState([]);
     const localHoveredRef = useRef(null); // Ref for lag-free tooltip updates
 
     // Maintain color consistency
@@ -463,12 +465,10 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
         if (diffDays <= 365 * 5) return 'weekly'; // Up to 5 years
         return 'monthly';
     }, [resolution, startDate, endDate]);
-
     const processedData = useMemo(() => {
         const effectiveRes = getEffectiveResolution();
         if (effectiveRes === 'daily' || !filteredChartData.length) return filteredChartData;
 
-        // ... (Aggregation logic implementation similar to original) ...
         const getGroupKey = (dateStr) => {
             const date = new Date(dateStr);
             if (effectiveRes === 'yearly') return `${date.getFullYear()}`;
@@ -532,8 +532,48 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             aggregated.push(entry);
         });
 
-        return aggregated; // Sorting usually preserved by map insertion order logic
+        return aggregated;
     }, [filteredChartData, getEffectiveResolution, aggregation, items]);
+
+    // Normalization Effect - Processes data and shows spinner if it takes time
+    useEffect(() => {
+        if (!processedData.length) {
+            setFinalChartData([]);
+            setIsNormalizing(false);
+            return;
+        }
+
+        // If no normalization, just use processedData
+        if (!normTargets) {
+            setFinalChartData(processedData);
+            setIsNormalizing(false);
+            return;
+        }
+
+        setIsNormalizing(true);
+
+        // Defer calculation slightly to ensure spinner renders if thread blocks
+        const id = setTimeout(() => {
+            const normalized = processedData.map(d => {
+                const entry = { ...d };
+                items.forEach(item => {
+                    const name = item.name;
+                    if (d[name] !== undefined) {
+                        entry[name] = getNormalizedPrice(d[name], item.unit, normTargets);
+                    }
+                    if (d[`${name}_ext`] !== undefined) {
+                        entry[`${name}_ext`] = getNormalizedPrice(d[`${name}_ext`], item.unit, normTargets);
+                    }
+                });
+                return entry;
+            });
+
+            setFinalChartData(normalized);
+            setIsNormalizing(false);
+        }, 100);
+
+        return () => clearTimeout(id);
+    }, [processedData, normTargets, items]);
 
 
     // Calculate stats
@@ -582,16 +622,9 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             const color = getItemColor(name);
             const item = items.find(i => i.name === name);
 
-            // Normalize data on the fly for the series
-            const mainData = processedData.map(d => {
-                if (d[name] === undefined || d[name] === null) return undefined;
-                return normTargets ? getNormalizedPrice(d[name], item.unit, normTargets) : d[name];
-            });
-            const extData = processedData.map(d => {
-                const val = d[`${name}_ext`];
-                if (val === undefined || val === null) return undefined;
-                return normTargets ? getNormalizedPrice(val, item.unit, normTargets) : val;
-            });
+            // Use data from finalChartData (pre-normalized)
+            const mainData = finalChartData.map(d => d[name]);
+            const extData = finalChartData.map(d => d[`${name}_ext`]);
 
             // Only add series if data exists (forces entrance animation on load)
             const hasMainData = mainData.some(v => v !== undefined && v !== null);
@@ -689,7 +722,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 formatter: (params) => {
                     if (!params.length) return '';
                     const dateIndex = params[0].dataIndex;
-                    const dateItem = processedData[dateIndex];
+                    const dateItem = finalChartData[dateIndex];
                     if (!dateItem) return '';
 
                     let html = `<div class="font-medium ${isDark ? 'text-[#6B5B95]' : 'text-[#8B7E6B]'} mb-2">${dateItem.fullDate}</div>`;
@@ -719,7 +752,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             },
             xAxis: {
                 type: 'category',
-                data: processedData.map(d => d.dateShort), // Use pre-formatted short dates
+                data: finalChartData.map(d => d.dateShort), // Use pre-formatted short dates
                 boundaryGap: false,
                 axisLine: { show: false },
                 axisTick: { show: false },
@@ -751,7 +784,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             animationEasing: 'cubicOut',
             animationEasingUpdate: 'cubicOut', // Smooth updates
         };
-    }, [items, processedData, getItemColor, hoveredItem, startDate, endDate, getEffectiveResolution, isDark]);
+    }, [items, finalChartData, getItemColor, hoveredItem, startDate, endDate, getEffectiveResolution, isDark]);
 
 
     // Manual Option Management for 'replaceMerge'
@@ -801,6 +834,15 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
     return (
         <div className="bg-[#FFFDF8] dark:bg-[#2A2442] p-6 rounded-2xl shadow-sm border border-[#D4E6DC] dark:border-[#4A3F6B] relative transition-colors duration-300">
+            {isNormalizing && (
+                <div className="absolute inset-0 z-20 bg-[#FFFDF8]/40 dark:bg-[#2A2442]/40 backdrop-blur-[2px] flex items-center justify-center rounded-2xl animate-in fade-in duration-300">
+                    <div className="bg-[#FFFDF8] dark:bg-[#2A2442] px-6 py-4 rounded-2xl shadow-2xl border border-[#D4E6DC] dark:border-[#4A3F6B] flex flex-col items-center gap-3">
+                        <Loader2 className="w-10 h-10 text-[#7A9F7A] dark:text-[#9D8EC9] animate-spin" />
+                        <span className="text-sm font-bold text-[#5C5247] dark:text-white">Normalizing Units...</span>
+                        <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95]">Applying custom quantities</span>
+                    </div>
+                </div>
+            )}
             {loadingItem && chartData.length > 0 && (
                 <div className="absolute top-4 right-4 flex items-center gap-2 bg-[#D4E6DC] dark:bg-[#3D3460] text-[#7A9F7A] dark:text-[#9D8EC9] px-3 py-1.5 rounded-full text-xs font-medium z-10 animate-pulse">
                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -922,19 +964,18 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                                 const xIndex = Math.round(pointInData[0]);
                                 const mousePrice = pointInData[1];
 
-                                if (xIndex >= 0 && xIndex < processedData.length) {
+                                if (xIndex >= 0 && xIndex < finalChartData.length) {
                                     let closestName = null;
                                     let minDiff = Infinity;
 
                                     items.forEach(item => {
-                                        const row = processedData[xIndex];
+                                        const row = finalChartData[xIndex];
                                         if (!row) return;
 
-                                        // Check both actual and extended price
-                                        const price = row[item.name] !== undefined ? row[item.name] : row[`${item.name}_ext`];
-                                        if (price === undefined || price === null) return;
+                                        // Data in finalChartData is already normalized
+                                        const displayPrice = row[item.name] !== undefined ? row[item.name] : row[`${item.name}_ext`];
+                                        if (displayPrice === undefined || displayPrice === null) return;
 
-                                        const displayPrice = normTargets ? getNormalizedPrice(price, item.unit, normTargets) : price;
                                         const diff = Math.abs(displayPrice - mousePrice);
 
                                         // Use a small bias to prefer current hover if distances are nearly identical
@@ -963,7 +1004,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             {/* Footer Info */}
             <div className="mt-4 flex justify-between items-center text-xs text-[#8B7E6B] dark:text-[#6B5B95] border-t border-[#D4E6DC]/50 dark:border-[#3D3460] pt-3">
                 <p>{items.length} item{items.length > 1 ? 's' : ''} active</p>
-                <p>{processedData.length} data points shown</p>
+                <p>{finalChartData.length} data points shown</p>
             </div>
 
         </div>
