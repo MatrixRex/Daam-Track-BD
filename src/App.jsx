@@ -13,6 +13,7 @@ import { Toaster } from 'sonner';
 import ItemHoverCard from './components/ItemHoverCard';
 import ItemDetailModal from './components/ItemDetailModal';
 import { ChevronRight } from 'lucide-react';
+import clsx from 'clsx';
 
 // Extended color palette for unlimited comparisons
 const COLORS = [
@@ -355,83 +356,93 @@ function App() {
                             setMousePos({ x: e.clientX, y: e.clientY });
                           }
                         }}
-                        className={`p-3 transition-colors group cursor-pointer relative ${hoveredItem === item.name ? 'bg-[#D4E6DC]/50 dark:bg-[#3D3460] shadow-sm border-l-4 border-l-[#97B897] dark:border-l-[#6B5B95]' : 'hover:bg-[#F5E6D3]/50 dark:hover:bg-[#3D3460]/50 border-l-4 border-l-transparent'}`}
+                        className={`p-3.5 transition-colors group cursor-pointer relative ${hoveredItem === item.name ? 'bg-[#D4E6DC]/40 dark:bg-[#3D3460] shadow-sm border-l-4 border-l-[#97B897] dark:border-l-[#6B5B95]' : 'hover:bg-[#F5E6D3]/50 dark:hover:bg-[#3D3460]/50 border-l-4 border-l-transparent'}`}
                       >
-                        <div className="flex items-center gap-3">
-                          {/* Color Indicator */}
-                          <div
-                            className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-offset-1"
-                            style={{
-                              backgroundColor: itemColor.stroke,
-                              ringColor: itemColor.stroke + '40'
-                            }}
-                          />
-
-                          {/* Small Image */}
-                          <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3D3460] flex-shrink-0 overflow-hidden border border-[#D4E6DC] dark:border-[#4A3F6B]">
-                            <img
-                              src={`${DATA_BASE_URL}/images/${item.image}`}
-                              alt={item.name}
-                              className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-90"
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                              }}
+                        <div className="flex gap-3 items-start">
+                          {/* Column 1: Image with Color Badge Overlay */}
+                          <div className="relative flex-shrink-0">
+                            <div className="w-14 h-14 rounded-xl bg-[#F5E6D3] dark:bg-[#3D3460] flex items-center justify-center overflow-hidden border border-[#D4E6DC] dark:border-[#4A3F6B] shadow-sm group-hover:scale-105 transition-transform duration-200">
+                              <img
+                                src={`${DATA_BASE_URL}/images/${item.image}`}
+                                alt={item.name}
+                                className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-90"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                            <div
+                              className="absolute -top-1 -left-1 w-4 h-4 rounded-full border-2 border-[#FFFDF8] dark:border-[#2A2442] shadow-sm z-10"
+                              style={{ backgroundColor: itemColor.stroke }}
                             />
                           </div>
 
-                          {/* Item Info */}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-medium text-[#5C5247] dark:text-white truncate">
+                          {/* Column 2: Info & Actions */}
+                          <div className="flex-1 min-w-0 flex flex-col gap-1">
+                            {/* Row 1: Item Name */}
+                            <h4 className="text-sm font-bold text-[#5C5247] dark:text-white truncate leading-snug" title={item.name}>
                               {item.name}
                             </h4>
-                            <div className="flex flex-col gap-0.5">
-                              {/* Current Price and Change */}
-                              {itemStats[item.name] ? (
-                                <>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-bold text-[#5C5247] dark:text-white">৳{itemStats[item.name].current}</span>
-                                    <span className={`text-xs font-medium flex items-center ${itemStats[item.name].change > 0 ? 'text-red-500 dark:text-red-400' : itemStats[item.name].change < 0 ? 'text-[#7A9F7A] dark:text-green-400' : 'text-[#8B7E6B] dark:text-[#6B5B95]'}`}>
+
+                            {/* Row 2: Stats and Actions Row */}
+                            <div className="flex items-end justify-between gap-1 mt-0.5">
+                              {/* Sub-column 1: Price and Range */}
+                              <div className="flex flex-col gap-1 min-w-0">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-sm font-black text-[#5C5247] dark:text-white">
+                                    ৳{itemStats[item.name]?.current ?? item.price ?? 0}<span className="text-[11px] opacity-70 font-bold ml-0.5">/{item.unit}</span>
+                                  </span>
+                                  {itemStats[item.name] && (
+                                    <span className={clsx(
+                                      "text-[9px] font-bold px-1 rounded flex items-center h-4",
+                                      itemStats[item.name].change > 0 ? "text-red-500 bg-red-50/50 dark:bg-red-900/20" :
+                                        itemStats[item.name].change < 0 ? "text-[#7A9F7A] bg-[#D4E6DC]/30 dark:bg-green-900/20" :
+                                          "text-[#8B7E6B] bg-[#F5E6D3]/40"
+                                    )}>
                                       {itemStats[item.name].change > 0 ? '▲' : itemStats[item.name].change < 0 ? '▼' : ''}
                                       {Math.abs(itemStats[item.name].change)}
                                     </span>
+                                  )}
+                                </div>
+
+                                {itemStats[item.name] && (
+                                  <div className="flex items-center gap-1 flex-wrap">
+                                    <div className="flex items-center gap-0.5 h-4 px-1 bg-[#D4E6DC]/40 dark:bg-green-900/30 rounded border border-[#D4E6DC]/60 dark:border-green-800/30 text-[9px] font-bold">
+                                      <span className="text-[#4A6B4A] dark:text-green-400 opacity-70">L</span>
+                                      <span className="text-[#5C5247] dark:text-white">{itemStats[item.name].min}</span>
+                                    </div>
+                                    <div className="flex items-center gap-0.5 h-4 px-1 bg-red-50 dark:bg-red-900/30 rounded border border-red-100 dark:border-red-800/30 text-[9px] font-bold">
+                                      <span className="text-red-500 dark:text-red-400 opacity-70">H</span>
+                                      <span className="text-[#5C5247] dark:text-white">{itemStats[item.name].max}</span>
+                                    </div>
                                   </div>
-                                  {/* High / Low Stats */}
-                                  <div className="flex items-center gap-2 text-[10px] text-[#8B7E6B] dark:text-[#6B5B95] font-medium">
-                                    <span className="text-[#7A9F7A] dark:text-green-400 bg-[#D4E6DC] dark:bg-green-900/40 px-1 py-0.5 rounded">L: {itemStats[item.name].min}</span>
-                                    <span className="text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/40 px-1 py-0.5 rounded">H: {itemStats[item.name].max}</span>
-                                  </div>
-                                </>
-                              ) : (
-                                <span className="text-xs font-semibold text-[#8B7E6B] dark:text-[#B8AED0]">৳{item.price}</span>
-                              )}
+                                )}
+                              </div>
+
+                              {/* Sub-column 2: Action Buttons */}
+                              <div className="flex items-center gap-1 shrink-0 pb-0.5">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDetailItem(item);
+                                  }}
+                                  className="text-[#8B7E6B] dark:text-[#6B5B95] border border-[#D4E6DC] dark:border-[#4A3F6B] hover:bg-[#D4E6DC]/50 dark:hover:bg-[#3D3460]/80 hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] transition-all p-1 rounded-md shadow-sm bg-white/50 dark:bg-[#3D3460]/30"
+                                  title="View Details"
+                                >
+                                  <ChevronRight size={14} />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemoveItem(item.name);
+                                  }}
+                                  className="text-[#8B7E6B] dark:text-[#6B5B95] border border-red-100 dark:border-red-900/30 ring-1 ring-red-500/10 hover:bg-red-50 dark:hover:bg-red-900/40 hover:text-red-600 dark:hover:text-red-400 transition-all p-1 rounded-md shadow-sm bg-white/50 dark:bg-[#3D3460]/30"
+                                  title="Remove item"
+                                >
+                                  <X size={12} />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-
-                          {/* Actions Wrapper */}
-                          <div className="flex items-center gap-1">
-                            {/* View Details Button */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDetailItem(item);
-                              }}
-                              className="text-[#8B7E6B] dark:text-[#6B5B95] border border-[#D4E6DC] dark:border-[#4A3F6B] hover:bg-[#D4E6DC]/50 dark:hover:bg-[#3D3460]/80 hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] transition-all p-1.5 rounded-lg shadow-sm"
-                              title="View Details"
-                            >
-                              <ChevronRight size={16} />
-                            </button>
-
-                            {/* Remove Button */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRemoveItem(item.name);
-                              }}
-                              className="text-[#8B7E6B] dark:text-[#6B5B95] border border-red-100 dark:border-red-900/30 ring-1 ring-red-500/10 hover:bg-red-50 dark:hover:bg-red-900/40 hover:text-red-600 dark:hover:text-red-400 transition-all p-1.5 rounded-lg shadow-sm"
-                              title="Remove item"
-                            >
-                              <X size={14} />
-                            </button>
                           </div>
                         </div>
                       </li>
