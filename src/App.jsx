@@ -465,18 +465,7 @@ function App() {
                                         : item.unit}
                                     </span>
                                   </span>
-                                  {itemStats[item.name] && itemStats[item.name].change !== 0 && (
-                                    <span className={clsx(
-                                      "text-[10px] sm:text-xs font-bold px-1.5 rounded-md flex items-center h-5 shadow-sm",
-                                      itemStats[item.name].change > 0 ? "text-red-600 bg-red-50 dark:bg-red-900/40 border border-red-100 dark:border-red-800/30" :
-                                        "text-[#4A6B4A] bg-[#D4E6DC] dark:bg-green-900/40 border border-[#D4E6DC] dark:border-green-800/30"
-                                    )}>
-                                      {itemStats[item.name].change > 0 ? '▲' : '▼'}
-                                      {normTargets.enabled
-                                        ? Math.round(getNormalizedPrice(Math.abs(itemStats[item.name].change), item.unit, normTargets))
-                                        : Math.abs(itemStats[item.name].change)}
-                                    </span>
-                                  )}
+
                                 </div>
 
                               </div>
