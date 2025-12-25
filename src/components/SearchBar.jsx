@@ -33,7 +33,8 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
         keys: ['name', 'category'], // Search in these fields
         threshold: 0.3,             // 0.0 = Exact match, 1.0 = Match anything
         distance: 100,              // How close the typo can be
-        minMatchCharLength: 2
+        minMatchCharLength: 2,
+        ignoreLocation: true        // Ignore where the match is found in the string
     }), [items]);
 
     // 3. Handle Search Logic
@@ -44,17 +45,19 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
         }
 
         // Perform the search
-        // 1. Exact/Prefix Matches (Higher Priority)
-        const lowerQuery = query.toLowerCase();
-        const prefixMatches = items.filter(item =>
-            item.name.toLowerCase().startsWith(lowerQuery)
-        );
+        // 1. Contains-All-Words Matches (Higher Priority)
+        const words = query.toLowerCase().split(/\s+/).filter(word => word.length > 0);
+        const strictMatches = items.filter(item => {
+            const itemName = item.name.toLowerCase();
+            const itemCategory = item.category.toLowerCase();
+            return words.every(word => itemName.includes(word) || itemCategory.includes(word));
+        });
 
         // 2. Fuzzy Matches (Fuse.js)
         const fuseResults = fuse.search(query).map(res => res.item);
 
-        // 3. Merge: Prefix + Fuzzy (Deduplicate using Set)
-        const finalResults = Array.from(new Set([...prefixMatches, ...fuseResults])).slice(0, 8);
+        // 3. Merge: Strict + Fuzzy (Deduplicate using Set)
+        const finalResults = Array.from(new Set([...strictMatches, ...fuseResults])).slice(0, 8);
 
         setResults(finalResults);
         setIsOpen(true);
