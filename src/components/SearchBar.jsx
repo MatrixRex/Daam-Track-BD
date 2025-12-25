@@ -233,7 +233,7 @@ export default function SearchBar({ onSelect, selectedItems = [] }) {
                 </div>
             )}
             {/* Hover Details Card */}
-            <ItemHoverCard item={hoveredItem} mousePos={mousePos} sideRect={sideRect} />
+            <ItemHoverCard item={hoveredItem} mousePos={mousePos} sideRect={sideRect} side="left" />
 
             {/* Mobile/Touch Details Modal */}
             <ItemDetailModal item={detailItem} onClose={() => setDetailItem(null)} />

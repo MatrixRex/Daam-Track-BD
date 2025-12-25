@@ -10,6 +10,9 @@ import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown, Downloa
 import { useMemo } from 'react';
 import { DATA_BASE_URL } from './config';
 import { Toaster } from 'sonner';
+import ItemHoverCard from './components/ItemHoverCard';
+import ItemDetailModal from './components/ItemDetailModal';
+import { ChevronRight } from 'lucide-react';
 
 // Extended color palette for unlimited comparisons
 const COLORS = [
@@ -37,8 +40,18 @@ function App() {
   const [itemStats, setItemStats] = useState({});
   const [isSorted, setIsSorted] = useState(false);
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
+  const [hoveredItemObj, setHoveredItemObj] = useState(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [sideRect, setSideRect] = useState(null);
+  const [detailItem, setDetailItem] = useState(null);
 
+  const compareListRef = useRef(null);
   const chartRef = useRef(null);
+
+  // Detect touch device to disable hover
+  const isTouchDevice = useMemo(() => {
+    return (typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+  }, []);
 
   // Optimize stats update to prevent infinite loops if reference unstable
   const handleStatsUpdate = useCallback((newStats) => {
@@ -88,7 +101,10 @@ function App() {
   // Remove item from comparison
   const handleRemoveItem = useCallback((itemName) => {
     setSelectedItems(prev => prev.filter(i => i.name !== itemName));
-  }, []);
+    if (hoveredItemObj?.name === itemName) {
+      setHoveredItemObj(null);
+    }
+  }, [hoveredItemObj]);
 
   // Clear all items
   const handleClearAll = useCallback(() => {
@@ -309,15 +325,37 @@ function App() {
                 </div>
 
                 {/* Items List */}
-                <ul className="max-h-[60vh] overflow-y-auto divide-y divide-[#D4E6DC]/30 dark:divide-[#3D3460] scrollbar-thin scrollbar-thumb-[#D4E6DC] dark:scrollbar-thumb-[#4A3F6B] scrollbar-track-transparent hover:scrollbar-thumb-[#97B897] dark:hover:scrollbar-thumb-[#6B5B95] pr-1">
+                <ul
+                  ref={compareListRef}
+                  className="max-h-[60vh] overflow-y-auto divide-y divide-[#D4E6DC]/30 dark:divide-[#3D3460] scrollbar-thin scrollbar-thumb-[#D4E6DC] dark:scrollbar-thumb-[#4A3F6B] scrollbar-track-transparent hover:scrollbar-thumb-[#97B897] dark:hover:scrollbar-thumb-[#6B5B95] pr-1"
+                >
                   {sortedItems.map((item) => {
                     const itemColor = getItemColor(item.name);
                     return (
                       <li
                         key={item.name}
-                        onMouseEnter={() => setHoveredItem(item.name)}
-                        onMouseLeave={() => setHoveredItem(null)}
-                        className={`p-3 transition-colors group cursor-pointer ${hoveredItem === item.name ? 'bg-[#D4E6DC]/50 dark:bg-[#3D3460] shadow-sm border-l-4 border-l-[#97B897] dark:border-l-[#6B5B95]' : 'hover:bg-[#F5E6D3]/50 dark:hover:bg-[#3D3460]/50 border-l-4 border-l-transparent'}`}
+                        onMouseEnter={() => {
+                          setHoveredItem(item.name);
+                          if (!isTouchDevice) {
+                            setHoveredItemObj(item);
+                            if (compareListRef.current) {
+                              setSideRect(compareListRef.current.getBoundingClientRect());
+                            }
+                          }
+                        }}
+                        onMouseLeave={() => {
+                          setHoveredItem(null);
+                          if (!isTouchDevice) {
+                            setHoveredItemObj(null);
+                            setSideRect(null);
+                          }
+                        }}
+                        onMouseMove={(e) => {
+                          if (!isTouchDevice) {
+                            setMousePos({ x: e.clientX, y: e.clientY });
+                          }
+                        }}
+                        className={`p-3 transition-colors group cursor-pointer relative ${hoveredItem === item.name ? 'bg-[#D4E6DC]/50 dark:bg-[#3D3460] shadow-sm border-l-4 border-l-[#97B897] dark:border-l-[#6B5B95]' : 'hover:bg-[#F5E6D3]/50 dark:hover:bg-[#3D3460]/50 border-l-4 border-l-transparent'}`}
                       >
                         <div className="flex items-center gap-3">
                           {/* Color Indicator */}
@@ -369,17 +407,32 @@ function App() {
                             </div>
                           </div>
 
-                          {/* Remove Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveItem(item.name);
-                            }}
-                            className="text-[#8B7E6B] dark:text-[#6B5B95] hover:bg-red-100 dark:hover:bg-red-900/40 hover:text-red-600 dark:hover:text-red-400 transition-all p-1.5 rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100"
-                            title="Remove item"
-                          >
-                            <X size={14} />
-                          </button>
+                          {/* Actions Wrapper */}
+                          <div className="flex items-center gap-1">
+                            {/* View Details Button */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDetailItem(item);
+                              }}
+                              className="text-[#8B7E6B] dark:text-[#6B5B95] border border-[#D4E6DC] dark:border-[#4A3F6B] hover:bg-[#D4E6DC]/50 dark:hover:bg-[#3D3460]/80 hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] transition-all p-1.5 rounded-lg shadow-sm"
+                              title="View Details"
+                            >
+                              <ChevronRight size={16} />
+                            </button>
+
+                            {/* Remove Button */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveItem(item.name);
+                              }}
+                              className="text-[#8B7E6B] dark:text-[#6B5B95] border border-red-100 dark:border-red-900/30 ring-1 ring-red-500/10 hover:bg-red-50 dark:hover:bg-red-900/40 hover:text-red-600 dark:hover:text-red-400 transition-all p-1.5 rounded-lg shadow-sm"
+                              title="Remove item"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
                         </div>
                       </li>
                     );
@@ -404,6 +457,10 @@ function App() {
       </div>
       <BuildInfo />
       <Toaster position="bottom-right" theme="system" />
+
+      {/* Hover & Details Overlay Components */}
+      <ItemHoverCard item={hoveredItemObj} mousePos={mousePos} sideRect={sideRect} />
+      <ItemDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
     </div>
   );
 }

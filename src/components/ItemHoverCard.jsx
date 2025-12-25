@@ -2,27 +2,37 @@ import React from 'react';
 import { DATA_BASE_URL } from '../config';
 import clsx from 'clsx';
 
-export default function ItemHoverCard({ item, mousePos, sideRect }) {
+export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right' }) {
     if (!item) return null;
 
     const cardWidth = 288; // Default width of w-72
     const cardHeight = 380; // Approximate height
-    const gap = 20;
+    const gap = 15;
 
     let left = mousePos.x + 20;
     let top = mousePos.y + 10;
 
     if (sideRect) {
-        // Horizontal: Show beside the dropdown
-        const spaceOnLeft = sideRect.left;
+        // Horizontal: Show beside the anchor
         const spaceOnRight = window.innerWidth - sideRect.right;
+        const spaceOnLeft = sideRect.left;
 
-        if (spaceOnLeft > cardWidth + gap) {
-            // Position on the left of search results
-            left = sideRect.left - cardWidth - gap;
+        if (side === 'right') {
+            if (spaceOnRight > cardWidth + gap) {
+                // Show on the right
+                left = sideRect.right + gap;
+            } else {
+                // Not enough space on right, and we want to avoid the left (chart)
+                // So we overlap the anchor list itself
+                left = Math.max(10, sideRect.right - cardWidth);
+            }
         } else {
-            // Position on the right of search results
-            left = sideRect.right + gap;
+            // side === 'left' preference (Search Bar)
+            if (spaceOnLeft > cardWidth + gap) {
+                left = sideRect.left - cardWidth - gap;
+            } else {
+                left = sideRect.right + gap;
+            }
         }
 
         // Vertical: Track mouse but center the card vertically on cursor
