@@ -6,41 +6,54 @@ import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quan
 export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right', normTargets, stats }) {
     if (!item) return null;
 
-    const cardWidth = 288; // Default width of w-72
-    const cardHeight = 380; // Approximate height
+    const cardWidth = 288;
+    const cardHeight = 380;
     const gap = 15;
+    const hoverItemOffset = 40; // Space to keep the hovered item visible
 
     let left = mousePos.x + 20;
-    let top = mousePos.y + 10;
+    let top = mousePos.y;
 
+    // 1. Vertical Positioning Logic: Anchor based on screen half
+    if (mousePos.y < window.innerHeight / 2) {
+        // Cursor in top half: card goes BELOW
+        top = mousePos.y + hoverItemOffset;
+    } else {
+        // Cursor in bottom half: card goes ABOVE
+        top = mousePos.y - cardHeight - hoverItemOffset;
+    }
+
+    // 2. Horizontal Positioning Logic
     if (sideRect) {
-        // Horizontal: Show beside the anchor
         const spaceOnRight = window.innerWidth - sideRect.right;
         const spaceOnLeft = sideRect.left;
 
         if (side === 'right') {
+            // Priority 1: Right of the list
             if (spaceOnRight > cardWidth + gap) {
-                // Show on the right
                 left = sideRect.right + gap;
             } else {
-                // Not enough space on right, and we want to avoid the left (chart)
-                // So we overlap the anchor list itself
-                left = Math.max(10, sideRect.right - cardWidth);
+                // Priority 2: Overlap the list, but NEVER overlap the chart (don't go left of sideRect.left)
+                left = Math.max(sideRect.left, sideRect.right - cardWidth);
             }
         } else {
-            // side === 'left' preference (Search Bar)
+            // side === 'left' (e.g. Search Bar)
+            // Priority 1: Left of the anchor
             if (spaceOnLeft > cardWidth + gap) {
                 left = sideRect.left - cardWidth - gap;
-            } else {
+            }
+            // Priority 2: Right of the anchor
+            else if (spaceOnRight > cardWidth + gap) {
                 left = sideRect.right + gap;
             }
+            // Priority 3: Overlap but stay within sideRect bounds if possible
+            else {
+                left = Math.max(10, sideRect.left);
+            }
         }
-
-        // Vertical: Track mouse but center the card vertically on cursor
-        top = mousePos.y - (cardHeight / 2);
     }
 
-    // Guardrail: Keep within viewport bounds
+    // Final Guardrail: Keep within viewport bounds
     const clampedTop = Math.max(10, Math.min(top, window.innerHeight - cardHeight - 10));
     const clampedLeft = Math.max(10, Math.min(left, window.innerWidth - cardWidth - 10));
 
