@@ -10,14 +10,12 @@ jobs:
       contents: write
 
     steps:
-      # 1. Checkout 'main' to get the scraper/fix_data.py script
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           path: main_code
 
-      # 2. Checkout 'database' branch into the 'public' folder
-      # We put it in main_code/public so the script can find it at ../public
+      # Checkout database branch into main_code/public
       - name: Checkout Database
         uses: actions/checkout@v4
         with:
@@ -32,17 +30,16 @@ jobs:
       - name: Install Dependencies
         run: pip install pandas pyarrow fastparquet
 
-      # 3. Run the script
+      # Execute script from the root of the checked out code
       - name: Run Fix Script
         working-directory: ./main_code
         run: python scraper/fix_data.py
 
-      # 4. Push changes ONLY to the database branch
       - name: Commit and Push Data
         working-directory: ./main_code/public
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Fix: Separate product variants in database" || echo "No changes to commit"
+          git commit -m "Fix: Separate product variants" || echo "No changes to commit"
           git push
