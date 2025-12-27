@@ -66,6 +66,7 @@ def scrape():
         print("Launching browser...")
         browser = p.chromium.launch(headless=True) 
         
+        # specific context setup (mobile view/location/locale)
         context = browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             permissions=['geolocation'], 
@@ -76,13 +77,13 @@ def scrape():
         total_cats = len(URLS)
         
         for index, entry in enumerate(URLS):
-            # Optional: Add simple ETA based on average time per category
             print(f"[{index+1}/{total_cats}] Scraping: {entry['category']}...")
             
             try:
                 page = context.new_page()
                 page.goto(entry['url'], timeout=60000)
 
+                # Wait for products to load
                 try:
                     page.wait_for_selector('.product', timeout=10000)
                 except:
@@ -90,6 +91,7 @@ def scrape():
                     page.close()
                     continue
 
+                # Scroll down to load lazy-loaded items
                 for i in range(15): 
                     page.keyboard.press("PageDown")
                     time.sleep(0.5)
@@ -99,6 +101,7 @@ def scrape():
 
                 for product in products:
                     try:
+                        # Skip cart/summary items
                         class_attr = product.get_attribute("class")
                         if "total" in class_attr or "shoppingCart" in class_attr: continue
 
@@ -107,14 +110,26 @@ def scrape():
                         
                         if not name_el or not price_el: continue
 
-                        name = name_el.inner_text()
+                        name = name_el.inner_text().strip()
                         price_text = price_el.inner_text().replace('৳', '').replace(',', '').strip()
+                        
                         if not price_text: continue
                         price = float(price_text)
 
                         unit_el = product.query_selector('.subText')
-                        unit = unit_el.inner_text() if unit_el else "N/A"
+                        unit = unit_el.inner_text().strip() if unit_el else "N/A"
 
+                        # ---------------------------------------------------------
+                        # ### FIX: COMPOSITE NAME LOGIC
+                        # We append the unit to the name. This ensures that "Oil 1L" 
+                        # and "Oil 5L" are treated as completely different products 
+                        # by the database, the image hasher, and the frontend.
+                        # ---------------------------------------------------------
+                        if unit and unit != "N/A":
+                            name = f"{name} {unit}"
+                        # ---------------------------------------------------------
+
+                        # Image processing (Now uses the unique name with unit for hashing)
                         img_el = product.query_selector('img')
                         img_url = img_el.get_attribute('src') if img_el else None
                         
@@ -124,7 +139,7 @@ def scrape():
 
                         scraped_data.append({
                             "date": today,
-                            "name": name,
+                            "name": name, # This now contains the unit (e.g. "Soybean Oil 5L")
                             "price": price,
                             "unit": unit,
                             "category": entry['category'],
@@ -142,6 +157,7 @@ def scrape():
 
         browser.close()
 
+    # --- DATA SAVING LOGIC ---
     if scraped_data:
         df_new = pd.DataFrame(scraped_data)
         
@@ -157,14 +173,21 @@ def scrape():
             print("Creating new database...")
             df_final = df_new
 
-        initial_count = len(df_final)
-        df_final = df_final.drop_duplicates(subset=['date', 'name'], keep='first')
+        # ---------------------------------------------------------
+        # ### FIX: DUPLICATE PROTECTION
+        # Because 'name' is now unique per variant (e.g. "Oil 1L" vs "Oil 5L"),
+        # we can safely drop duplicates based on just Date + Name.
+        # We also added 'unit' to the subset just to be explicit/safe.
+        # ---------------------------------------------------------
+        df_final = df_final.drop_duplicates(subset=['date', 'name', 'unit'], keep='first')
         
         # Sort for optimization
         df_final = df_final.sort_values(by=['name', 'date'])
         
         df_final.to_parquet(parquet_file, index=False, compression='snappy')
         
+        # Update Meta JSON for search suggestions
+        # We keep the LAST seen price/details for the frontend search
         meta_df = df_final.sort_values('date').drop_duplicates('name', keep='last')
         meta_df = meta_df[['name', 'category', 'unit', 'image', 'price']]
         meta_df.to_json(os.path.join(DATA_DIR, "meta.json"), orient='records')

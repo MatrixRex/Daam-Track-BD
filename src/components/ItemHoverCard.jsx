@@ -72,11 +72,11 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
                 "animate-in fade-in zoom-in-95 duration-200"
             )}>
                 {/* Image Section */}
-                <div className="relative h-48 bg-[#F5E6D3] dark:bg-[#1E1A2E] flex items-center justify-center p-6">
+                <div className="relative h-48 bg-[#F5E6D3] dark:bg-[#1E1A2E] flex items-center justify-center overflow-hidden">
                     <img
                         src={`${DATA_BASE_URL}/images/${item.image}`}
                         alt={item.name}
-                        className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-110 drop-shadow-xl"
+                        className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-110"
                         onError={(e) => {
                             e.target.style.display = 'none';
                             e.target.nextSibling.style.display = 'flex';
