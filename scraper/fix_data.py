@@ -1,62 +1,69 @@
 import pandas as pd
 import os
-import datetime
-
-# --- CONFIGURATION ---
-# Script is in 'scraper/', so we go up one level to find the root
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.dirname(CURRENT_DIR)
-
-# We will mount the database branch into the 'public' folder
-# So the data path will be: root/public/data
-DATA_DIR = os.path.join(BASE_DIR, "public", "data")
-PRICES_DIR = os.path.join(DATA_DIR, "prices")
-
-# Target current year
-current_year = datetime.datetime.now().year
-PARQUET_PATH = os.path.join(PRICES_DIR, f"year={current_year}", "data.parquet")
 
 def fix_database():
-    print(f"📂 Looking for database at: {PARQUET_PATH}")
+    # We are running from the root 'main_code' directory
+    base_path = os.getcwd() 
     
-    if not os.path.exists(PARQUET_PATH):
-        print(f"❌ Error: Database not found.")
+    # Construct the exact path: public/data/prices/year=2025/data.parquet
+    parquet_path = os.path.join(base_path, "public", "data", "prices", "year=2025", "data.parquet")
+    
+    print(f"Target Database Path: {parquet_path}")
+
+    if not os.path.exists(parquet_path):
+        print(f"Error: File not found at {parquet_path}")
+        # Debugging: check if public/data even exists
+        public_data = os.path.join(base_path, "public", "data")
+        if os.path.exists(public_data):
+            print(f"Contents of public/data: {os.listdir(public_data)}")
+        else:
+            print("Folder public/data does not exist.")
         return
 
-    print(f"Loading database...")
-    df = pd.read_parquet(PARQUET_PATH)
-    old_count = len(df)
+    print("File found. Loading database...")
     
-    # 1. FIX NAMES (Append Unit)
-    def fix_name(row):
-        name = row['name']
-        unit = row['unit']
-        # If unit is valid and not already in name
-        if unit and unit != "N/A" and str(unit) not in name:
-            return f"{name} {unit}"
-        return name
+    try:
+        df = pd.read_parquet(parquet_path)
+        old_count = len(df)
+        print(f"Loaded {old_count} rows.")
 
-    df['name'] = df.apply(fix_name, axis=1)
+        # --- APPLY FIX ---
+        print("Applying name and unit fix...")
+        def fix_name(row):
+            name = row['name']
+            unit = row['unit']
+            # If unit exists, is not N/A, and is not already in the name
+            if unit and unit != "N/A" and str(unit) not in name:
+                return f"{name} {unit}"
+            return name
 
-    # 2. DROP DUPLICATES
-    # Now that names are unique ("Oil 1L", "Oil 5L"), we can drop true duplicates
-    df = df.drop_duplicates(subset=['date', 'name', 'unit'], keep='first')
-    df = df.sort_values(by=['name', 'date'])
+        df['name'] = df.apply(fix_name, axis=1)
+        
+        # Deduplicate based on the new unique names
+        df = df.drop_duplicates(subset=['date', 'name', 'unit'], keep='first')
+        df = df.sort_values(by=['name', 'date'])
+        # -----------------
 
-    print(f"Rows: {old_count} -> {len(df)}")
+        print(f"New row count: {len(df)} (Removed {old_count - len(df)} duplicates)")
 
-    # 3. SAVE PARQUET
-    df.to_parquet(PARQUET_PATH, index=False, compression='snappy')
+        # SAVE PARQUET
+        df.to_parquet(parquet_path, index=False, compression='snappy')
+        print("Saved fixed parquet file.")
 
-    # 4. REGENERATE META.JSON
-    # We use the LAST seen price for the search index
-    meta_df = df.sort_values('date').drop_duplicates('name', keep='last')
-    meta_df = meta_df[['name', 'category', 'unit', 'image', 'price']]
-    
-    meta_path = os.path.join(DATA_DIR, "meta.json")
-    meta_df.to_json(meta_path, orient='records')
+        # REGENERATE META.JSON
+        # Path: public/data/meta.json
+        meta_path = os.path.join(base_path, "public", "data", "meta.json")
+        print(f"Regenerating meta.json at {meta_path}...")
+        
+        # We use the LAST seen price for the search index
+        meta_df = df.sort_values('date').drop_duplicates('name', keep='last')
+        meta_df = meta_df[['name', 'category', 'unit', 'image', 'price']]
+        meta_df.to_json(meta_path, orient='records')
 
-    print("✅ Fix Complete.")
+        print("SUCCESS: Database repair finished.")
+        
+    except Exception as e:
+        print(f"CRITICAL ERROR: {e}")
 
 if __name__ == "__main__":
     fix_database()

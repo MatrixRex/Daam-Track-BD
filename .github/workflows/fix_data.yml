@@ -1,31 +1,45 @@
 name: Manual Data Fix
 
 on:
-  workflow_dispatch: # This allows you to run it manually from a button
+  workflow_dispatch:
 
 jobs:
-  fix-data:
+  fix-data-branch:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          path: main_code
+
+      # Checkout database branch into main_code/public
+      - name: Checkout Database
+        uses: actions/checkout@v4
+        with:
+          ref: database
+          path: main_code/public
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Install Dependencies
-        run: |
-          pip install pandas pyarrow fastparquet
+        run: pip install pandas pyarrow fastparquet
 
+      # Execute script from the root of the checked out code
       - name: Run Fix Script
-        run: python fix_data.py
+        working-directory: ./main_code
+        run: python scraper/fix_data.py
 
-      - name: Commit and Push Changes
+      - name: Commit and Push Data
+        working-directory: ./main_code/public
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/data/
-          git commit -m "Fix: Separate product variants in parquet database" || echo "No changes to commit"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Fix: Separate product variants" || echo "No changes to commit"
           git push
