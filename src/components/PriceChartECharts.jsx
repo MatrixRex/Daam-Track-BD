@@ -626,8 +626,8 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             const mainData = finalChartData.map(d => d[name]);
             const extData = finalChartData.map(d => d[`${name}_ext`]);
 
-            // Only add series if data exists (forces entrance animation on load)
-            const hasMainData = mainData.some(v => v !== undefined && v !== null);
+            const validMainPointsCount = mainData.filter(v => v !== undefined && v !== null).length;
+            const hasMainData = validMainPointsCount > 0;
             const hasExtData = extData.some(v => v !== undefined && v !== null);
 
             if (hasMainData) {
@@ -637,16 +637,25 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     name: name,
                     type: 'line',
                     data: mainData,
-                    itemStyle: { color: color },
+                    itemStyle: {
+                        color: color,
+                        opacity: hoveredItem && hoveredItem !== name ? 0.2 : 1
+                    },
                     lineStyle: {
                         width: 2,
                         opacity: hoveredItem && hoveredItem !== name ? 0.2 : 1 // Dim if not hovered from list
                     },
-                    showSymbol: false,
+                    showSymbol: true,
+                    symbol: 'circle',
+                    symbolSize: validMainPointsCount === 1 ? 10 : 4,
                     smooth: true,
                     animation: true, // Force animation
                     emphasis: {
-                        disabled: true
+                        scale: true,
+                        itemStyle: {
+                            borderWidth: 2,
+                            borderColor: isDark ? '#2A2442' : '#fff'
+                        }
                     },
                     // Area filling on specific hover or if active?
                     areaStyle: {

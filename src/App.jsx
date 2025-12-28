@@ -40,7 +40,7 @@ function App() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [hoveredItem, setHoveredItem] = useState(null);
   const [itemStats, setItemStats] = useState({});
-  const [isSorted, setIsSorted] = useState(false);
+  const [isSorted, setIsSorted] = useState(true);
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
   const [hoveredItemObj, setHoveredItemObj] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -343,8 +343,8 @@ function App() {
                 </div>
 
                 {/* Normalization Controls */}
-                <div className="p-4 border-b border-[#D4E6DC]/50 dark:border-[#3D3460] bg-[#F5E6D3]/20 dark:bg-[#1E1A2E]/20">
-                  <div className="flex items-center justify-between mb-3">
+                <div className={clsx("px-4 border-b border-[#D4E6DC]/50 dark:border-[#3D3460] bg-[#F5E6D3]/20 dark:bg-[#1E1A2E]/20 transition-all duration-300", normTargets.enabled ? "py-4" : "py-2.5")}>
+                  <div className={clsx("flex items-center justify-between", normTargets.enabled && "mb-3")}>
                     <div className="flex items-center gap-2">
                       <Scale size={16} className={normTargets.enabled ? "text-[#7A9F7A] dark:text-[#9D8EC9]" : "text-[#8B7E6B] dark:text-[#6B5B95]"} />
                       <span className="text-sm font-semibold text-[#5C5247] dark:text-white">Normalize Units</span>
@@ -366,24 +366,24 @@ function App() {
                   </div>
 
                   {normTargets.enabled && (
-                    <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="grid grid-cols-3 gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
                       {[
-                        { label: 'Weight', key: 'mass', unit: 'kg' },
-                        { label: 'Volume', key: 'volume', unit: 'L' },
-                        { label: 'Count', key: 'count', unit: 'pcs' },
+                        { label: 'Weight', key: 'mass', unit: 'kg', step: '0.1' },
+                        { label: 'Volume', key: 'volume', unit: 'L', step: '0.1' },
+                        { label: 'Count', key: 'count', unit: 'pcs', step: '1' },
                       ].map((type) => (
-                        <div key={type.key} className="flex items-center justify-between gap-4">
-                          <label className="text-xs font-medium text-[#8B7E6B] dark:text-[#6B5B95]">{type.label}</label>
+                        <div key={type.key} className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-[#8B7E6B] dark:text-[#6B5B95] uppercase tracking-tighter pl-0.5">{type.label}</label>
                           <div className="flex items-center bg-white dark:bg-[#3D3460] border border-[#D4E6DC] dark:border-[#4A3F6B] rounded-lg px-2 py-1 shadow-sm">
                             <input
                               type="number"
                               min="0"
-                              step="1"
+                              step={type.step}
                               value={normTargets[type.key]}
-                              onChange={(e) => setNormTargets(prev => ({ ...prev, [type.key]: parseInt(e.target.value, 10) || 0 }))}
-                              className="w-12 text-right text-xs font-bold bg-transparent border-none focus:ring-0 text-[#5C5247] dark:text-white p-0"
+                              onChange={(e) => setNormTargets(prev => ({ ...prev, [type.key]: parseFloat(e.target.value) || 0 }))}
+                              className="w-full text-right text-xs font-bold bg-transparent border-none focus:ring-0 text-[#5C5247] dark:text-white p-0"
                             />
-                            <span className="text-[10px] font-bold text-[#8B7E6B] dark:text-[#6B5B95] border-l border-[#D4E6DC] dark:border-[#4A3F6B] ml-2 pl-2">{type.unit}</span>
+                            <span className="text-[9px] font-bold text-[#8B7E6B] dark:text-[#6B5B95] ml-1 opacity-70">{type.unit}</span>
                           </div>
                         </div>
                       ))}
