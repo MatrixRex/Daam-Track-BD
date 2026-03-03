@@ -3,7 +3,6 @@ import sys
 import time
 import hashlib
 import datetime
-import requests
 import json
 import pandas as pd
 from playwright.sync_api import sync_playwright
@@ -54,6 +53,9 @@ def process_image(image_url, filename):
     except Exception:
         pass 
 
+# --- CONFIGURATION ---
+# No longer using API constants, back to Browser automation for reliability
+
 def scrape():
     # 1. START TIMER
     start_time = time.time()
@@ -72,15 +74,13 @@ def scrape():
         print("Launching browser...")
         browser = p.chromium.launch(headless=True) 
         
-        # specific context setup (mobile view/location/locale)
+        # specific context setup
         context = browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             permissions=['geolocation'], 
             geolocation={'latitude': 23.8103, 'longitude': 90.4125}, 
             locale='en-US'
         )
-        
-        # total_cats = len(URLS) # Moved up
         
         for index, entry in enumerate(URLS):
             print(f"[{index+1}/{total_cats}] Scraping: {entry['category']}...")
@@ -89,30 +89,45 @@ def scrape():
                 page = context.new_page()
                 page.goto(entry['url'], timeout=60000)
 
-                # Wait for products to load
-                try:
-                    page.wait_for_selector('.product', timeout=10000)
-                except:
-                    print(f"  > Warning: No items found for {entry['category']} (Timeout)")
+                # Wait for any product container to load (Multi-selector wait)
+                container_selectors = ['.productV2Catalog', '.product', '.productsContent > div', '.product-pane div']
+                found_container = None
+                for selector in container_selectors:
+                    try:
+                        page.wait_for_selector(selector, timeout=8000)
+                        found_container = selector
+                        break
+                    except:
+                        continue
+
+                if not found_container:
+                    print(f"  > Warning: No product containers found for {entry['category']} (Final URL: {page.url})")
                     page.close()
                     continue
 
-                # Scroll down to load lazy-loaded items
-                for i in range(15): 
+                # Scroll down with more breathing room for infinite scroll
+                for i in range(16): 
                     page.keyboard.press("PageDown")
-                    time.sleep(0.5)
+                    time.sleep(0.8) # Increased wait for loading
+                
+                # Final settle wait
+                time.sleep(1.5)
 
-                products = page.query_selector_all('.product')
+                products = page.query_selector_all(found_container)
                 count_for_page = 0
 
                 for product in products:
                     try:
-                        # Skip cart/summary items
-                        class_attr = product.get_attribute("class")
-                        if "total" in class_attr or "shoppingCart" in class_attr: continue
-
-                        name_el = product.query_selector('.name')
-                        price_el = product.query_selector('.price')
+                        # 1. NAME SELECTORS
+                        name_el = product.query_selector('.nameTextWithEllipsis') or \
+                                  product.query_selector('.pvName p') or \
+                                  product.query_selector('.name')
+                        
+                        # 2. PRICE SELECTORS
+                        # Note: Some use .productV2discountedPrice, some use .price
+                        price_el = product.query_selector('.productV2discountedPrice span') or \
+                                   product.query_selector('.price span') or \
+                                   product.query_selector('.price')
                         
                         if not name_el or not price_el: continue
 
@@ -122,35 +137,41 @@ def scrape():
                         if not price_text: continue
                         price = float(price_text)
 
-                        unit_el = product.query_selector('.subText')
+                        # 3. UNIT SELECTORS
+                        # Note: Case sensitivity matters in CSS (.subText vs .subtext)
+                        unit_el = product.query_selector('.subText span') or \
+                                  product.query_selector('.subtext span') or \
+                                  product.query_selector('.subText') or \
+                                  product.query_selector('.subtext') or \
+                                  product.query_selector('.sub-text')
+                        
                         unit = unit_el.inner_text().strip() if unit_el else "N/A"
 
-                        # ---------------------------------------------------------
-                        # ### FIX: COMPOSITE NAME LOGIC
-                        # We append the unit to the name. This ensures that "Oil 1L" 
-                        # and "Oil 5L" are treated as completely different products 
-                        # by the database, the image hasher, and the frontend.
-                        # ---------------------------------------------------------
-                        if unit and unit != "N/A":
-                            name = f"{name} {unit}"
-                        # ---------------------------------------------------------
+                        # Composition logic
+                        display_name = name
+                        if unit and unit != "N/A" and unit.lower() not in name.lower():
+                            display_name = f"{name} {unit}"
 
-                        # Image processing (Now uses the unique name with unit for hashing)
-                        img_el = product.query_selector('img')
+                        # 4. IMAGE SELECTORS
+                        img_el = product.query_selector('.imageWrapperWrapper img') or \
+                                 product.query_selector('.imageWrapper img') or \
+                                 product.query_selector('img')
+                        
                         img_url = img_el.get_attribute('src') if img_el else None
                         
-                        img_filename = get_image_filename(name)
+                        img_filename = get_image_filename(display_name)
                         if img_url:
                             process_image(img_url, img_filename)
 
                         scraped_data.append({
                             "date": today,
-                            "name": name, # This now contains the unit (e.g. "Soybean Oil 5L")
+                            "name": display_name,
                             "price": price,
                             "unit": unit,
                             "category": entry['category'],
                             "image": img_filename
                         })
+                        print(f"    + {display_name}: ৳{price}") 
                         count_for_page += 1
                     except Exception:
                         continue
