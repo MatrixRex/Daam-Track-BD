@@ -439,7 +439,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     result[extKey] = undefined;
                 } else if (existing && existing[name] !== undefined) {
                     result[name] = existing[name];
-                    result[extKey] = existing[name];
+                    result[extKey] = undefined; // No dashed line where real data exists
                 } else if (dateEntry.date < bounds.firstDate) {
                     result[name] = undefined;
                     result[extKey] = bounds.firstValue;
@@ -526,7 +526,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 else resultVal = values.reduce((a, b) => a + b, 0) / values.length;
 
                 entry[name] = Math.round(resultVal);
-                entry[`${name}_ext`] = Math.round(resultVal);
+                // No dashed line where real data exists
             });
 
             aggregated.push(entry);
@@ -684,9 +684,9 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         width: 2
                     },
                     showSymbol: false,
-                    smooth: true,
+                    smooth: false,
                     animation: true, // Force animation here too
-                    connectNulls: true,
+                    connectNulls: false,
                     z: 1,
                     silent: true,
                     emphasis: { disabled: true }
