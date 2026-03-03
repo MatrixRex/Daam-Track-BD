@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import time
 from playwright.sync_api import sync_playwright
 
@@ -129,7 +130,11 @@ def fetch_categories():
 
         browser.close()
 
-    # Save
+    # Validation & Save
+    if not final_links:
+        print("\n[!] FATAL ERROR: No categories found. Site structure likely changed.")
+        sys.exit(1)
+
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(final_links, f, indent=2)
     print(f"\nSUCCESS! Scraped {len(final_links)} categories.")

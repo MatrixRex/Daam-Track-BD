@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import hashlib
 import datetime
@@ -62,6 +63,11 @@ def scrape():
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     current_year = datetime.datetime.now().year
 
+    # Validation Counters
+    total_cats = len(URLS)
+    categories_with_data = 0
+    total_items_scraped = 0
+
     with sync_playwright() as p:
         print("Launching browser...")
         browser = p.chromium.launch(headless=True) 
@@ -74,7 +80,7 @@ def scrape():
             locale='en-US'
         )
         
-        total_cats = len(URLS)
+        # total_cats = len(URLS) # Moved up
         
         for index, entry in enumerate(URLS):
             print(f"[{index+1}/{total_cats}] Scraping: {entry['category']}...")
@@ -149,6 +155,10 @@ def scrape():
                     except Exception:
                         continue
                 
+                if count_for_page > 0:
+                    categories_with_data += 1
+                    total_items_scraped += count_for_page
+
                 print(f"  > Found {count_for_page} items.")
                 page.close()
                 
@@ -156,6 +166,28 @@ def scrape():
                 print(f"  > Error scraping {entry['category']}: {e}")
 
         browser.close()
+
+    # --- VALIDATION CHECK ---
+    print(f"\n--- Scraping Summary ---")
+    print(f"Total Categories Attempted: {total_cats}")
+    print(f"Categories with Data: {categories_with_data}")
+    print(f"Total Items Scraped: {total_items_scraped}")
+    
+    # 1. Fatal: No data at all
+    if total_items_scraped == 0:
+        print("\n[!] FATAL ERROR: No products found across ALL categories.")
+        print("This usually means the site structure or selector ('.product') has changed.")
+        sys.exit(1)
+        
+    # 2. Fatal: High failure rate (e.g., > 95% of categories empty)
+    # We expect some categories to be empty occasionally, but not most of them.
+    success_rate = categories_with_data / total_cats
+    if success_rate < 0.05: # Adjust this threshold as needed
+        print(f"\n[!] FATAL ERROR: High failure rate ({success_rate:.1%} success).")
+        print(f"Only {categories_with_data} out of {total_cats} categories returned data.")
+        sys.exit(1)
+
+    print(f"Data validation passed (Success Rate: {success_rate:.1%})\n")
 
     # --- DATA SAVING LOGIC ---
     if scraped_data:
