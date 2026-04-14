@@ -9,9 +9,12 @@ import { useDuckDB } from './hooks/useDuckDB';
 import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown, Download, FileJson, FileSpreadsheet, Image as ImageIcon, FileText, Copy } from 'lucide-react';
 import { useMemo } from 'react';
 import { DATA_BASE_URL } from './config';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import ItemHoverCard from './components/ItemHoverCard';
 import ItemDetailModal from './components/ItemDetailModal';
+import CommandBar from './components/CommandBar';
+import StatsSidebar from './components/StatsSidebar';
+import ItemDetailsPanel from './components/ItemDetailsPanel';
 import { ChevronRight, Scale } from 'lucide-react';
 import clsx from 'clsx';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from './utils/quantityUtils';
@@ -46,6 +49,7 @@ function App() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [sideRect, setSideRect] = useState(null);
   const [detailItem, setDetailItem] = useState(null);
+  const [selectedDetailItemName, setSelectedDetailItemName] = useState(null);
   const [normTargets, setNormTargets] = useState({
     mass: 1,
     volume: 1,
@@ -146,14 +150,26 @@ function App() {
     if (hoveredItemObj?.name === itemName) {
       setHoveredItemObj(null);
     }
-  }, [hoveredItemObj]);
+    if (selectedDetailItemName === itemName) {
+      setSelectedDetailItemName(null);
+    }
+  }, [hoveredItemObj, selectedDetailItemName]);
 
   // Clear all items
   const handleClearAll = useCallback(() => {
     setSelectedItems([]);
+    setSelectedDetailItemName(null);
     // Reset color assignments when all items are cleared
     colorAssignmentsRef.current.clear();
     nextColorIndexRef.current = 0;
+  }, []);
+
+  const handleResetView = useCallback(() => {
+    // This could reset Zoom or Date range if exposed by the chart
+    if (chartRef.current) {
+        // We'll just toast for now or trigger a chart method if it exists
+        toast.info("Resetting view...");
+    }
   }, []);
 
   const sortedItems = useMemo(() => {
@@ -321,13 +337,23 @@ function App() {
       </div>
 
       {/* --- MAIN CONTENT AREA --- */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full max-w-[1920px] mx-auto px-1 sm:px-2 lg:px-4 py-6">
+
+        {/* --- COMMAND & SELECTION BAR --- */}
+        <div className="flex flex-col gap-4 mb-6">
+          <CommandBar
+            normTargets={normTargets}
+            onUpdateNorm={setNormTargets}
+            onClearAll={handleClearAll}
+            onResetView={handleResetView}
+          />
+        </div>
 
         {selectedItems.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full">
 
-            {/* Left Column: Chart (3/4 width) */}
-            <div className="lg:col-span-3">
+            {/* Column 1: Chart (Flexible) */}
+            <div className="lg:col-span-6 xl:col-span-7 min-h-[500px]">
               <PriceChart
                 ref={chartRef}
                 items={selectedItems}
@@ -339,223 +365,63 @@ function App() {
               />
             </div>
 
-            {/* Right Column: Selected Items List (1/4 width) */}
-            <div className="lg:col-span-1">
-              <div className="bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl shadow-sm border border-[#D4E6DC] dark:border-[#4A3F6B] sticky top-24 transition-colors duration-300">
-                {/* Header */}
-                <div className="p-4 border-b border-[#D4E6DC]/50 dark:border-[#3D3460] flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm sm:text-base font-semibold text-[#5C5247] dark:text-white">Comparing</h3>
-                    <p className="text-xs text-[#8B7E6B] dark:text-[#6B5B95]">{selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''}</p>
-                  </div>
-                  {selectedItems.length > 1 && (
-                    <div className="flex items-center gap-2">
-                      {/* Sort Controls */}
-                      <div className="flex items-center bg-[#F5E6D3] dark:bg-[#3D3460] rounded-lg p-0.5 border border-[#D4E6DC] dark:border-[#4A3F6B]">
-                        <button
-                          onClick={() => setIsSorted(!isSorted)}
-                          className={`p-1.5 rounded-md transition-all ${isSorted ? 'bg-[#FFFDF8] dark:bg-[#6B5B95] text-[#7A9F7A] dark:text-white shadow-sm' : 'text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0]'}`}
-                          title={isSorted ? "Turn sort off" : "Sort by price"}
-                        >
-                          <ArrowDownWideNarrow size={14} />
-                        </button>
-
-                        {isSorted && (
-                          <button
-                            onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                            className="p-1.5 rounded-md text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] hover:bg-[#FFFDF8]/50 dark:hover:bg-[#3D3460] transition-all"
-                            title={sortDirection === 'asc' ? "Lowest first" : "Highest first"}
-                          >
-                            {sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="w-px h-4 bg-[#D4E6DC] dark:bg-[#4A3F6B] mx-1"></div>
-
-                      <button
-                        onClick={handleClearAll}
-                        className="text-xs px-2 py-1.5 rounded-md text-[#8B7E6B] dark:text-[#6B5B95] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all"
-                        title="Clear all items"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Normalization Controls */}
-                <div className={clsx("px-4 border-b border-[#D4E6DC]/50 dark:border-[#3D3460] bg-[#F5E6D3]/20 dark:bg-[#1E1A2E]/20 transition-all duration-300", normTargets.enabled ? "py-4" : "py-2.5")}>
-                  <div className={clsx("flex items-center justify-between", normTargets.enabled && "mb-3")}>
-                    <div className="flex items-center gap-2">
-                      <Scale size={16} className={normTargets.enabled ? "text-[#7A9F7A] dark:text-[#9D8EC9]" : "text-[#8B7E6B] dark:text-[#6B5B95]"} />
-                      <span className="text-sm font-semibold text-[#5C5247] dark:text-white">Normalize Units</span>
-                    </div>
+            {/* Column 2: Stats Sidebar (Fixed-ish) */}
+            <div className="lg:col-span-3 xl:col-span-2">
+              <div className="sticky top-24">
+                <div className="flex items-center justify-between mb-4 px-2">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#8B7E6B] dark:text-[#6B5B95]">Comparison</h3>
+                  <div className="flex items-center bg-[#F5E6D3] dark:bg-[#3D3460] rounded-lg p-0.5 border border-[#D4E6DC] dark:border-[#4A3F6B]">
                     <button
-                      onClick={() => setNormTargets(prev => ({ ...prev, enabled: !prev.enabled }))}
-                      className={clsx(
-                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
-                        normTargets.enabled ? "bg-[#7A9F7A] dark:bg-[#6B5B95]" : "bg-[#D4E6DC] dark:bg-[#3D3460]"
-                      )}
+                      onClick={() => setIsSorted(!isSorted)}
+                      className={`p-1 rounded-md transition-all ${isSorted ? 'bg-white dark:bg-[#6B5B95] text-[#7A9F7A] dark:text-white shadow-sm' : 'text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0]'}`}
+                      title={isSorted ? "Turn sort off" : "Sort by price"}
                     >
-                      <span
-                        className={clsx(
-                          "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                          normTargets.enabled ? "translate-x-6" : "translate-x-1"
-                        )}
-                      />
+                      <ArrowDownWideNarrow size={12} />
                     </button>
-                  </div>
-
-                  {normTargets.enabled && (
-                    <div className="grid grid-cols-3 gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                      {[
-                        { label: 'Weight', key: 'mass', unit: 'kg', step: '0.1' },
-                        { label: 'Volume', key: 'volume', unit: 'L', step: '0.1' },
-                        { label: 'Count', key: 'count', unit: 'pcs', step: '1' },
-                      ].map((type) => (
-                        <div key={type.key} className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-[#8B7E6B] dark:text-[#6B5B95] uppercase tracking-tighter pl-0.5">{type.label}</label>
-                          <div className="flex items-center bg-white dark:bg-[#3D3460] border border-[#D4E6DC] dark:border-[#4A3F6B] rounded-lg px-2 py-1 shadow-sm">
-                            <input
-                              type="number"
-                              min="0"
-                              step={type.step}
-                              value={normTargets[type.key]}
-                              onChange={(e) => setNormTargets(prev => ({ ...prev, [type.key]: parseFloat(e.target.value) || 0 }))}
-                              className="w-full text-right text-xs font-bold bg-transparent border-none focus:ring-0 text-[#5C5247] dark:text-white p-0"
-                            />
-                            <span className="text-[9px] font-bold text-[#8B7E6B] dark:text-[#6B5B95] ml-1 opacity-70">{type.unit}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Items List */}
-                <ul
-                  ref={compareListRef}
-                  className="max-h-[60vh] overflow-y-auto divide-y divide-[#D4E6DC]/30 dark:divide-[#3D3460] scrollbar-thin scrollbar-thumb-[#D4E6DC] dark:scrollbar-thumb-[#4A3F6B] scrollbar-track-transparent hover:scrollbar-thumb-[#97B897] dark:hover:scrollbar-thumb-[#6B5B95] pr-1"
-                >
-                  {sortedItems.map((item) => {
-                    const itemColor = getItemColor(item.name);
-                    return (
-                      <li
-                        key={item.name}
-                        onMouseEnter={() => {
-                          setHoveredItem(item.name);
-                          if (!isTouchDevice) {
-                            setHoveredItemObj(item);
-                            if (compareListRef.current) {
-                              setSideRect(compareListRef.current.getBoundingClientRect());
-                            }
-                          }
-                        }}
-                        onMouseLeave={() => {
-                          setHoveredItem(null);
-                          if (!isTouchDevice) {
-                            setHoveredItemObj(null);
-                            setSideRect(null);
-                          }
-                        }}
-                        onMouseMove={(e) => {
-                          if (!isTouchDevice) {
-                            setMousePos({ x: e.clientX, y: e.clientY });
-                          }
-                        }}
-                        className={`p-3.5 transition-colors group cursor-pointer relative ${hoveredItem === item.name ? 'bg-[#D4E6DC]/40 dark:bg-[#3D3460] shadow-sm border-l-4 border-l-[#97B897] dark:border-l-[#6B5B95]' : 'hover:bg-[#F5E6D3]/50 dark:hover:bg-[#3D3460]/50 border-l-4 border-l-transparent'}`}
+                    {isSorted && (
+                      <button
+                        onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                        className="p-1 rounded-md text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] hover:bg-white/50 dark:hover:bg-[#3D3460] transition-all"
+                        title={sortDirection === 'asc' ? "Lowest first" : "Highest first"}
                       >
-                        <div className="flex gap-3 items-start">
-                          {/* Column 1: Image with Color Badge Overlay */}
-                          <div className="relative flex-shrink-0">
-                            <div className="w-14 h-14 rounded-xl bg-[#F5E6D3] dark:bg-[#3D3460] flex items-center justify-center overflow-hidden border border-[#D4E6DC] dark:border-[#4A3F6B] shadow-sm group-hover:scale-105 transition-transform duration-200">
-                              <img
-                                src={`${DATA_BASE_URL}/images/${item.image}`}
-                                alt={item.name}
-                                className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-90"
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                }}
-                              />
-                            </div>
-                            <div
-                              className="absolute -top-1 -left-1 w-4 h-4 rounded-full border-2 border-[#FFFDF8] dark:border-[#2A2442] shadow-sm z-10"
-                              style={{ backgroundColor: itemColor.stroke }}
-                            />
-                          </div>
-
-                          {/* Column 2: Info & Actions */}
-                          <div className="flex-1 min-w-0 flex flex-col gap-1">
-                            {/* Row 1: Item Name */}
-                            <h4 className="text-sm font-bold text-[#5C5247] dark:text-white truncate leading-snug" title={item.name}>
-                              {item.name}
-                            </h4>
-
-                            {/* Row 2: Stats and Actions Row */}
-                            <div className="flex items-end justify-between gap-1 mt-0.5">
-                              {/* Sub-column 1: Price and Range */}
-                              <div className="flex flex-col gap-1 min-w-0">
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="text-sm sm:text-base font-black text-[#5C5247] dark:text-white">
-                                    ৳{normTargets.enabled
-                                      ? Math.round(getNormalizedPrice(itemStats[item.name]?.current ?? item.price ?? 0, item.unit, normTargets))
-                                      : (itemStats[item.name]?.current ?? item.price ?? 0)}
-                                    <span className="text-xs opacity-70 font-bold ml-0.5">
-                                      /{normTargets.enabled
-                                        ? getTargetUnitLabel(parseUnit(item.unit).type, normTargets[parseUnit(item.unit).type], item.unit)
-                                        : item.unit}
-                                    </span>
-                                  </span>
-
-                                </div>
-
-                              </div>
-
-                              {/* Sub-column 2: Action Buttons */}
-                              <div className="flex items-center gap-1 shrink-0 pb-0.5">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setDetailItem(item);
-                                  }}
-                                  className="text-[#8B7E6B] dark:text-[#6B5B95] border border-[#D4E6DC] dark:border-[#4A3F6B] hover:bg-[#D4E6DC]/50 dark:hover:bg-[#3D3460]/80 hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] transition-all p-1 rounded-md shadow-sm bg-white/50 dark:bg-[#3D3460]/30"
-                                  title="View Details"
-                                >
-                                  <ChevronRight size={14} />
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRemoveItem(item.name);
-                                  }}
-                                  className="text-[#8B7E6B] dark:text-[#6B5B95] border border-red-100 dark:border-red-900/30 ring-1 ring-red-500/10 hover:bg-red-50 dark:hover:bg-red-900/40 hover:text-red-600 dark:hover:text-red-400 transition-all p-1 rounded-md shadow-sm bg-white/50 dark:bg-[#3D3460]/30"
-                                  title="Remove item"
-                                >
-                                  <X size={12} />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-
-                {/* Footer hint */}
-                <div className="p-3 border-t border-[#D4E6DC]/50 dark:border-[#3D3460] bg-[#F5E6D3]/30 dark:bg-[#1E1A2E]/50 rounded-b-2xl transition-colors duration-300">
-                  <p className="text-xs text-[#8B7E6B] dark:text-[#6B5B95] text-center">
-                    Search to add more items
-                  </p>
+                        {sortDirection === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
+                      </button>
+                    )}
+                  </div>
                 </div>
+                
+                <StatsSidebar
+                  items={sortedItems}
+                  stats={Object.values(itemStats)}
+                  colors={COLORS}
+                  normTargets={normTargets.enabled ? normTargets : null}
+                  onRemove={(item) => handleRemoveItem(item.name)}
+                  onHover={setHoveredItem}
+                  selectedItemName={selectedDetailItemName}
+                  onSelect={(name) => setSelectedDetailItemName(prev => prev === name ? null : name)}
+                />
+              </div>
+            </div>
+
+            {/* Column 3: Details Panel */}
+            <div className="lg:col-span-3 xl:col-span-3">
+              <div className="sticky top-24">
+                <ItemDetailsPanel
+                  item={selectedItems.find(i => i.name === selectedDetailItemName)}
+                  stats={itemStats[selectedDetailItemName]}
+                  normTargets={normTargets.enabled ? normTargets : null}
+                  onClose={() => setSelectedDetailItemName(null)}
+                  onRemove={(item) => handleRemoveItem(item.name)}
+                />
               </div>
             </div>
 
           </div>
         ) : (
           /* Empty State */
-          <EmptyStateSkeleton />
+          <div className="mt-12">
+            <EmptyStateSkeleton />
+          </div>
         )}
 
       </div>
