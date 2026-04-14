@@ -6,12 +6,17 @@ import { DATA_BASE_URL } from '../config';
 import ItemHoverCard from './ItemHoverCard';
 import ItemDetailModal from './ItemDetailModal';
 
-export default function SearchBar({ onSelect, selectedItems = [], normTargets, itemStats = {} }) {
-    const [items, setItems] = useState([]);
+export default function SearchBar({ 
+    onSelect, 
+    items = [], 
+    loading = false, 
+    selectedItems = [], 
+    normTargets, 
+    itemStats = {} 
+}) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [hoveredItem, setHoveredItem] = useState(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [sideRect, setSideRect] = useState(null);
@@ -24,20 +29,6 @@ export default function SearchBar({ onSelect, selectedItems = [], normTargets, i
 
     // Ref for clicking outside to close dropdown
     const searchRef = useRef(null);
-
-    // 1. Fetch the Meta Index (Runs once on mount)
-    useEffect(() => {
-        fetch(`${DATA_BASE_URL}/data/meta.json`)
-            .then(res => res.json())
-            .then(data => {
-                setItems(data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Failed to load search index:", err);
-                setLoading(false);
-            });
-    }, []);
 
     // 2. Initialize Fuse.js (The Fuzzy Search Engine)
     const fuse = useMemo(() => new Fuse(items, {

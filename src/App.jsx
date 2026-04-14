@@ -1,7 +1,7 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import SearchBar from './components/SearchBar';
 import PriceChart from './components/PriceChartECharts';
-import DevSourceToggle from './components/DevSourceToggle';
+import DevControls from './components/DevControls';
 import EmptyStateSkeleton from './components/EmptyStateSkeleton';
 import ThemeToggle from './components/ThemeToggle';
 import BuildInfo from './components/BuildInfo';
@@ -56,6 +56,23 @@ function App() {
   const compareListRef = useRef(null);
   const chartRef = useRef(null);
 
+  // 1a. Fetch Product Catalog (Meta Index)
+  const [allItems, setAllItems] = useState([]);
+  const [isMetaLoading, setIsMetaLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${DATA_BASE_URL}/data/meta.json`)
+      .then(res => res.json())
+      .then(data => {
+        setAllItems(data);
+        setIsMetaLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load product catalog:", err);
+        setIsMetaLoading(false);
+      });
+  }, []);
+
   // Detect touch device to disable hover
   const isTouchDevice = useMemo(() => {
     return (typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
@@ -103,6 +120,23 @@ function App() {
       // Pre-assign color when item is added
       getItemColor(item.name);
       return [...prev, item];
+    });
+  }, [getItemColor]);
+
+  // Bulk add items (useful for dev/exploration)
+  const handleBulkAdd = useCallback((newItems) => {
+    if (!newItems || newItems.length === 0) return;
+    
+    setSelectedItems(prev => {
+      const existingNames = new Set(prev.map(i => i.name));
+      const filteredNewItems = newItems.filter(item => !existingNames.has(item.name));
+      
+      if (filteredNewItems.length === 0) return prev;
+      
+      // Assign colors for all new items
+      filteredNewItems.forEach(item => getItemColor(item.name));
+      
+      return [...prev, ...filteredNewItems];
     });
   }, [getItemColor]);
 
@@ -157,8 +191,12 @@ function App() {
               </h1>
             </div>
 
-            {/* Dev Data Source Toggle */}
-            <DevSourceToggle />
+            {/* Advanced Dev Controls (Quick Add + Data Source) */}
+            <DevControls 
+              allItems={allItems} 
+              selectedItems={selectedItems} 
+              onAddItems={handleBulkAdd} 
+            />
           </div>
 
           {/* Search Bar and Theme Toggle (Right Side) */}
@@ -166,6 +204,8 @@ function App() {
             <div className="hidden md:block w-96">
               <SearchBar
                 onSelect={handleAddItem}
+                items={allItems}
+                loading={isMetaLoading}
                 selectedItems={selectedItems}
                 normTargets={normTargets.enabled ? normTargets : null}
                 itemStats={itemStats}
@@ -272,6 +312,8 @@ function App() {
       <div className="md:hidden p-4 bg-[#FFFDF8] dark:bg-[#2A2442] border-b border-[#D4E6DC] dark:border-[#4A3F6B] transition-colors duration-300">
         <SearchBar
           onSelect={handleAddItem}
+          items={allItems}
+          loading={isMetaLoading}
           selectedItems={selectedItems}
           normTargets={normTargets.enabled ? normTargets : null}
           itemStats={itemStats}
