@@ -5,7 +5,7 @@ Daam Track BD is an open-source research project dedicated to tracking and visua
 ![alt text](showcase_dark.jpg)
 
 ## 🚀 Live Demo
-[Live Demo](https://matrixrex.github.io/Daam-Track-BD/)
+[Live Demo](http://daam.pro.bd/)
 
 ## 🛠 Tech Stack
 
