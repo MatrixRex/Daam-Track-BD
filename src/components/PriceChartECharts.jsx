@@ -325,7 +325,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
         const result = await runQuery(`
       SELECT date, price 
       FROM 'prices/*.parquet' 
-      WHERE name = '${item.name}' 
+      WHERE name = '${item.name.replace(/'/g, "''")}' 
       ORDER BY date ASC
     `);
         const formattedData = result.map(r => ({

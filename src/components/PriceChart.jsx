@@ -264,7 +264,7 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHovere
     const result = await runQuery(`
       SELECT date, price 
       FROM 'data.parquet' 
-      WHERE name = '${item.name}' 
+      WHERE name = '${item.name.replace(/'/g, "''")}' 
       ORDER BY date ASC
     `);
     const formattedData = result.map(r => ({
