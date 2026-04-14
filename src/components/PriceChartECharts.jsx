@@ -118,6 +118,11 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     // Expose methods to parent
     React.useImperativeHandle(ref, () => ({
         exportImage: async (mode = 'download') => { // mode: 'download' | 'copy'
+            if (!items.length || !finalChartData.length) {
+                toast.error('No data available to export');
+                return;
+            }
+
             const chart = echartsRef.current?.getEchartsInstance();
             if (!chart) return;
 
@@ -210,6 +215,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     link.href = newUrl;
                     link.click();
                     URL.revokeObjectURL(newUrl);
+                    toast.success('Image download started');
                 }
             } catch (err) {
                 console.error("Failed to export image:", err);
@@ -217,7 +223,10 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             }
         },
         exportData: async (format, mode = 'download') => { // format: 'json' | 'csv' | 'xlsx', mode: 'download' | 'copy'
-            if (!items.length || !processedData.length) return;
+            if (!items.length || !processedData.length) {
+                toast.error('No data available to export');
+                return;
+            }
 
             // Prepare clean data for export
             const dataToExport = processedData.map(row => {
@@ -251,6 +260,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     link.href = url;
                     link.download = `${filename}.json`;
                     link.click();
+                    toast.success('JSON download started');
                 }
             } else if (format === 'csv') {
                 const headers = ['Date', 'Date (Short)', 'ISO Date', ...itemHeaders];
@@ -281,6 +291,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     link.href = url;
                     link.download = `${filename}.csv`;
                     link.click();
+                    toast.success('CSV download started');
                 }
             } else if (format === 'xlsx') {
                 if (mode === 'copy') {
@@ -301,6 +312,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, "Price Data");
                     XLSX.writeFile(wb, `${filename}.xlsx`);
+                    toast.success('Excel download started');
                 }
             }
         }

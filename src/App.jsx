@@ -153,7 +153,7 @@ function App() {
                 <TrendingUp size={24} />
               </div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#5C5247] dark:text-white">
-                DaamTrack<span className="text-[#7A9F7A] dark:text-[#9D8EC9]">BD</span>
+                Daam<span className="text-[#7A9F7A] dark:text-[#9D8EC9]">Trace</span>
               </h1>
             </div>
 
