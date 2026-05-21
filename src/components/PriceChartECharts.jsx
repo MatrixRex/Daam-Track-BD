@@ -4,7 +4,7 @@ import * as echarts from 'echarts';
 import { useDuckDB } from '../hooks/useDuckDB';
 import { Loader2, AlertCircle, Calendar, ChevronDown } from 'lucide-react';
 import Tooltip from './Tooltip';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { toast } from 'sonner';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 
@@ -296,11 +296,19 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     await navigator.clipboard.writeText(tsvContent);
                     toast.success('Excel-compatible data copied to clipboard');
                 } else {
-                    // Use xlsx library
-                    const ws = XLSX.utils.json_to_sheet(dataToExport);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Price Data");
-                    XLSX.writeFile(wb, `${filename}.xlsx`);
+                    const wb = new ExcelJS.Workbook();
+                    const ws = wb.addWorksheet('Price Data');
+                    const keys = Object.keys(dataToExport[0]);
+                    ws.columns = keys.map(key => ({ header: key, key }));
+                    ws.addRows(dataToExport);
+                    const buf = await wb.xlsx.writeBuffer();
+                    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${filename}.xlsx`;
+                    link.click();
+                    URL.revokeObjectURL(url);
                 }
             }
         }
