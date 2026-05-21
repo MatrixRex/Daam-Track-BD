@@ -5,39 +5,35 @@
  */
 
 const BuildInfo = () => {
-    const buildSha = import.meta.env.VITE_BUILD_SHA;
+    const buildTag = import.meta.env.VITE_BUILD_TAG;
     const buildDate = import.meta.env.VITE_BUILD_DATE;
 
-    // Check if we're in dev mode (env variables missing)
-    const isDevMode = !buildSha || !buildDate;
+    const isDevMode = !buildTag || !buildDate;
 
-    // Shorten commit hash to 7 characters for display
-    const shortSha = isDevMode ? 'dev' : buildSha.slice(0, 7);
+    const displayTag = isDevMode ? 'dev' : buildTag;
     const displayDate = isDevMode ? 'local' : buildDate;
 
-    // Construct the GitHub commit URL (only valid in production)
-    const commitUrl = isDevMode
+    const tagUrl = isDevMode
         ? null
-        : `https://github.com/MatrixRex/Daam-Track-BD/commit/${buildSha}`;
+        : `https://github.com/MatrixRex/Daam-Track-BD/releases/tag/${buildTag}`;
 
-    // Render the hash as a link in production, plain text in dev
-    const hashElement = commitUrl ? (
+    const tagElement = tagUrl ? (
         <a
-            href={commitUrl}
+            href={tagUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono hover:underline transition-colors"
         >
-            {shortSha}
+            {displayTag}
         </a>
     ) : (
-        <span className="font-mono">{shortSha}</span>
+        <span className="font-mono">{displayTag}</span>
     );
 
     return (
         <div className="fixed bottom-2 right-4 text-[10px] text-[#8B7E6B]/60 dark:text-[#6B5B95]/60 z-20 flex items-center gap-1.5">
             <span>Build:</span>
-            {hashElement}
+            {tagElement}
             <span>•</span>
             <span>{displayDate}</span>
         </div>
