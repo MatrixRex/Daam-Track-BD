@@ -11,6 +11,9 @@ importers:
       '@duckdb/duckdb-wasm':
         specifier: ^1.30.0
         version: 1.30.0
+      '@leeoniya/ufuzzy':
+        specifier: ^1.0.14
+        version: 1.0.19
       apache-arrow:
         specifier: ^21.1.0
         version: 21.1.0
@@ -26,9 +29,6 @@ importers:
       exceljs:
         specifier: ^4.4.0
         version: 4.4.0
-      fuse.js:
-        specifier: ^7.1.0
-        version: 7.1.0
       lucide-react:
         specifier: ^0.556.0
         version: 0.556.0(react@19.2.1)
@@ -401,6 +401,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@leeoniya/ufuzzy@1.0.19':
+    resolution: {integrity: sha512-0pikDeYt0IHEUPza5RTCDXc/17S1pTrYnReEMp8Aa6k1ovzw5QdZLwicW8TjljwEZRb6oYag0xmALohrcq/yOQ==}
 
   '@reduxjs/toolkit@2.11.0':
     resolution: {integrity: sha512-hBjYg0aaRL1O2Z0IqWhnTLytnjDIxekmRxm1snsHjHaKVmIF1HiImWqsq+PuEbn6zdMlkIj9WofK1vR8jjx+Xw==}
@@ -1126,10 +1129,6 @@ packages:
     resolution: {integrity: sha512-WvJ193OHa0GHPEL+AycEJgxvBEwyfRkN1vhjca23OaPVMCaLCXTd5qAu82AjTcgP1UJmytkOKb63Ypde7raDIg==}
     engines: {node: '>=0.6'}
     deprecated: This package is no longer supported.
-
-  fuse.js@7.1.0:
-    resolution: {integrity: sha512-trLf4SzuuUxfusZADLINj+dE8clK1frKdmqiJNb1Es75fmI5oY6X2mxLVUciLLjxqw/xr72Dhy+lER6dGd02FQ==}
-    engines: {node: '>=10'}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -2073,6 +2072,8 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@leeoniya/ufuzzy@1.0.19': {}
+
   '@reduxjs/toolkit@2.11.0(react-redux@9.2.0(@types/react@19.2.7)(react@19.2.1)(redux@5.0.1))(react@19.2.1)':
     dependencies:
       '@standard-schema/spec': 1.0.0
@@ -2787,8 +2788,6 @@ snapshots:
       inherits: 2.0.4
       mkdirp: 0.5.6
       rimraf: 2.7.1
-
-  fuse.js@7.1.0: {}
 
   gensync@1.0.0-beta.2: {}
 
