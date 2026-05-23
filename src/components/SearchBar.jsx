@@ -46,7 +46,7 @@ export default function SearchBar({
 
         if (order && order.length > 0) {
             // Retrieve matched items using the sorted order double-indirection indices
-            return order.map(infoIdx => items[info.idx[infoIdx]]).slice(0, 8);
+            return order.map(infoIdx => items[info.idx[infoIdx]]).slice(0, 24);
         }
         return [];
     }, [query, uf, haystack, items]);
@@ -109,8 +109,8 @@ export default function SearchBar({
 
             {/* Dropdown Results */}
             {isOpen && results.length > 0 && (
-                <div className="absolute w-full mt-2 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-xl shadow-xl dark:shadow-[#1E1A2E]/50 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    <ul className="max-h-[60vh] overflow-y-auto">
+                <div className="absolute w-full md:w-[150%] lg:w-[180%] md:left-1/2 md:-translate-x-1/2 mt-2 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl shadow-2xl dark:shadow-[#1E1A2E]/70 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <ul className="max-h-[60vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 p-3">
                         {results.map((item, index) => {
                             const isSelected = selectedItems.some(i => i.name === item.name);
                             return (
@@ -141,14 +141,14 @@ export default function SearchBar({
                                         }
                                     }}
                                     className={clsx(
-                                        "flex items-center gap-4 p-3 border-b border-[#D4E6DC]/30 dark:border-[#3D3460] last:border-none transition-colors group relative",
+                                        "flex items-center gap-3 p-2.5 rounded-xl border border-[#D4E6DC]/40 dark:border-[#3D3460]/80 transition-all duration-200 group relative",
                                         isSelected
-                                            ? "bg-[#D4E6DC]/50 dark:bg-[#3D3460] cursor-default opacity-60"
-                                            : "hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460]/50 cursor-pointer"
+                                            ? "bg-[#D4E6DC]/40 dark:bg-[#3D3460]/60 cursor-default opacity-70"
+                                            : "hover:bg-[#D4E6DC]/20 dark:hover:bg-[#3D3460]/40 hover:border-[#7A9F7A]/30 dark:hover:border-[#9D8EC9]/30 hover:shadow-sm cursor-pointer"
                                     )}
                                 >
                                     {/* Product Image (With smart fallback) */}
-                                    <div className="w-12 h-12 rounded-lg bg-[#F5E6D3] dark:bg-[#3D3460] p-1 flex-shrink-0 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden">
+                                    <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3D3460] p-1 flex-shrink-0 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden">
                                         <img
                                             src={`${DATA_BASE_URL}/images/${item.image}`}
                                             alt={item.name}
@@ -167,36 +167,36 @@ export default function SearchBar({
 
                                     {/* Text Info */}
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="text-sm sm:text-base font-semibold text-[#5C5247] dark:text-white truncate group-hover:text-[#7A9F7A] dark:group-hover:text-[#9D8EC9]">
+                                        <h4 className="text-xs sm:text-sm font-semibold text-[#5C5247] dark:text-white truncate group-hover:text-[#7A9F7A] dark:group-hover:text-[#9D8EC9]">
                                             {item.name}
                                         </h4>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#F5E6D3] dark:bg-[#3D3460] text-[#8B7E6B] dark:text-[#B8AED0]">
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#F5E6D3] dark:bg-[#3D3460] text-[#8B7E6B] dark:text-[#B8AED0]">
                                                 {item.category}
                                             </span>
-                                            <span className="text-xs text-[#8B7E6B] dark:text-[#6B5B95]">•</span>
-                                            <span className="text-xs text-[#8B7E6B] dark:text-[#B8AED0]">{item.unit}</span>
+                                            <span className="text-[10px] text-[#8B7E6B] dark:text-[#6B5B95]">•</span>
+                                            <span className="text-[10px] text-[#8B7E6B] dark:text-[#B8AED0]">{item.unit}</span>
                                         </div>
                                     </div>
 
                                     {/* Price & Arrow/Check */}
-                                    <div className="text-right flex items-center gap-3">
+                                    <div className="text-right flex items-center gap-2">
                                         <div className="flex flex-col items-end">
-                                            <span className="text-sm sm:text-base font-bold text-[#5C5247] dark:text-white">৳{item.price}</span>
-                                            <span className="text-[10px] sm:text-xs text-[#8B7E6B] dark:text-[#6B5B95]">{isSelected ? 'Selected' : 'Latest'}</span>
+                                            <span className="text-xs sm:text-sm font-bold text-[#5C5247] dark:text-white">৳{item.price}</span>
+                                            <span className="text-[9px] sm:text-[10px] text-[#8B7E6B] dark:text-[#6B5B95]">{isSelected ? 'Selected' : 'Latest'}</span>
                                         </div>
                                         {isSelected
-                                            ? <Check className="w-4 h-4 text-[#7A9F7A] dark:text-[#9D8EC9]" />
+                                            ? <Check className="w-3.5 h-3.5 text-[#7A9F7A] dark:text-[#9D8EC9]" />
                                             : (
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setDetailItem(item);
                                                     }}
-                                                    className="p-2 rounded-lg hover:bg-[#D4E6DC]/50 dark:hover:bg-[#3D3460] text-[#D4E6DC] dark:text-[#4A3F6B] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] transition-all"
+                                                    className="p-1 rounded-md hover:bg-[#D4E6DC]/50 dark:hover:bg-[#3D3460] text-[#D4E6DC] dark:text-[#4A3F6B] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] transition-all"
                                                     title="View Details"
                                                 >
-                                                    <ChevronRight className="w-5 h-5" />
+                                                    <ChevronRight className="w-4 h-4" />
                                                 </button>
                                             )
                                         }

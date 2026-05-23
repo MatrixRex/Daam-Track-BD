@@ -194,10 +194,10 @@ function App() {
 
       {/* --- HEADER SECTION --- */}
       <div className="bg-[#FFFDF8] dark:bg-[#2A2442] border-b border-[#D4E6DC] dark:border-[#4A3F6B] shadow-sm sticky top-0 z-30 transition-colors duration-300">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between md:grid md:grid-cols-3 gap-4">
 
           {/* Logo */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 justify-start">
             <div className="flex items-center gap-2">
               <div className="bg-[#97B897] dark:bg-[#6B5B95] p-2 rounded-lg text-white">
                 <TrendingUp size={24} />
@@ -215,9 +215,9 @@ function App() {
             />
           </div>
 
-          {/* Search Bar and Theme Toggle (Right Side) */}
-          <div className="flex items-center gap-3">
-            <div className="hidden md:block w-96">
+          {/* Center: Search Bar */}
+          <div className="hidden md:flex justify-center w-full">
+            <div className="w-full max-w-lg lg:max-w-xl">
               <SearchBar
                 onSelect={handleAddItem}
                 items={allItems}
@@ -227,7 +227,10 @@ function App() {
                 itemStats={itemStats}
               />
             </div>
+          </div>
 
+          {/* Right: Actions */}
+          <div className="flex items-center justify-end gap-3">
             {/* Export Button */}
             <div className="relative group">
               <button
