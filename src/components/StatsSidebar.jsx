@@ -3,8 +3,11 @@ import { DATA_BASE_URL } from '../config';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 import clsx from 'clsx';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 
 export default function StatsSidebar({ items, stats, colors, normTargets, onRemove, onHover, selectedItemName, onSelect }) {
+    const [parent] = useAutoAnimate();
+
     if (items.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center p-8 text-center bg-[#FFFDF8] dark:bg-[#2A2442] border border-dashed border-[#D4E6DC] dark:border-[#4A3F6B] rounded-3xl h-full min-h-[400px]">
@@ -20,7 +23,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onRemo
     }
 
     return (
-        <div className="flex flex-col gap-3 h-full max-h-[calc(100vh-250px)] overflow-y-auto pr-2 custom-scrollbar">
+        <div ref={parent} className="flex flex-col gap-3 h-full max-h-[calc(100vh-250px)] overflow-y-auto pr-2 custom-scrollbar">
             {items.map((item, index) => {
                 const color = colors[index % colors.length]?.stroke || '#7A9F7A';
                 const itemStat = stats.find(s => s.name === item.name);

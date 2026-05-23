@@ -18,6 +18,7 @@ import ItemDetailsPanel from './components/ItemDetailsPanel';
 import { ChevronRight, Scale } from 'lucide-react';
 import clsx from 'clsx';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from './utils/quantityUtils';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 
 // Extended color palette for unlimited comparisons
 const COLORS = [
@@ -38,6 +39,8 @@ const COLORS = [
 function App() {
   // 1. Start DuckDB in background
   useDuckDB();
+
+  const [parent] = useAutoAnimate();
 
   // Array for multi-item comparison (no limit)
   const [selectedItems, setSelectedItems] = useState([]);
@@ -340,7 +343,7 @@ function App() {
       </div>
 
       {/* --- MAIN CONTENT AREA --- */}
-      <div className="w-full max-w-[1920px] mx-auto px-1 sm:px-2 lg:px-4 py-6">
+      <div ref={parent} className="w-full max-w-[1920px] mx-auto px-1 sm:px-2 lg:px-4 py-6">
 
         {/* --- COMMAND & SELECTION BAR --- */}
         <div className="flex flex-col gap-4 mb-6">
