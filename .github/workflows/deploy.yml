@@ -30,23 +30,24 @@ jobs:
 
       - name: Generate build version info
         run: |
-          # Extract full and short commit SHA
-          FULL_SHA=$(git rev-parse HEAD)
-          SHORT_SHA=$(git rev-parse --short HEAD)
+          # Extract tag name from GITHUB_REF (e.g. refs/tags/v0.0.8 -> v0.0.8)
+          GIT_TAG=${GITHUB_REF#refs/tags/}
           
-          # Extract current git tag
-          BUILD_TAG=$(git describe --tags --abbrev=0)
+          # Fallback to nearest git tag if not triggered by a tag push
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            BUILD_TAG=${GIT_TAG}
+          else
+            BUILD_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+          fi
           
           # Extract build date in "DD Mon YYYY" format
           BUILD_DATE=$(date -u +'%d %b %Y')
           
           # Create .env.production file with build info
-          echo "VITE_BUILD_SHA=${FULL_SHA}" > .env.production
-          echo "VITE_BUILD_TAG=${BUILD_TAG}" >> .env.production
+          echo "VITE_BUILD_TAG=${BUILD_TAG}" > .env.production
           echo "VITE_BUILD_DATE=${BUILD_DATE}" >> .env.production
           
           # Log for debugging
-          echo "Build SHA: ${SHORT_SHA} (${FULL_SHA})"
           echo "Build Tag: ${BUILD_TAG}"
           echo "Build Date: ${BUILD_DATE}"
 

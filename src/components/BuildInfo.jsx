@@ -6,7 +6,6 @@
 
 const BuildInfo = () => {
     const buildTag = import.meta.env.VITE_BUILD_TAG;
-    const buildSha = import.meta.env.VITE_BUILD_SHA;
     const buildDate = import.meta.env.VITE_BUILD_DATE;
 
     // Check if we're in dev mode (env variables missing)
@@ -28,7 +27,6 @@ const BuildInfo = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono hover:underline transition-colors"
-            title={`Commit: ${buildSha}`}
         >
             {displayVersion}
         </a>

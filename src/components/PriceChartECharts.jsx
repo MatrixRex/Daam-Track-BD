@@ -4,7 +4,7 @@ import * as echarts from 'echarts';
 import { useDuckDB } from '../hooks/useDuckDB';
 import { Loader2, AlertCircle, Calendar, ChevronDown } from 'lucide-react';
 import Tooltip from './Tooltip';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { toast } from 'sonner';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 
@@ -87,7 +87,7 @@ const DateInput = ({ value, onChange, label, min, max }) => {
     );
 };
 
-const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate, normTargets }, ref) => {
+const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, onStatsUpdate, normTargets }, ref) => {
     const { runQuery, loading: engineLoading } = useDuckDB();
     const echartsRef = useRef(null);
     const dataCache = useRef(new Map());
@@ -114,6 +114,167 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     const [resolution, setResolution] = useState('auto'); // 'auto', 'daily', 'weekly', 'monthly', 'yearly'
     const [aggregation, setAggregation] = useState('avg'); // 'avg', 'max', 'min'
     const [isDensityOpen, setIsDensityOpen] = useState(false);
+
+    // Generate filtered/extended data (Same logic)
+    const filteredChartData = useMemo(() => {
+        if (!startDate || !endDate || !items.length) return [];
+
+        const startYear = parseInt(startDate.split('-')[0]);
+        const endYear = parseInt(endDate.split('-')[0]);
+        const multiYear = startYear !== endYear;
+
+        // Generate all dates
+        const allDates = [];
+        let current = new Date(startDate);
+        const end = new Date(endDate);
+
+        while (current <= end) {
+            const dateStr = formatDateForInput(current);
+            const day = current.getDate();
+            const monthIndex = current.getMonth();
+            const year = current.getFullYear();
+
+            allDates.push({
+                date: dateStr,
+                dateShort: multiYear
+                    ? `${day} ${MONTH_NAMES[monthIndex]} '${String(year).slice(-2)}`
+                    : `${day} ${MONTH_NAMES[monthIndex]}`,
+                fullDate: `${day} ${MONTH_NAMES_FULL[monthIndex]} ${year}`
+            });
+            current.setDate(current.getDate() + 1);
+        }
+
+        const dataMap = new Map(chartData.map(r => [r.date, r]));
+
+        // Calculate bounds
+        const itemBounds = {};
+        items.forEach(item => {
+            const name = item.name;
+            const itemDates = chartData
+                .filter(row => row[name] !== undefined)
+                .map(row => row.date)
+                .sort();
+
+            if (itemDates.length > 0) {
+                itemBounds[name] = {
+                    firstDate: itemDates[0],
+                    lastDate: itemDates[itemDates.length - 1],
+                    firstValue: chartData.find(r => r.date === itemDates[0])?.[name],
+                    lastValue: chartData.find(r => r.date === itemDates[itemDates.length - 1])?.[name]
+                };
+            }
+        });
+
+        return allDates.map(dateEntry => {
+            const existing = dataMap.get(dateEntry.date);
+            const result = { ...dateEntry };
+
+            items.forEach(item => {
+                const name = item.name;
+                const extKey = `${name}_ext`;
+                const bounds = itemBounds[name];
+
+                if (!bounds) {
+                    result[name] = undefined;
+                    result[extKey] = undefined;
+                } else if (existing && existing[name] !== undefined) {
+                    result[name] = existing[name];
+                    result[extKey] = undefined; // No dashed line where real data exists
+                } else if (dateEntry.date < bounds.firstDate) {
+                    result[name] = undefined;
+                    result[extKey] = bounds.firstValue;
+                } else if (dateEntry.date > bounds.lastDate) {
+                    result[name] = undefined;
+                    result[extKey] = bounds.lastValue;
+                } else {
+                    result[name] = undefined;
+                    result[extKey] = undefined; // ECharts handles connectNulls or we can interpolate if needed
+                }
+            });
+            return result;
+        });
+    }, [chartData, startDate, endDate, items]);
+
+    // Aggregation Logic - RELAXED
+    const getEffectiveResolution = useCallback(() => {
+        if (resolution !== 'auto') return resolution;
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 365) return 'daily'; // Up to 1 year
+        if (diffDays <= 365 * 5) return 'weekly'; // Up to 5 years
+        return 'monthly';
+    }, [resolution, startDate, endDate]);
+
+    const processedData = useMemo(() => {
+        const effectiveRes = getEffectiveResolution();
+        if (effectiveRes === 'daily' || !filteredChartData.length) return filteredChartData;
+
+        const getGroupKey = (dateStr) => {
+            const date = new Date(dateStr);
+            if (effectiveRes === 'yearly') return `${date.getFullYear()}`;
+            if (effectiveRes === 'monthly') return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            if (effectiveRes === 'weekly') {
+                const day = date.getDay();
+                const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+                const monday = new Date(date.setDate(diff));
+                return monday.toISOString().split('T')[0];
+            }
+            return dateStr;
+        };
+
+        const groups = new Map();
+        filteredChartData.forEach(item => {
+            const key = getGroupKey(item.date);
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(item);
+        });
+
+        const aggregated = [];
+        const activeNames = items.map(i => i.name);
+
+        groups.forEach((groupItems, key) => {
+            const dateObj = new Date(groupItems[0].date);
+            let dateShort = groupItems[0].dateShort;
+            let fullDate = groupItems[0].fullDate;
+
+            if (effectiveRes === 'monthly') {
+                dateShort = dateObj.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
+                fullDate = dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+            } else if (effectiveRes === 'yearly') {
+                dateShort = dateObj.getFullYear().toString();
+                fullDate = dateObj.getFullYear().toString();
+            }
+
+            const entry = { date: key, dateShort, fullDate };
+
+            activeNames.forEach(name => {
+                const values = groupItems.map(d => d[name]).filter(v => v !== undefined && v !== null);
+
+                // Handle extended values
+                const extValues = groupItems.map(d => d[`${name}_ext`]).filter(v => v !== undefined);
+                let extVal = undefined;
+                if (extValues.length > 0) extVal = extValues[0]; // Simplification for extensions
+
+                if (values.length === 0) {
+                    entry[`${name}_ext`] = extVal;
+                    return;
+                }
+
+                let resultVal;
+                if (aggregation === 'max') resultVal = Math.max(...values);
+                else if (aggregation === 'min') resultVal = Math.min(...values);
+                else resultVal = values.reduce((a, b) => a + b, 0) / values.length;
+
+                entry[name] = Math.round(resultVal);
+                // No dashed line where real data exists
+            });
+
+            aggregated.push(entry);
+        });
+
+        return aggregated;
+    }, [filteredChartData, getEffectiveResolution, aggregation, items]);
 
     // Expose methods to parent
     React.useImperativeHandle(ref, () => ({
@@ -307,12 +468,19 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     await navigator.clipboard.writeText(tsvContent);
                     toast.success('Excel-compatible data copied to clipboard');
                 } else {
-                    // Use xlsx library
-                    const ws = XLSX.utils.json_to_sheet(dataToExport);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Price Data");
-                    XLSX.writeFile(wb, `${filename}.xlsx`);
-                    toast.success('Excel download started');
+                    const wb = new ExcelJS.Workbook();
+                    const ws = wb.addWorksheet('Price Data');
+                    const keys = Object.keys(dataToExport[0]);
+                    ws.columns = keys.map(key => ({ header: key, key }));
+                    ws.addRows(dataToExport);
+                    const buf = await wb.xlsx.writeBuffer();
+                    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${filename}.xlsx`;
+                    link.click();
+                    URL.revokeObjectURL(url);
                 }
             }
         }
@@ -387,165 +555,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
     }, [items, engineLoading, fetchItemData, buildChartData]);
 
-    // Generate filtered/extended data (Same logic)
-    const filteredChartData = useMemo(() => {
-        if (!startDate || !endDate || !items.length) return [];
 
-        const startYear = parseInt(startDate.split('-')[0]);
-        const endYear = parseInt(endDate.split('-')[0]);
-        const multiYear = startYear !== endYear;
-
-        // Generate all dates
-        const allDates = [];
-        let current = new Date(startDate);
-        const end = new Date(endDate);
-
-        while (current <= end) {
-            const dateStr = formatDateForInput(current);
-            const day = current.getDate();
-            const monthIndex = current.getMonth();
-            const year = current.getFullYear();
-
-            allDates.push({
-                date: dateStr,
-                dateShort: multiYear
-                    ? `${day} ${MONTH_NAMES[monthIndex]} '${String(year).slice(-2)}`
-                    : `${day} ${MONTH_NAMES[monthIndex]}`,
-                fullDate: `${day} ${MONTH_NAMES_FULL[monthIndex]} ${year}`
-            });
-            current.setDate(current.getDate() + 1);
-        }
-
-        const dataMap = new Map(chartData.map(r => [r.date, r]));
-
-        // Calculate bounds
-        const itemBounds = {};
-        items.forEach(item => {
-            const name = item.name;
-            const itemDates = chartData
-                .filter(row => row[name] !== undefined)
-                .map(row => row.date)
-                .sort();
-
-            if (itemDates.length > 0) {
-                itemBounds[name] = {
-                    firstDate: itemDates[0],
-                    lastDate: itemDates[itemDates.length - 1],
-                    firstValue: chartData.find(r => r.date === itemDates[0])?.[name],
-                    lastValue: chartData.find(r => r.date === itemDates[itemDates.length - 1])?.[name]
-                };
-            }
-        });
-
-        return allDates.map(dateEntry => {
-            const existing = dataMap.get(dateEntry.date);
-            const result = { ...dateEntry };
-
-            items.forEach(item => {
-                const name = item.name;
-                const extKey = `${name}_ext`;
-                const bounds = itemBounds[name];
-
-                if (!bounds) {
-                    result[name] = undefined;
-                    result[extKey] = undefined;
-                } else if (existing && existing[name] !== undefined) {
-                    result[name] = existing[name];
-                    result[extKey] = undefined; // No dashed line where real data exists
-                } else if (dateEntry.date < bounds.firstDate) {
-                    result[name] = undefined;
-                    result[extKey] = bounds.firstValue;
-                } else if (dateEntry.date > bounds.lastDate) {
-                    result[name] = undefined;
-                    result[extKey] = bounds.lastValue;
-                } else {
-                    result[name] = undefined;
-                    result[extKey] = undefined; // ECharts handles connectNulls or we can interpolate if needed
-                }
-            });
-            return result;
-        });
-    }, [chartData, startDate, endDate, items]);
-
-    // Aggregation Logic - RELAXED
-    const getEffectiveResolution = useCallback(() => {
-        if (resolution !== 'auto') return resolution;
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24));
-        if (diffDays <= 365) return 'daily'; // Up to 1 year
-        if (diffDays <= 365 * 5) return 'weekly'; // Up to 5 years
-        return 'monthly';
-    }, [resolution, startDate, endDate]);
-    const processedData = useMemo(() => {
-        const effectiveRes = getEffectiveResolution();
-        if (effectiveRes === 'daily' || !filteredChartData.length) return filteredChartData;
-
-        const getGroupKey = (dateStr) => {
-            const date = new Date(dateStr);
-            if (effectiveRes === 'yearly') return `${date.getFullYear()}`;
-            if (effectiveRes === 'monthly') return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            if (effectiveRes === 'weekly') {
-                const day = date.getDay();
-                const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-                const monday = new Date(date.setDate(diff));
-                return monday.toISOString().split('T')[0];
-            }
-            return dateStr;
-        };
-
-        const groups = new Map();
-        filteredChartData.forEach(item => {
-            const key = getGroupKey(item.date);
-            if (!groups.has(key)) groups.set(key, []);
-            groups.get(key).push(item);
-        });
-
-        const aggregated = [];
-        const activeNames = items.map(i => i.name);
-
-        groups.forEach((groupItems, key) => {
-            const dateObj = new Date(groupItems[0].date);
-            let dateShort = groupItems[0].dateShort;
-            let fullDate = groupItems[0].fullDate;
-
-            if (effectiveRes === 'monthly') {
-                dateShort = dateObj.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
-                fullDate = dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-            } else if (effectiveRes === 'yearly') {
-                dateShort = dateObj.getFullYear().toString();
-                fullDate = dateObj.getFullYear().toString();
-            }
-
-            const entry = { date: key, dateShort, fullDate };
-
-            activeNames.forEach(name => {
-                const values = groupItems.map(d => d[name]).filter(v => v !== undefined && v !== null);
-
-                // Handle extended values
-                const extValues = groupItems.map(d => d[`${name}_ext`]).filter(v => v !== undefined);
-                let extVal = undefined;
-                if (extValues.length > 0) extVal = extValues[0]; // Simplification for extensions
-
-                if (values.length === 0) {
-                    entry[`${name}_ext`] = extVal;
-                    return;
-                }
-
-                let resultVal;
-                if (aggregation === 'max') resultVal = Math.max(...values);
-                else if (aggregation === 'min') resultVal = Math.min(...values);
-                else resultVal = values.reduce((a, b) => a + b, 0) / values.length;
-
-                entry[name] = Math.round(resultVal);
-                // No dashed line where real data exists
-            });
-
-            aggregated.push(entry);
-        });
-
-        return aggregated;
-    }, [filteredChartData, getEffectiveResolution, aggregation, items]);
 
     // Normalization Effect - Processes data and shows spinner if it takes time
     useEffect(() => {
@@ -588,6 +598,18 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     }, [processedData, normTargets, items]);
 
 
+    // Determine Colors
+    const getItemColor = useCallback((itemName) => {
+        if (colorAssignmentsRef.current.has(itemName)) {
+            return colorAssignmentsRef.current.get(itemName);
+        }
+        const colorIndex = nextColorIndexRef.current % colors.length;
+        const color = colors[colorIndex]?.stroke || '#3B82F6';
+        colorAssignmentsRef.current.set(itemName, color);
+        nextColorIndexRef.current++;
+        return color;
+    }, [colors]);
+
     // Calculate stats
     useEffect(() => {
         if (!filteredChartData.length || !items.length) {
@@ -609,30 +631,16 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             };
         }).filter(Boolean);
         if (onStatsUpdate) onStatsUpdate(newStats);
-    }, [filteredChartData, items]);
-
-
-    // Determine Colors
-    const getItemColor = useCallback((itemName) => {
-        if (colorAssignmentsRef.current.has(itemName)) {
-            return colorAssignmentsRef.current.get(itemName);
-        }
-        const colorIndex = nextColorIndexRef.current % colors.length;
-        const color = colors[colorIndex]?.stroke || '#3B82F6';
-        colorAssignmentsRef.current.set(itemName, color);
-        nextColorIndexRef.current++;
-        return color;
-    }, [colors]);
+    }, [filteredChartData, items, getItemColor, onStatsUpdate]);
 
     // ECharts Option Generation
     const option = useMemo(() => {
         const activeNames = items.map(i => i.name);
 
-        // Series generation
         const series = [];
+        // eslint-disable-next-line react-hooks/refs
         activeNames.forEach(name => {
             const color = getItemColor(name);
-            const item = items.find(i => i.name === name);
 
             // Use data from finalChartData (pre-normalized)
             const mainData = finalChartData.map(d => d[name]);
@@ -706,7 +714,6 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             }
         });
 
-        const isMultiYear = (new Date(endDate).getFullYear() - new Date(startDate).getFullYear()) > 0;
         const xAxisMode = getEffectiveResolution();
 
         return {
@@ -794,7 +801,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 axisLabel: {
                     color: isDark ? '#6B5B95' : '#8B7E6B',
                     interval: 'auto', // Let ECharts decide density
-                    formatter: (value, index) => {
+                    formatter: (value) => {
                         return value.replace(' ', '\n');
                     },
                     fontSize: 11
@@ -819,7 +826,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             animationEasing: 'cubicOut',
             animationEasingUpdate: 'cubicOut', // Smooth updates
         };
-    }, [items, finalChartData, getItemColor, hoveredItem, startDate, endDate, getEffectiveResolution, isDark]);
+    }, [items, finalChartData, getItemColor, hoveredItem, getEffectiveResolution, isDark, normTargets]);
 
 
     // Manual Option Management for 'replaceMerge'

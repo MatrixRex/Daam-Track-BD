@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import Fuse from 'fuse.js';
+import uFuzzy from '@leeoniya/ufuzzy';
 import { Search, X, ChevronRight, Check } from 'lucide-react';
 import clsx from 'clsx';
 import { DATA_BASE_URL } from '../config';
@@ -15,7 +15,6 @@ export default function SearchBar({
     itemStats = {} 
 }) {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredItem, setHoveredItem] = useState(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -30,40 +29,27 @@ export default function SearchBar({
     // Ref for clicking outside to close dropdown
     const searchRef = useRef(null);
 
-    // 2. Initialize Fuse.js (The Fuzzy Search Engine)
-    const fuse = useMemo(() => new Fuse(items, {
-        keys: ['name', 'category'], // Search in these fields
-        threshold: 0.3,             // 0.0 = Exact match, 1.0 = Match anything
-        distance: 100,              // How close the typo can be
-        minMatchCharLength: 2,
-        ignoreLocation: true        // Ignore where the match is found in the string
-    }), [items]);
+    // Initialize uFuzzy & Memoize Haystack
+    const uf = useMemo(() => new uFuzzy(), []);
+    const haystack = useMemo(() => {
+        return items.map(item => `${item.name} ${item.category}`);
+    }, [items]);
 
-    // 3. Handle Search Logic
-    useEffect(() => {
+    // 3. Handle Search Logic using uFuzzy
+    const results = useMemo(() => {
         if (!query.trim()) {
-            setResults([]);
-            return;
+            return [];
         }
 
         // Perform the search
-        // 1. Contains-All-Words Matches (Higher Priority)
-        const words = query.toLowerCase().split(/\s+/).filter(word => word.length > 0);
-        const strictMatches = items.filter(item => {
-            const itemName = item.name.toLowerCase();
-            const itemCategory = item.category.toLowerCase();
-            return words.every(word => itemName.includes(word) || itemCategory.includes(word));
-        });
+        const [, info, order] = uf.search(haystack, query);
 
-        // 2. Fuzzy Matches (Fuse.js)
-        const fuseResults = fuse.search(query).map(res => res.item);
-
-        // 3. Merge: Strict + Fuzzy (Deduplicate using Set)
-        const finalResults = Array.from(new Set([...strictMatches, ...fuseResults])).slice(0, 8);
-
-        setResults(finalResults);
-        setIsOpen(true);
-    }, [query, fuse]);
+        if (order && order.length > 0) {
+            // Retrieve matched items using the sorted order double-indirection indices
+            return order.map(infoIdx => items[info.idx[infoIdx]]).slice(0, 8);
+        }
+        return [];
+    }, [query, uf, haystack, items]);
 
     // 4. Handle Click Outside
     useEffect(() => {
@@ -96,7 +82,12 @@ export default function SearchBar({
                     )}
                     placeholder={loading ? "Loading products..." : "Search for eggs, rice, beef..."}
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(e) => {
+                        setQuery(e.target.value);
+                        if (e.target.value.trim()) {
+                            setIsOpen(true);
+                        }
+                    }}
                     onFocus={() => { if (query) setIsOpen(true); }}
                     disabled={loading}
                 />
