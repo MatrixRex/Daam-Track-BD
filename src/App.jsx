@@ -469,8 +469,6 @@ function App() {
                 item={selectedItems.find(i => i.name === selectedDetailItemName)}
                 stats={itemStats[selectedDetailItemName]}
                 normTargets={normTargets.enabled ? normTargets : null}
-                onClose={() => setSelectedDetailItemName(null)}
-                onRemove={(item) => handleRemoveItem(item.name)}
               />
             </div>
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import { DATA_BASE_URL } from '../config';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
-import { X, TrendingUp, TrendingDown, Minus, Info, Trash2, Maximize2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Info, Maximize2 } from 'lucide-react';
 import clsx from 'clsx';
 
-export default function ItemDetailsPanel({ item, stats, normTargets, onClose, onRemove }) {
+export default function ItemDetailsPanel({ item, stats, normTargets }) {
   if (!item) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center bg-muted border border-dashed border-border rounded-3xl h-[600px]">
@@ -34,21 +34,7 @@ export default function ItemDetailsPanel({ item, stats, normTargets, onClose, on
     : change;
 
   return (
-    <div key={item.name} className="flex flex-col bg-muted border border-border rounded-3xl shadow-xl overflow-hidden flex-1 min-h-0 motion-preset-blur-right motion-duration-300">
-      {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-border/40 bg-background/30">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-primary" />
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Detail Insight</span>
-        </div>
-        <button 
-          onClick={onClose}
-          className="p-2 hover:bg-accent rounded-xl text-muted-foreground transition-all"
-        >
-          <X size={18} />
-        </button>
-      </div>
-
+    <div key={`${item.name}-${normTargets?.enabled ? 'norm' : 'raw'}`} className="flex flex-col bg-muted border border-border rounded-3xl shadow-xl overflow-hidden flex-1 min-h-0 motion-preset-blur-right motion-duration-300">
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
         {/* Visual Hero */}
         <div className="relative group mb-8">
@@ -87,7 +73,7 @@ export default function ItemDetailsPanel({ item, stats, normTargets, onClose, on
               <span className="text-4xl font-black text-foreground">৳{normalizedPrice}</span>
               <span className="text-sm font-bold text-muted-foreground">/ {unitLabel}</span>
             </div>
-            {change !== 0 && (
+            {change !== 0 ? (
               <div className={clsx(
                 "mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black shadow-sm",
                 change > 0 
@@ -96,6 +82,11 @@ export default function ItemDetailsPanel({ item, stats, normTargets, onClose, on
               )}>
                 {change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                 ৳{Math.abs(normalizedChange)} {change > 0 ? 'Increase' : 'Savings'}
+              </div>
+            ) : (
+              <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black shadow-sm bg-gray-50 dark:bg-gray-800 text-gray-400">
+                <Minus size={14} />
+                No change
               </div>
             )}
           </div>
@@ -111,30 +102,8 @@ export default function ItemDetailsPanel({ item, stats, normTargets, onClose, on
           </div>
         </div>
 
-        {/* Specs/Meta */}
-        <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-muted border border-border/30">
-             <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold text-muted-foreground">Standardization</span>
-                <span className="text-xs font-black text-primary">Enabled</span>
-             </div>
-             <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-               Calculated based on {normTargets?.enabled ? 'manual override' : 'default unit'} targets to ensure accurate multi-product comparison.
-             </p>
-          </div>
-        </div>
       </div>
 
-      {/* Footer Controls */}
-      <div className="p-6 bg-background/20 border-t border-border/40 mt-auto">
-        <button
-          onClick={() => onRemove(item)}
-          className="w-full flex items-center justify-center gap-2 py-3.5 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl text-sm font-black transition-all border border-red-100"
-        >
-          <Trash2 size={16} />
-          Remove from Dashboard
-        </button>
-      </div>
     </div>
   );
 }

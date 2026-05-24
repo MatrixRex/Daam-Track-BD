@@ -2,9 +2,9 @@ import React from 'react';
 import { DATA_BASE_URL } from '../config';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 import clsx from 'clsx';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { TrendingUp, Trash2 } from 'lucide-react';
 
-export default function StatsSidebar({ items, stats, colors, normTargets, onHover, selectedItemName, onSelect }) {
+export default function StatsSidebar({ items, stats, colors, normTargets, onHover, selectedItemName, onSelect, onRemove }) {
 
     if (items.length === 0) {
         return (
@@ -37,11 +37,6 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                     ? getTargetUnitLabel(parseUnit(item.unit).type, normTargets[parseUnit(item.unit).type], item.unit)
                     : item.unit;
 
-                const changeRaw = itemStat?.change ?? 0;
-                const normalizedChange = normTargets?.enabled
-                    ? Math.round(getNormalizedPrice(changeRaw, item.unit, normTargets))
-                    : changeRaw;
-
                 return (
                     <div
                         key={`${item.name}-${normTargets?.enabled ? 'norm' : 'raw'}`}
@@ -49,7 +44,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                         onMouseEnter={() => onHover(item.name)}
                         onMouseLeave={() => onHover(null)}
                         className={clsx(
-                            "flex items-center gap-3 p-3 bg-muted rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out group cursor-pointer",
+                            "flex items-center gap-3 p-3 bg-muted rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out group cursor-pointer relative overflow-hidden",
                             "motion-preset-fade motion-duration-200",
                             "ring-2 border",
                             isSelected 
@@ -89,33 +84,15 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                             </div>
                         </div>
 
-                        {/* Change/Trend */}
-                        <div className="flex flex-col items-end gap-1">
-                            {normalizedChange !== 0 ? (
-                                <div className={clsx(
-                                    "flex items-center gap-0.5 px-1.5 py-0.5 rounded-lg text-[10px] font-black",
-                                    normalizedChange > 0 
-                                        ? "bg-red-50 dark:bg-red-900/20 text-red-500" 
-                                        : "bg-primary/10 dark:bg-primary/10 text-primary dark:text-primary"
-                                )}>
-                                    {normalizedChange > 0 ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
-                                    ৳{Math.abs(normalizedChange)}
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg text-[10px] font-black bg-gray-50 dark:bg-gray-800 text-gray-400">
-                                    <Minus className="w-2.5 h-2.5" />
-                                    No change
-                                </div>
-                            )}
-                            
-                            {/* Min/Max (Tiny) */}
-                            {itemStat && (
-                                <div className="flex gap-1 text-[9px] font-bold">
-                                    <span className="text-muted-foreground dark:text-muted-foreground">L:৳{normTargets?.enabled ? Math.round(getNormalizedPrice(itemStat.min, item.unit, normTargets)) : itemStat.min}</span>
-                                    <span className="text-muted-foreground dark:text-muted-foreground">H:৳{normTargets?.enabled ? Math.round(getNormalizedPrice(itemStat.max, item.unit, normTargets)) : itemStat.max}</span>
-                                </div>
-                            )}
-                        </div>
+                        {/* Delete button */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onRemove(item); }}
+                          className="absolute right-0 top-0 h-full aspect-square translate-x-full group-hover:translate-x-0 transition-transform duration-200 bg-red-400 hover:bg-red-500 flex items-center justify-center text-white shadow-sm"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+
+
                     </div>
                 );
             })}
