@@ -383,7 +383,7 @@ function App() {
             </div>
 
             {/* Column 2: Stats Sidebar (20%) */}
-            <div className="lg:col-span-1 flex flex-col min-h-0 overflow-hidden">
+            <div className="lg:col-span-1 flex flex-col gap-4 min-h-0 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-4 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">Items</h3>
                 <div className="flex items-center gap-1">
