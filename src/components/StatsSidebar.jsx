@@ -49,9 +49,12 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                         onMouseEnter={() => onHover(item.name)}
                         onMouseLeave={() => onHover(null)}
                         className={clsx(
-                            "flex items-center gap-3 p-3 bg-[#FFFDF8] dark:bg-[#3D3460] border border-[#D4E6DC] dark:border-[#4A3F6B] rounded-2xl shadow-sm hover:shadow-md hover:border-[#7A9F7A] dark:hover:border-[#9D8EC9] transition-all group cursor-pointer",
+                            "flex items-center gap-3 p-3 bg-[#FFFDF8] dark:bg-[#3D3460] rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out group cursor-pointer",
                             "motion-preset-fade motion-duration-300",
-                            isSelected && "ring-2 ring-[#7A9F7A] dark:ring-[#9D8EC9] border-transparent bg-white dark:bg-[#1E1A2E]"
+                            "ring-2 border",
+                            isSelected 
+                                ? "ring-[#7A9F7A] dark:ring-[#9D8EC9] border-transparent bg-white dark:bg-[#1E1A2E] translate-x-1.5 shadow-md" 
+                                : "ring-transparent border-[#D4E6DC] dark:border-[#4A3F6B] hover:translate-x-0.5"
                         )}
                         style={{ borderLeft: `3px solid ${color}` }}
                     >
