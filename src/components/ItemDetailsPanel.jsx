@@ -56,7 +56,7 @@ export default function ItemDetailsPanel({ item, stats, normTargets, onClose, on
             <img
               src={`${DATA_BASE_URL}/images/${item.image}`}
               alt={item.name}
-              className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-110"
+              className="w-full h-full object-contain"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background-50/20 to-transparent pointer-events-none" />
           </div>
