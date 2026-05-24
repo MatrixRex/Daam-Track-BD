@@ -5,7 +5,6 @@ import clsx from 'clsx';
 import { DATA_BASE_URL } from '../config';
 import ItemHoverCard from './ItemHoverCard';
 import ItemDetailModal from './ItemDetailModal';
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 
 export default function SearchBar({ 
     onSelect, 
@@ -15,7 +14,6 @@ export default function SearchBar({
     normTargets, 
     itemStats = {} 
 }) {
-    const [parent] = useAutoAnimate();
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredItem, setHoveredItem] = useState(null);
@@ -111,8 +109,8 @@ export default function SearchBar({
 
             {/* Dropdown Results */}
             {isOpen && results.length > 0 && (
-                <div className="absolute w-full md:w-[150%] lg:w-[180%] md:left-1/2 md:-translate-x-1/2 mt-2 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl shadow-2xl dark:shadow-[#1E1A2E]/70 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                    <ul ref={parent} className="max-h-[60vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 p-3">
+                <div className="absolute w-full md:w-[150%] lg:w-[180%] md:left-1/2 md:-translate-x-1/2 mt-2 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl shadow-2xl dark:shadow-[#1E1A2E]/70 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden motion-preset-blur-fade motion-duration-300">
+                    <ul className="max-h-[60vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 p-3">
                         {results.map((item, index) => {
                             const isSelected = selectedItems.some(i => i.name === item.name);
                             return (

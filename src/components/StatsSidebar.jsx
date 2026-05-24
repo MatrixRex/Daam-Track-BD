@@ -3,10 +3,8 @@ import { DATA_BASE_URL } from '../config';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 import clsx from 'clsx';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 
-export default function StatsSidebar({ items, stats, colors, normTargets, onRemove, onHover, selectedItemName, onSelect }) {
-    const [parent] = useAutoAnimate();
+export default function StatsSidebar({ items, stats, colors, normTargets, onHover, selectedItemName, onSelect }) {
 
     if (items.length === 0) {
         return (
@@ -23,7 +21,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onRemo
     }
 
     return (
-        <div ref={parent} className="flex flex-col gap-3 h-full max-h-[calc(100vh-250px)] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="flex flex-col gap-3 h-full max-h-[calc(100vh-250px)] overflow-y-auto pr-2 custom-scrollbar">
             {items.map((item, index) => {
                 const color = colors[index % colors.length]?.stroke || '#7A9F7A';
                 const itemStat = stats.find(s => s.name === item.name);
@@ -52,7 +50,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onRemo
                         onMouseLeave={() => onHover(null)}
                         className={clsx(
                             "flex items-center gap-3 p-3 bg-[#FFFDF8] dark:bg-[#3D3460] border border-[#D4E6DC] dark:border-[#4A3F6B] rounded-2xl shadow-sm hover:shadow-md hover:border-[#7A9F7A] dark:hover:border-[#9D8EC9] transition-all group cursor-pointer",
-                            "animate-in fade-in slide-in-from-right-2 duration-300",
+                            "motion-preset-fade motion-duration-300",
                             isSelected && "ring-2 ring-[#7A9F7A] dark:ring-[#9D8EC9] border-transparent bg-white dark:bg-[#1E1A2E]"
                         )}
                         style={{ borderLeft: `3px solid ${color}` }}
