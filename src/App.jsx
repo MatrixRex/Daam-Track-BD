@@ -254,6 +254,12 @@ function App() {
                   <span className="text-xs font-semibold text-text-500 uppercase tracking-wider">Export As</span>
                 </div>
 
+                {selectedItems.length === 0 ? (
+                  <div className="px-4 py-6 text-center">
+                    <p className="text-sm text-text-400">Add items to the comparison list to enable export.</p>
+                  </div>
+                ) : (<>
+
                 {/* Image (PNG) */}
                 <div className="flex items-center hover:bg-primary-200/30 transition-colors group/item">
                   <button
@@ -325,6 +331,8 @@ function App() {
                     <Copy size={14} />
                   </button>
                 </div>
+
+                </>)}
 
               </div>
               </div>
