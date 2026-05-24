@@ -3,7 +3,7 @@ import { TrendingUp } from 'lucide-react';
 
 const EmptyStateSkeleton = () => {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-pulse">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-pulse motion-preset-fade motion-duration-300">
 
             {/* Left Column: Chart Area Skeleton (3/4 width) */}
             <div className="lg:col-span-3">

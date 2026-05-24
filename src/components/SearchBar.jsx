@@ -241,7 +241,7 @@ export default function SearchBar({
 
             {/* "No Results" State */}
             {isOpen && query && results.length === 0 && (
-                <div className="absolute w-full mt-2 bg-background-100 rounded-xl shadow-lg border border-primary-200 p-8 text-center">
+                <div className="absolute w-full mt-2 bg-background-100 rounded-xl shadow-lg border border-primary-200 p-8 text-center motion-preset-blur-down motion-duration-300">
                     <p className="text-text-500">No items found for "{query}"</p>
                 </div>
             )}

@@ -10,7 +10,7 @@ export default function CommandBar({ normTargets, onUpdateNorm, onClearAll, onRe
     ];
 
     return (
-        <div className="flex flex-wrap items-center gap-4 p-4 bg-background-100 border border-primary-200 rounded-2xl shadow-sm transition-all duration-300">
+        <div className="flex flex-wrap items-center gap-4 p-4 bg-background-100 border border-primary-200 rounded-2xl shadow-sm transition-all duration-300 motion-preset-fade motion-duration-300">
             {/* Normalization Toggle */}
             <div className="flex items-center gap-3 pr-4 border-r border-primary-200">
                 <button

@@ -37,7 +37,7 @@ const ThemeToggle = () => {
     return (
         <button
             onClick={() => setIsDark(!isDark)}
-            className="relative p-2.5 rounded-xl bg-primary-200 hover:bg-primary-400/40 transition-all duration-300 group overflow-hidden border border-primary-200"
+            className="relative p-2.5 rounded-xl bg-primary-200 hover:bg-primary-400/40 transition-all duration-300 group overflow-hidden border border-primary-200 motion-preset-fade motion-duration-300"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         >

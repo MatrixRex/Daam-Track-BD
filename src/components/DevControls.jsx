@@ -43,7 +43,7 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
     };
 
     return (
-        <div className="flex items-center gap-2 bg-background-100 p-1 pr-2 rounded-full border border-primary-200 shadow-sm">
+        <div className="flex items-center gap-2 bg-background-100 p-1 pr-2 rounded-full border border-primary-200 shadow-sm motion-preset-fade motion-duration-200">
             
             {/* 1. Quick Add Section */}
             <div className="flex items-center gap-1.5 pl-2 border-r border-primary-200 pr-2">

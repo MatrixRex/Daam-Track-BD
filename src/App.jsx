@@ -193,7 +193,7 @@ function App() {
     <div className="min-h-screen bg-background-50 font-sans text-text-800 transition-colors duration-300">
 
       {/* --- HEADER SECTION --- */}
-      <div className="bg-background-100 border-b border-primary-200 shadow-sm sticky top-0 z-30 transition-colors duration-300">
+      <div className="bg-background-100 border-b border-primary-200 shadow-sm sticky top-0 z-30 transition-colors duration-300 motion-preset-fade motion-duration-300">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between md:grid md:grid-cols-3 gap-4">
 
           {/* Logo */}
@@ -241,7 +241,7 @@ function App() {
               </button>
 
               {/* Export Dropdown */}
-              <div className="absolute right-0 top-full mt-2 w-56 bg-background-100 rounded-xl shadow-xl border border-primary-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right">
+              <div className="absolute right-0 top-full mt-2 w-56 bg-background-100 rounded-xl shadow-xl border border-primary-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right motion-preset-blur-down motion-duration-200">
                 <div className="px-3 py-2 border-b border-primary-200/50">
                   <span className="text-xs font-semibold text-text-500 uppercase tracking-wider">Export As</span>
                 </div>
@@ -328,7 +328,7 @@ function App() {
       </div>
 
       {/* --- MOBILE SEARCH (Visible only on small screens) --- */}
-      <div className="md:hidden p-4 bg-background-100 border-b border-primary-200 transition-colors duration-300">
+      <div className="md:hidden p-4 bg-background-100 border-b border-primary-200 transition-colors duration-300 motion-preset-fade motion-duration-300">
         <SearchBar
           onSelect={handleAddItem}
           items={allItems}
@@ -353,7 +353,7 @@ function App() {
         </div>
 
         {selectedItems.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full motion-preset-fade motion-duration-300">
 
             {/* Column 1: Chart (Flexible) */}
             <div className="lg:col-span-6 xl:col-span-7 min-h-[500px]">
