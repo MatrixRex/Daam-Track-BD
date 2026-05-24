@@ -382,8 +382,8 @@ function App() {
               />
             </div>
 
-            {/* Column 2: Items List */}
-            <div className="lg:col-span-1 flex flex-col gap-4 min-h-0 overflow-hidden">
+            {/* Column 2: Stats Sidebar (20%) */}
+            <div className="lg:col-span-1 flex flex-col min-h-0 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-4 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">Items</h3>
                 <div className="flex items-center gap-1">
@@ -435,7 +435,9 @@ function App() {
                   </button>
                 </div>
               </div>
-              <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2">
+            </div>
+            
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2">
                 <StatsSidebar
                   items={sortedItems}
                   stats={Object.values(itemStats)}
@@ -450,7 +452,7 @@ function App() {
             </div>
 
             {/* Column 3: Details Panel (20%) */}
-            <div className="lg:col-span-1 flex flex-col gap-4 min-h-0 overflow-hidden">
+            <div className="flex flex-col gap-4 min-h-0 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-4 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">Details</h3>
                 {selectedDetailItemName && (
