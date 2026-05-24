@@ -790,6 +790,7 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
               domain={[currentDomain[0], currentDomain[1]]}
             />
             <Tooltip
+              wrapperStyle={{ zIndex: 100 }}
               contentStyle={{
                 borderRadius: '12px',
                 border: 'none',
