@@ -43,10 +43,10 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
     };
 
     return (
-        <div className="flex items-center gap-2 bg-[#FFFDF8] dark:bg-[#2A2442] p-1 pr-2 rounded-full border border-[#D4E6DC] dark:border-[#4A3F6B] shadow-sm">
+        <div className="flex items-center gap-2 bg-background-100 p-1 pr-2 rounded-full border border-primary-200 shadow-sm">
             
             {/* 1. Quick Add Section */}
-            <div className="flex items-center gap-1.5 pl-2 border-r border-[#D4E6DC] dark:border-[#4A3F6B] pr-2">
+            <div className="flex items-center gap-1.5 pl-2 border-r border-primary-200 pr-2">
                 <div className="relative group/input">
                     <input
                         type="number"
@@ -54,24 +54,24 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
                         max="50"
                         value={addCount}
                         onChange={(e) => setAddCount(parseInt(e.target.value) || 1)}
-                        className="w-10 h-7 text-center bg-transparent text-xs font-bold text-[#5C5247] dark:text-white focus:outline-none"
+                        className="w-10 h-7 text-center bg-transparent text-xs font-bold text-text-800 focus:outline-none"
                         title="Number of items to add"
                     />
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover/input:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded group-hover/input:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                         Items to add
                     </div>
                 </div>
 
                 <button
                     onClick={handleQuickAdd}
-                    className="flex items-center gap-1 px-2 py-1 bg-[#97B897] dark:bg-[#6B5B95] hover:bg-[#7A9F7A] dark:hover:bg-[#8271B5] text-white rounded-full text-[10px] font-bold transition-all shadow-sm active:scale-95 group relative"
+                    className="flex items-center gap-1 px-2 py-1 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-[10px] font-bold transition-all shadow-sm active:scale-95 group relative"
                     title="Add Random Items"
                 >
                     <Zap size={10} fill="currentColor" />
                     <span>Quick Add</span>
                     
                     {/* Tooltip */}
-                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                         Add {addCount} random products
                     </div>
                 </button>
@@ -83,8 +83,8 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
                 className={`
                     flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold transition-all
                     ${useRemote
-                        ? 'text-purple-700 dark:text-[#9D8EC9] hover:bg-purple-50 dark:hover:bg-[#3D3460]'
-                        : 'text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
+                        ? 'text-primary-700 hover:bg-primary-50'
+                        : 'text-secondary-700 hover:bg-secondary-50'
                     }
                 `}
                 title={`Switch to ${useRemote ? 'Local' : 'Remote'} Data`}

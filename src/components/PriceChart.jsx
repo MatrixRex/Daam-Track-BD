@@ -95,10 +95,10 @@ const DateInput = ({ value, onChange, label, min, max }) => {
 
   return (
     <div
-      className="relative flex items-center bg-white border border-slate-200 rounded-lg px-3 py-1.5 hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer"
+      className="relative flex items-center bg-background-100 border border-primary-200 rounded-lg px-3 py-1.5 hover:border-primary-400 hover:bg-primary-200/30 transition-colors cursor-pointer"
       onClick={openPicker}
     >
-      <span className="text-sm font-medium text-slate-700 pointer-events-none">
+      <span className="text-sm font-medium text-text-800 pointer-events-none">
         {displayValue}
       </span>
       <input
@@ -119,6 +119,11 @@ const DateInput = ({ value, onChange, label, min, max }) => {
 const CustomXAxisTick = ({ x, y, payload, mode }) => {
   if (!payload || !payload.value) return null;
 
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const textColorMain = isDark ? '#afb6b3' : '#49504d';
+  const textColorMuted = isDark ? '#7a8580' : '#7a8580';
+  const textColorLight = isDark ? '#626a66' : '#959d99';
+
   // Manual parsing to avoid timezone issues: YYYY-MM-DD
   const [yearStr, monthStr, dayStr] = payload.value.split('-');
   const day = parseInt(dayStr, 10);
@@ -128,22 +133,17 @@ const CustomXAxisTick = ({ x, y, payload, mode }) => {
 
   const monthName = MONTH_NAMES[monthIndex];
 
-  // Mode Logic:
-  // 'detailed': Day (top), Month (mid), Year (bot)
-  // 'monthly': Month (top), Year (bot)
-  // 'yearly': Year (top)
-
   return (
     <g transform={`translate(${x},${y})`}>
       {mode === 'detailed' && (
         <React.Fragment>
-          <text x={0} y={0} dy={14} textAnchor="middle" fill="#64748b" fontSize={11} fontWeight={500}>
+          <text x={0} y={0} dy={14} textAnchor="middle" fill={textColorMain} fontSize={11} fontWeight={500}>
             {day}
           </text>
-          <text x={0} y={0} dy={28} textAnchor="middle" fill="#94a3b8" fontSize={10}>
+          <text x={0} y={0} dy={28} textAnchor="middle" fill={textColorMuted} fontSize={10}>
             {monthName}
           </text>
-          <text x={0} y={0} dy={42} textAnchor="middle" fill="#cbd5e1" fontSize={10}>
+          <text x={0} y={0} dy={42} textAnchor="middle" fill={textColorLight} fontSize={10}>
             {yearShort}
           </text>
         </React.Fragment>
@@ -151,17 +151,17 @@ const CustomXAxisTick = ({ x, y, payload, mode }) => {
 
       {mode === 'monthly' && (
         <React.Fragment>
-          <text x={0} y={0} dy={14} textAnchor="middle" fill="#64748b" fontSize={11} fontWeight={500}>
+          <text x={0} y={0} dy={14} textAnchor="middle" fill={textColorMain} fontSize={11} fontWeight={500}>
             {monthName}
           </text>
-          <text x={0} y={0} dy={28} textAnchor="middle" fill="#94a3b8" fontSize={10}>
+          <text x={0} y={0} dy={28} textAnchor="middle" fill={textColorMuted} fontSize={10}>
             {yearFull}
           </text>
         </React.Fragment>
       )}
 
       {mode === 'yearly' && (
-        <text x={0} y={0} dy={14} textAnchor="middle" fill="#64748b" fontSize={11} fontWeight={500}>
+        <text x={0} y={0} dy={14} textAnchor="middle" fill={textColorMain} fontSize={11} fontWeight={500}>
           {yearFull}
         </text>
       )}
@@ -171,7 +171,9 @@ const CustomXAxisTick = ({ x, y, payload, mode }) => {
 
 // Custom Cursor to ensure vertical line renders correctly regardless of axis type
 const CustomCursor = (props) => {
-  const { x, y, width, height, stroke, strokeWidth, strokeDasharray, strokeOpacity, points } = props;
+  const { x, y, width, height, strokeWidth, strokeDasharray, strokeOpacity, points } = props;
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const strokeColor = isDark ? '#428a79' : '#75bdac';
 
   // For continuous axis (Recharts passes points)
   if (points && points.length >= 2) {
@@ -181,7 +183,7 @@ const CustomCursor = (props) => {
         y1={points[0].y}
         x2={points[1].x}
         y2={points[1].y}
-        stroke={stroke}
+        stroke={strokeColor}
         strokeWidth={strokeWidth}
         strokeDasharray={strokeDasharray}
         strokeOpacity={strokeOpacity}
@@ -200,7 +202,7 @@ const CustomCursor = (props) => {
         y1={y}
         x2={midX}
         y2={y + height}
-        stroke={stroke}
+        stroke={strokeColor}
         strokeWidth={strokeWidth}
         strokeDasharray={strokeDasharray}
         strokeOpacity={strokeOpacity}
@@ -211,9 +213,10 @@ const CustomCursor = (props) => {
   return null;
 };
 
-const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate }) => {
+const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUpdate }) => {
   const { runQuery, loading: engineLoading } = useDuckDB();
   const dataCache = useRef(new Map());
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
 
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -665,16 +668,16 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHovere
   // Loading state
   if (loading && chartData.length === 0) {
     return (
-      <div className="h-[500px] flex flex-col items-center justify-center bg-white rounded-2xl border border-slate-200">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-2" />
-        <span className="text-sm text-gray-400">{loadingItem ? `Loading ${loadingItem}...` : 'Loading...'}</span>
+      <div className="h-[500px] flex flex-col items-center justify-center bg-background-100 rounded-2xl border border-primary-200">
+        <Loader2 className="w-8 h-8 text-primary-500 animate-spin mb-2" />
+        <span className="text-sm text-text-500">{loadingItem ? `Loading ${loadingItem}...` : 'Loading...'}</span>
       </div>
     );
   }
 
   if (items.length > 0 && chartData.length === 0 && !loading) {
     return (
-      <div className="h-[500px] flex flex-col items-center justify-center bg-white rounded-2xl border border-slate-200 text-red-400">
+      <div className="h-[500px] flex flex-col items-center justify-center bg-background-100 rounded-2xl border border-primary-200 text-red-400">
         <AlertCircle className="w-8 h-8 mb-2" />
         <span className="text-sm">No history found.</span>
       </div>
@@ -691,9 +694,9 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHovere
   });
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative">
+    <div className="bg-background-100 p-6 rounded-2xl shadow-sm border border-primary-200 relative">
       {loadingItem && chartData.length > 0 && (
-        <div className="absolute top-4 right-4 flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-xs font-medium z-10 animate-pulse">
+        <div className="absolute top-4 right-4 flex items-center gap-2 bg-primary-200 text-primary-700 px-3 py-1.5 rounded-full text-xs font-medium z-10 animate-pulse">
           <Loader2 className="w-3 h-3 animate-spin" />
           Adding {loadingItem}...
         </div>
@@ -702,8 +705,8 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHovere
       {/* Header */}
       <div className="flex flex-wrap justify-between items-start mb-6 gap-4">
         <div>
-          <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Price Comparison</h3>
-          <p className="text-xs text-slate-400 mt-1">
+          <h3 className="text-sm font-semibold text-text-500 uppercase tracking-wider">Price Comparison</h3>
+          <p className="text-xs text-text-500 mt-1">
             {items.length} item{items.length > 1 ? 's' : ''} • {processedData.length} data points
           </p>
         </div>
@@ -714,14 +717,14 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHovere
       <div className="flex items-center gap-4">
         {/* Aggregation Selection (Only if not Daily) */}
         {getEffectiveResolution() !== 'daily' && (
-          <div className="flex bg-slate-100 rounded-lg p-1">
+          <div className="flex bg-background-50 rounded-lg p-1">
             {['avg', 'min', 'max'].map(mode => (
               <button
                 key={mode}
                 onClick={() => setAggregation(mode)}
-                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${aggregation === mode
-                  ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-900/5'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                className={`px-3 py-1 text-xs font-medium rounded-md active:scale-[0.96] transition-transform duration-200 ${aggregation === mode
+                  ? 'bg-primary-500 text-white shadow-sm ring-1 ring-primary-600'
+                  : 'text-text-500 hover:text-text-800 hover:bg-primary-200/30'
                   }`}
               >
                 {mode === 'avg' ? 'Avg' : mode === 'min' ? 'Low' : 'High'}
@@ -734,7 +737,7 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHovere
         <select
           value={resolution}
           onChange={(e) => setResolution(e.target.value)}
-          className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+          className="bg-background-50 border border-primary-200 text-text-800 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2"
         >
           <option value="auto">Auto ({getEffectiveResolution()})</option>
           <option value="daily">Daily</option>
@@ -744,15 +747,15 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHovere
         </select>
 
         {/* Date Range Filter */}
-        <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
-          <Calendar className="w-4 h-4 text-blue-500 flex-shrink-0" />
+        <div className="flex items-center gap-2 bg-background-50 rounded-xl px-3 py-2 border border-primary-200">
+          <Calendar className="w-4 h-4 text-primary-500 flex-shrink-0" />
           <DateInput
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             label="Start date"
             max={endDate}
           />
-          <span className="text-slate-400 text-sm font-medium">to</span>
+          <span className="text-text-500 text-sm font-medium">to</span>
           <DateInput
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
@@ -769,7 +772,7 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHovere
       <div className="h-[400px] w-full mt-6">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={processedData}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? '#145252' : '#adebeb'} />
             <XAxis
               dataKey="date"
               axisLine={false}
@@ -782,13 +785,20 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, setHovere
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#94a3b8', fontSize: 12 }}
+              tick={{ fill: '#7a8580', fontSize: 12 }}
               unit="৳"
               domain={[currentDomain[0], currentDomain[1]]}
             />
             <Tooltip
-              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
-              cursor={<CustomCursor stroke="#4b4f54" strokeWidth={1} strokeDasharray="5 5" strokeOpacity={0.4} />}
+              contentStyle={{
+                borderRadius: '12px',
+                border: 'none',
+                backgroundColor: isDark ? 'rgba(10, 41, 41, 0.95)' : 'rgba(214, 245, 245, 0.95)',
+                color: isDark ? '#cacecc' : '#313533',
+                boxShadow: isDark ? '0 10px 15px -3px rgb(5 20 20 / 0.5)' : '0 10px 15px -3px rgb(49 53 51 / 0.1)',
+                padding: '12px'
+              }}
+              cursor={<CustomCursor stroke={isDark ? '#428a79' : '#75bdac'} strokeWidth={1} strokeDasharray="5 5" strokeOpacity={0.4} />}
               labelFormatter={(label, payload) => {
                 // Find a payload entry that has fullDate (prefer non-ext entries)
                 const entry = payload?.find(p => p.payload?.fullDate);

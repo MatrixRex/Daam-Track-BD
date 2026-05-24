@@ -37,16 +37,16 @@ const ThemeToggle = () => {
     return (
         <button
             onClick={() => setIsDark(!isDark)}
-            className="relative p-2.5 rounded-xl bg-[#D4E6DC] dark:bg-[#3D3460] hover:bg-[#97B897]/40 dark:hover:bg-[#4A3F6B] transition-all duration-300 group overflow-hidden border border-[#D4E6DC] dark:border-[#4A3F6B]"
+            className="relative p-2.5 rounded-xl bg-primary-200 hover:bg-primary-400/40 transition-all duration-300 group overflow-hidden border border-primary-200"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
             {/* Background glow effect */}
             <div className={`absolute inset-0 transition-opacity duration-500 ${isDark ? 'opacity-100' : 'opacity-0'}`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-[#6B5B95]/30 to-[#9D8EC9]/30 blur-xl" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary-600/30 to-primary-400/30 blur-xl" />
             </div>
             <div className={`absolute inset-0 transition-opacity duration-500 ${!isDark ? 'opacity-100' : 'opacity-0'}`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-[#97B897]/30 to-[#7A9F7A]/30 blur-xl" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary-400/30 to-primary-500/30 blur-xl" />
             </div>
 
             {/* Icons container */}
@@ -54,7 +54,7 @@ const ThemeToggle = () => {
                 {/* Sun icon */}
                 <Sun
                     size={20}
-                    className={`absolute inset-0 text-[#7A9F7A] transition-all duration-300 ${isDark
+                    className={`absolute inset-0 text-primary-500 transition-all duration-300 ${isDark
                         ? 'opacity-0 rotate-90 scale-0'
                         : 'opacity-100 rotate-0 scale-100'
                         }`}
@@ -62,7 +62,7 @@ const ThemeToggle = () => {
                 {/* Moon icon */}
                 <Moon
                     size={20}
-                    className={`absolute inset-0 text-[#9D8EC9] transition-all duration-300 ${isDark
+                    className={`absolute inset-0 text-primary-400 transition-all duration-300 ${isDark
                         ? 'opacity-100 rotate-0 scale-100'
                         : 'opacity-0 -rotate-90 scale-0'
                         }`}

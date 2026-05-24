@@ -35,7 +35,7 @@ const BuildInfo = () => {
     );
 
     return (
-        <div className="fixed bottom-2 right-4 text-[10px] text-[#8B7E6B]/60 dark:text-[#6B5B95]/60 z-20 flex items-center gap-1.5">
+        <div className="fixed bottom-2 right-4 text-[10px] text-text-500/60 dark:text-text-400/60 z-20 flex items-center gap-1.5">
             <span>Community project by</span>
             <a 
                 href="https://github.com/MatrixRex/Daam-Track-BD" 

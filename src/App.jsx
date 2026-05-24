@@ -190,20 +190,20 @@ function App() {
   }, [selectedItems, isSorted, sortDirection, itemStats, normTargets]);
 
   return (
-    <div className="min-h-screen bg-[#F5E6D3] dark:bg-[#1E1A2E] font-sans text-[#5C5247] dark:text-[#B8AED0] transition-colors duration-300">
+    <div className="min-h-screen bg-background-50 font-sans text-text-800 transition-colors duration-300">
 
       {/* --- HEADER SECTION --- */}
-      <div className="bg-[#FFFDF8] dark:bg-[#2A2442] border-b border-[#D4E6DC] dark:border-[#4A3F6B] shadow-sm sticky top-0 z-30 transition-colors duration-300">
+      <div className="bg-background-100 border-b border-primary-200 shadow-sm sticky top-0 z-30 transition-colors duration-300">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between md:grid md:grid-cols-3 gap-4">
 
           {/* Logo */}
           <div className="flex items-center gap-4 justify-start">
             <div className="flex items-center gap-2">
-              <div className="bg-[#97B897] dark:bg-[#6B5B95] p-2 rounded-lg text-white">
+              <div className="bg-primary-400 p-2 rounded-lg text-white">
                 <TrendingUp size={24} />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#5C5247] dark:text-white">
-                Daam<span className="text-[#7A9F7A] dark:text-[#9D8EC9]">Trace</span>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-800">
+                Daam<span className="text-primary-500">Trace</span>
               </h1>
             </div>
 
@@ -234,30 +234,30 @@ function App() {
             {/* Export Button */}
             <div className="relative group">
               <button
-                className="p-2 rounded-lg bg-[#FFFDF8] dark:bg-[#3D3460] border border-[#D4E6DC] dark:border-[#4A3F6B] text-[#5C5247] dark:text-[#B8AED0] hover:bg-[#D4E6DC]/30 dark:hover:bg-[#4A3F6B] transition-colors"
+                className="p-2 rounded-lg bg-background-100 border border-primary-200 text-text-800 hover:bg-primary-200/30 transition-colors"
                 title="Export Chart & Data"
               >
                 <Download size={20} />
               </button>
 
               {/* Export Dropdown */}
-              <div className="absolute right-0 top-full mt-2 w-56 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-xl shadow-xl dark:shadow-[#1E1A2E]/50 border border-[#D4E6DC] dark:border-[#4A3F6B] py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right">
-                <div className="px-3 py-2 border-b border-[#D4E6DC]/50 dark:border-[#3D3460]">
-                  <span className="text-xs font-semibold text-[#8B7E6B] dark:text-[#6B5B95] uppercase tracking-wider">Export As</span>
+              <div className="absolute right-0 top-full mt-2 w-56 bg-background-100 rounded-xl shadow-xl border border-primary-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right">
+                <div className="px-3 py-2 border-b border-primary-200/50">
+                  <span className="text-xs font-semibold text-text-500 uppercase tracking-wider">Export As</span>
                 </div>
 
                 {/* Image (PNG) */}
-                <div className="flex items-center hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] transition-colors group/item">
+                <div className="flex items-center hover:bg-primary-200/30 transition-colors group/item">
                   <button
                     onClick={() => chartRef.current?.exportImage('download')}
-                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] flex items-center gap-2"
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-text-800 flex items-center gap-2"
                   >
-                    <ImageIcon size={14} className="text-[#3B82F6]" />
+                    <ImageIcon size={14} className="text-blue-500" />
                     <span>Image (PNG)</span>
                   </button>
                   <button
                     onClick={() => chartRef.current?.exportImage('copy')}
-                    className="p-2 mr-2 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    className="p-2 mr-2 text-text-500 hover:text-text-800 opacity-0 group-hover/item:opacity-100 transition-opacity"
                     title="Copy Image to Clipboard"
                   >
                     <Copy size={14} />
@@ -265,17 +265,17 @@ function App() {
                 </div>
 
                 {/* Excel (XLSX) */}
-                <div className="flex items-center hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] transition-colors group/item">
+                <div className="flex items-center hover:bg-primary-200/30 transition-colors group/item">
                   <button
                     onClick={() => chartRef.current?.exportData('xlsx', 'download')}
-                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] flex items-center gap-2"
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-text-800 flex items-center gap-2"
                   >
-                    <FileSpreadsheet size={14} className="text-[#10B981]" />
+                    <FileSpreadsheet size={14} className="text-emerald-500" />
                     <span>Excel (XLSX)</span>
                   </button>
                   <button
                     onClick={() => chartRef.current?.exportData('xlsx', 'copy')}
-                    className="p-2 mr-2 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    className="p-2 mr-2 text-text-500 hover:text-text-800 opacity-0 group-hover/item:opacity-100 transition-opacity"
                     title="Copy Data (TSV) to Clipboard"
                   >
                     <Copy size={14} />
@@ -283,17 +283,17 @@ function App() {
                 </div>
 
                 {/* CSV File */}
-                <div className="flex items-center hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] transition-colors group/item">
+                <div className="flex items-center hover:bg-primary-200/30 transition-colors group/item">
                   <button
                     onClick={() => chartRef.current?.exportData('csv', 'download')}
-                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] flex items-center gap-2"
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-text-800 flex items-center gap-2"
                   >
-                    <FileText size={14} className="text-[#F59E0B]" />
+                    <FileText size={14} className="text-amber-500" />
                     <span>CSV File</span>
                   </button>
                   <button
                     onClick={() => chartRef.current?.exportData('csv', 'copy')}
-                    className="p-2 mr-2 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    className="p-2 mr-2 text-text-500 hover:text-text-800 opacity-0 group-hover/item:opacity-100 transition-opacity"
                     title="Copy CSV to Clipboard"
                   >
                     <Copy size={14} />
@@ -301,17 +301,17 @@ function App() {
                 </div>
 
                 {/* JSON Data */}
-                <div className="flex items-center hover:bg-[#D4E6DC]/30 dark:hover:bg-[#3D3460] transition-colors group/item">
+                <div className="flex items-center hover:bg-primary-200/30 transition-colors group/item">
                   <button
                     onClick={() => chartRef.current?.exportData('json', 'download')}
-                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-[#5C5247] dark:text-[#B8AED0] flex items-center gap-2"
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-text-800 flex items-center gap-2"
                   >
-                    <FileJson size={14} className="text-[#8B5CF6]" />
+                    <FileJson size={14} className="text-purple-500" />
                     <span>JSON Data</span>
                   </button>
                   <button
                     onClick={() => chartRef.current?.exportData('json', 'copy')}
-                    className="p-2 mr-2 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    className="p-2 mr-2 text-text-500 hover:text-text-800 opacity-0 group-hover/item:opacity-100 transition-opacity"
                     title="Copy JSON to Clipboard"
                   >
                     <Copy size={14} />
@@ -328,7 +328,7 @@ function App() {
       </div>
 
       {/* --- MOBILE SEARCH (Visible only on small screens) --- */}
-      <div className="md:hidden p-4 bg-[#FFFDF8] dark:bg-[#2A2442] border-b border-[#D4E6DC] dark:border-[#4A3F6B] transition-colors duration-300">
+      <div className="md:hidden p-4 bg-background-100 border-b border-primary-200 transition-colors duration-300">
         <SearchBar
           onSelect={handleAddItem}
           items={allItems}
@@ -372,9 +372,9 @@ function App() {
             <div className="lg:col-span-3 xl:col-span-2">
               <div className="sticky top-24">
                 <div className="flex items-center justify-between mb-4 px-2">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#8B7E6B] dark:text-[#6B5B95]">Comparison</h3>
-                  <div className="group/sort flex items-center bg-[#F5E6D3] dark:bg-[#3D3460] rounded-lg p-0.5 border border-[#D4E6DC] dark:border-[#4A3F6B] transition-all duration-300">
-                    <span className="max-w-0 opacity-0 group-hover/sort:max-w-[150px] group-hover/sort:mx-1.5 group-hover/sort:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-[#8B7E6B] dark:text-[#B8AED0] select-none">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-text-500 dark:text-text-400">Comparison</h3>
+                  <div className="group/sort flex items-center bg-background-50 rounded-lg p-0.5 border border-primary-200 transition-all duration-300">
+                    <span className="max-w-0 opacity-0 group-hover/sort:max-w-[150px] group-hover/sort:mx-1.5 group-hover/sort:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-text-500 select-none">
                       {!isSorted ? "sort-price-off" : sortDirection === 'asc' ? "sort-price-Increasing" : "sort-price-Decreasing"}
                     </span>
                     <button
@@ -382,8 +382,8 @@ function App() {
                       className={clsx(
                         "p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px]",
                         isSorted 
-                          ? "bg-white dark:bg-[#6B5B95] text-[#7A9F7A] dark:text-white shadow-sm" 
-                          : "text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0]"
+                          ? "bg-background-200 text-primary-500 shadow-sm" 
+                          : "text-text-500 hover:text-text-800"
                       )}
                       title={isSorted ? "Turn sort off" : "Sort by price"}
                     >
@@ -392,7 +392,7 @@ function App() {
                     <button
                       onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
                       className={clsx(
-                        "rounded-md text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] hover:bg-white/50 dark:hover:bg-[#3D3460] transition-all duration-300 ease-out flex items-center justify-center",
+                        "rounded-md text-text-500 dark:text-text-400 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-white/50 dark:hover:bg-background-800 transition-all duration-300 ease-out flex items-center justify-center",
                         isSorted 
                           ? "w-[22px] h-[22px] opacity-100 scale-100 pointer-events-auto ml-1" 
                           : "w-0 h-[22px] opacity-0 scale-75 pointer-events-none overflow-hidden"

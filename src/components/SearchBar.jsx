@@ -93,17 +93,17 @@ export default function SearchBar({
             {/* Search Input Area */}
             <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-[#8B7E6B] dark:text-[#6B5B95] group-focus-within:text-[#7A9F7A] dark:group-focus-within:text-[#9D8EC9] transition-colors" />
+                    <Search className="h-5 w-5 text-text-500 group-focus-within:text-primary-500 transition-colors" />
                 </div>
 
                 <input
                     type="text"
                     className={clsx(
-                        "block w-full pl-11 pr-12 py-4 bg-[#FFFDF8] dark:bg-[#2A2442] border border-[#D4E6DC] dark:border-[#4A3F6B] rounded-xl",
-                        "text-[#5C5247] dark:text-[#B8AED0] placeholder-[#8B7E6B] dark:placeholder-[#6B5B95]",
-                        "focus:outline-none focus:ring-2 focus:ring-[#97B897]/30 dark:focus:ring-[#6B5B95]/30 focus:border-[#97B897] dark:focus:border-[#6B5B95]",
-                        "shadow-sm hover:shadow-md dark:shadow-[#1E1A2E]/50 transition-all duration-200",
-                        "disabled:bg-[#F5E6D3] dark:disabled:bg-[#1E1A2E] disabled:cursor-not-allowed"
+                        "block w-full pl-11 pr-12 py-4 bg-background-100 border border-primary-200 rounded-xl",
+                        "text-text-800 placeholder-text-500",
+                        "focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400",
+                        "shadow-sm hover:shadow-md transition-all duration-200",
+                        "disabled:bg-background-50 disabled:cursor-not-allowed"
                     )}
                     placeholder={loading ? "Loading products..." : "Search for eggs, rice, beef..."}
                     value={query}
@@ -127,7 +127,7 @@ export default function SearchBar({
                         }}
                         className="absolute inset-y-0 right-0 pr-4 flex items-center"
                     >
-                        <X className="h-5 w-5 text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0] cursor-pointer" />
+                        <X className="h-5 w-5 text-text-500 hover:text-text-800 cursor-pointer" />
                     </button>
                 )}
             </div>
@@ -135,7 +135,7 @@ export default function SearchBar({
             {isOpen && results.length > 0 && (
                 <div className="absolute w-full md:w-[150%] lg:w-[180%] md:left-1/2 md:-translate-x-1/2 mt-2 z-50">
                     <div 
-                        className="bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl shadow-2xl dark:shadow-[#1E1A2E]/70 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden motion-preset-blur-down motion-duration-300 transition-[height] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                        className="bg-background-100 rounded-2xl shadow-2xl border border-primary-200 overflow-hidden motion-preset-blur-down motion-duration-300 transition-[height] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
                         style={{ height: dropdownHeight ? `${dropdownHeight}px` : '0px' }}
                     >
                         <div ref={innerRef}>
@@ -170,14 +170,14 @@ export default function SearchBar({
                                             }
                                         }}
                                         className={clsx(
-                                            "flex items-center gap-3 p-2.5 rounded-xl border border-[#D4E6DC]/40 dark:border-[#3D3460]/80 transition-all duration-200 group relative",
+                                            "flex items-center gap-3 p-2.5 rounded-xl border border-primary-200/40 transition-all duration-200 group relative",
                                             isSelected
-                                                ? "bg-[#D4E6DC]/40 dark:bg-[#3D3460]/60 cursor-default opacity-70"
-                                                : "hover:bg-[#D4E6DC]/20 dark:hover:bg-[#3D3460]/40 hover:border-[#7A9F7A]/30 dark:hover:border-[#9D8EC9]/30 hover:shadow-sm cursor-pointer"
+                                                ? "bg-primary-200/40 cursor-default opacity-70"
+                                                : "hover:bg-primary-200/20 hover:border-primary-500/30 hover:shadow-sm cursor-pointer"
                                         )}
                                     >
                                         {/* Product Image (With smart fallback) */}
-                                        <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3D3460] p-1 flex-shrink-0 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden">
+                                        <div className="w-10 h-10 rounded-lg bg-background-50 p-1 flex-shrink-0 border border-primary-200 overflow-hidden">
                                             <img
                                                 src={`${DATA_BASE_URL}/images/${item.image}`}
                                                 alt={item.name}
@@ -189,40 +189,40 @@ export default function SearchBar({
                                                 }}
                                             />
                                             {/* Fallback Icon if image fails */}
-                                            <div className="hidden w-full h-full items-center justify-center bg-[#F5E6D3] dark:bg-[#3D3460] text-[#8B7E6B] dark:text-[#6B5B95] text-xs font-bold">
+                                            <div className="hidden w-full h-full items-center justify-center bg-background-50 text-text-500 text-xs font-bold">
                                                 {item.name.charAt(0)}
                                             </div>
                                         </div>
 
                                         {/* Text Info */}
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="text-xs sm:text-sm font-semibold text-[#5C5247] dark:text-white truncate group-hover:text-[#7A9F7A] dark:group-hover:text-[#9D8EC9]">
+                                            <h4 className="text-xs sm:text-sm font-semibold text-text-800 truncate group-hover:text-primary-500">
                                                 {item.name}
                                             </h4>
                                             <div className="flex items-center gap-1.5 mt-0.5">
-                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#F5E6D3] dark:bg-[#3D3460] text-[#8B7E6B] dark:text-[#B8AED0]">
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-background-50 text-text-500">
                                                     {item.category}
                                                 </span>
-                                                <span className="text-[10px] text-[#8B7E6B] dark:text-[#6B5B95]">•</span>
-                                                <span className="text-[10px] text-[#8B7E6B] dark:text-[#B8AED0]">{item.unit}</span>
+                                                <span className="text-[10px] text-text-500">•</span>
+                                                <span className="text-[10px] text-text-500">{item.unit}</span>
                                             </div>
                                         </div>
 
                                         {/* Price & Arrow/Check */}
                                         <div className="text-right flex items-center gap-2">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-xs sm:text-sm font-bold text-[#5C5247] dark:text-white">৳{item.price}</span>
-                                                <span className="text-[9px] sm:text-[10px] text-[#8B7E6B] dark:text-[#6B5B95]">{isSelected ? 'Selected' : 'Latest'}</span>
+                                                <span className="text-xs sm:text-sm font-bold text-text-800">৳{item.price}</span>
+                                                <span className="text-[9px] sm:text-[10px] text-text-500">{isSelected ? 'Selected' : 'Latest'}</span>
                                             </div>
                                             {isSelected
-                                                ? <Check className="w-3.5 h-3.5 text-[#7A9F7A] dark:text-[#9D8EC9]" />
+                                                ? <Check className="w-3.5 h-3.5 text-primary-500" />
                                                 : (
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setDetailItem(item);
                                                         }}
-                                                        className="p-1 rounded-md hover:bg-[#D4E6DC]/50 dark:hover:bg-[#3D3460] text-[#D4E6DC] dark:text-[#4A3F6B] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] transition-all"
+                                                        className="p-1 rounded-md hover:bg-primary-200/50 text-text-500 hover:text-primary-500 transition-all"
                                                         title="View Details"
                                                     >
                                                         <ChevronRight className="w-4 h-4" />
@@ -241,8 +241,8 @@ export default function SearchBar({
 
             {/* "No Results" State */}
             {isOpen && query && results.length === 0 && (
-                <div className="absolute w-full mt-2 bg-[#FFFDF8] dark:bg-[#2A2442] rounded-xl shadow-lg dark:shadow-[#1E1A2E]/50 border border-[#D4E6DC] dark:border-[#4A3F6B] p-8 text-center">
-                    <p className="text-[#8B7E6B] dark:text-[#B8AED0]">No items found for "{query}"</p>
+                <div className="absolute w-full mt-2 bg-background-100 rounded-xl shadow-lg border border-primary-200 p-8 text-center">
+                    <p className="text-text-500">No items found for "{query}"</p>
                 </div>
             )}
             {/* Hover Details Card */}
