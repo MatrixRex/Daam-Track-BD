@@ -361,21 +361,16 @@ function App() {
       {/* --- MAIN CONTENT AREA --- */}
       <div className="w-full max-w-[1920px] mx-auto px-1 sm:px-2 lg:px-4 py-6 flex flex-col overflow-hidden h-[calc(100vh-80px)]">
 
-        {/* --- COMMAND & SELECTION BAR --- */}
-        <div className="flex flex-col gap-4 mb-6 flex-shrink-0">
-          <CommandBar
-            normTargets={normTargets}
-            onUpdateNorm={setNormTargets}
-            onClearAll={handleClearAll}
-            onResetView={handleResetView}
-          />
-        </div>
-
         {selectedItems.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-[6fr_2fr_2fr] gap-4 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden motion-preset-fade motion-duration-300">
 
             {/* Column 1: Chart (60%) */}
-            <div className="lg:col-span-1 min-h-[500px]">
+            <div className="lg:col-span-1 min-h-[500px] flex flex-col gap-4">
+              <CommandBar
+                normTargets={normTargets}
+                onUpdateNorm={setNormTargets}
+                onResetView={handleResetView}
+              />
               <PriceChart
                 ref={chartRef}
                 items={selectedItems}
@@ -391,7 +386,20 @@ function App() {
             <div className="lg:col-span-1 flex flex-col min-h-0 overflow-hidden">
               <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-text-500 dark:text-text-400">Comparison</h3>
-                <div className="group/sort flex items-center bg-background-50 rounded-lg p-0.5 border border-primary-200 transition-all duration-300">
+                <div className="flex items-center gap-1">
+                  <div className="group/clear flex items-center bg-background-50 rounded-lg p-0.5 border border-primary-200 transition-all duration-300">
+                    <span className="max-w-0 opacity-0 group-hover/clear:max-w-[80px] group-hover/clear:mx-1.5 group-hover/clear:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-text-500 select-none">
+                      Clear All
+                    </span>
+                    <button
+                      onClick={handleClearAll}
+                      className="p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px] text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      title="Remove all items"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                  <div className="group/sort flex items-center bg-background-50 rounded-lg p-0.5 border border-primary-200 transition-all duration-300">
                   <span className="max-w-0 opacity-0 group-hover/sort:max-w-[150px] group-hover/sort:mx-1.5 group-hover/sort:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-text-500 select-none">
                     {!isSorted ? "sort-price-off" : sortDirection === 'asc' ? "sort-price-Increasing" : "sort-price-Decreasing"}
                   </span>
@@ -427,8 +435,9 @@ function App() {
                   </button>
                 </div>
               </div>
-              
-              <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2">
+            </div>
+            
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2">
                 <StatsSidebar
                   items={sortedItems}
                   stats={Object.values(itemStats)}

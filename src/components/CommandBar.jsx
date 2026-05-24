@@ -1,8 +1,8 @@
 import React from 'react';
-import { Trash2, RotateCcw, Scale, Droplet, Hash, ChevronDown, ChevronUp } from 'lucide-react';
+import { RotateCcw, Scale, Droplet, Hash } from 'lucide-react';
 import clsx from 'clsx';
 
-export default function CommandBar({ normTargets, onUpdateNorm, onClearAll, onResetView }) {
+export default function CommandBar({ normTargets, onUpdateNorm, onResetView }) {
     const categories = [
         { id: 'mass', label: 'Weight', icon: Scale, unit: 'kg' },
         { id: 'volume', label: 'Volume', icon: Droplet, unit: 'L' },
@@ -59,24 +59,15 @@ export default function CommandBar({ normTargets, onUpdateNorm, onClearAll, onRe
             {/* Actions Spacer */}
             <div className="flex-1" />
 
-            {/* Global Actions */}
-            <div className="flex items-center gap-2">
-                <button
-                    onClick={onResetView}
-                    className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-text-500 hover:bg-background-50 rounded-xl transition-all"
-                    title="Zoom Out Data"
-                >
-                    <RotateCcw className="w-4 h-4" />
-                    Reset
-                </button>
-                <button
-                    onClick={onClearAll}
-                    className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-800/30"
-                >
-                    <Trash2 className="w-4 h-4" />
-                    Clear All
-                </button>
-            </div>
+            {/* Reset View */}
+            <button
+                onClick={onResetView}
+                className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-text-500 hover:bg-background-50 rounded-xl transition-all"
+                title="Zoom Out Data"
+            >
+                <RotateCcw className="w-4 h-4" />
+                Reset
+            </button>
         </div>
     );
 }
