@@ -382,10 +382,10 @@ function App() {
               />
             </div>
 
-            {/* Column 2: Stats Sidebar (20%) */}
-            <div className="lg:col-span-1 flex flex-col min-h-0 overflow-hidden">
-              <div className="flex items-center justify-between px-2 py-4 flex-shrink-0">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground dark:text-muted-foreground">Items</h3>
+            {/* Column 2: Items List */}
+            <div className="lg:col-span-1 flex flex-col gap-4 min-h-0 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-4 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
+                <h3 className="text-sm font-bold text-foreground">Items</h3>
                 <div className="flex items-center gap-1">
                   <div className="group/clear flex items-center bg-background rounded-lg p-0.5 border border-border transition-all duration-300">
                     <span className="max-w-0 opacity-0 group-hover/clear:max-w-[80px] group-hover/clear:mx-1.5 group-hover/clear:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-muted-foreground select-none">
@@ -435,9 +435,7 @@ function App() {
                   </button>
                 </div>
               </div>
-            </div>
-            
-            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2">
+              <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2">
                 <StatsSidebar
                   items={sortedItems}
                   stats={Object.values(itemStats)}
@@ -452,7 +450,19 @@ function App() {
             </div>
 
             {/* Column 3: Details Panel (20%) */}
-            <div className="lg:col-span-1 flex flex-col min-h-0 overflow-hidden">
+            <div className="lg:col-span-1 flex flex-col gap-4 min-h-0 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-4 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
+                <h3 className="text-sm font-bold text-foreground">Details</h3>
+                {selectedDetailItemName && (
+                  <button
+                    onClick={() => setSelectedDetailItemName(null)}
+                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-muted-foreground hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                  >
+                    <Trash2 size={12} />
+                    Clear
+                  </button>
+                )}
+              </div>
               <ItemDetailsPanel
                 item={selectedItems.find(i => i.name === selectedDetailItemName)}
                 stats={itemStats[selectedDetailItemName]}
