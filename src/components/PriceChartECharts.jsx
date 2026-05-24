@@ -67,10 +67,10 @@ const DateInput = ({ value, onChange, label, min, max }) => {
 
     return (
         <div
-            className="relative flex items-center bg-background-100 border border-primary-200 rounded-lg px-3 py-1.5 hover:border-primary-400 hover:bg-primary-200/30 transition-colors cursor-pointer"
+            className="relative flex items-center bg-muted border border-border rounded-lg px-3 py-1.5 hover:border-ring hover:bg-accent transition-colors cursor-pointer"
             onClick={openPicker}
         >
-            <span className="text-sm font-medium text-text-800 pointer-events-none">
+            <span className="text-sm font-medium text-foreground pointer-events-none">
                 {displayValue}
             </span>
             <input
@@ -753,7 +753,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     const dateItem = finalChartData[dateIndex];
                     if (!dateItem) return '';
 
-                    let html = `<div class="font-medium text-text-500 mb-2">${dateItem.fullDate}</div>`;
+                    let html = `<div class="font-medium text-muted-foreground mb-2">${dateItem.fullDate}</div>`;
 
                     // Filter and sort items by price (highest first)
                     const sortedParams = params
@@ -780,10 +780,10 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         <div class="flex items-center justify-between gap-4 text-sm ${isHighlighted ? 'scale-105 origin-left' : ''} transition-all duration-200">
                             <div class="flex items-center gap-2 min-w-0">
                                 <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${color}; box-shadow: ${isHighlighted ? `0 0 8px ${color}` : 'none'}"></span>
-                                <span class="truncate ${isHighlighted ? 'font-bold text-text-950' : 'font-medium text-text-500'}">${name}:</span>
+                                <span class="truncate ${isHighlighted ? 'font-bold text-foreground' : 'font-medium text-muted-foreground'}">${name}:</span>
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
-                                <span class="font-bold ${isHighlighted ? 'text-text-950' : 'text-text-800'}">৳${value}</span>
+                                <span class="font-bold ${isHighlighted ? 'text-foreground' : 'text-foreground'}">৳${value}</span>
                                 <span class="text-[10px] opacity-70 ${isHighlighted ? 'font-bold' : ''}">/${unitLabel}</span>
                             </div>
                         </div>
@@ -856,16 +856,16 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
     if (loading && items.length > 0 && chartData.length === 0) {
         return (
-            <div className="h-[500px] flex flex-col items-center justify-center bg-background-100 rounded-2xl border border-primary-200 transition-colors duration-300">
-                <Loader2 className="w-8 h-8 text-primary-500 animate-spin mb-2" />
-                <span className="text-sm text-text-500">{loadingItem ? `Loading ${loadingItem}...` : 'Loading...'}</span>
+            <div className="h-[500px] flex flex-col items-center justify-center bg-muted rounded-2xl border border-border transition-colors duration-300">
+                <Loader2 className="w-8 h-8 text-primary animate-spin mb-2" />
+                <span className="text-sm text-muted-foreground">{loadingItem ? `Loading ${loadingItem}...` : 'Loading...'}</span>
             </div>
         );
     }
 
     if (items.length > 0 && chartData.length === 0 && !loading) {
         return (
-            <div className="h-[500px] flex flex-col items-center justify-center bg-background-100 rounded-2xl border border-primary-200 text-red-400 transition-colors duration-300">
+            <div className="h-[500px] flex flex-col items-center justify-center bg-muted rounded-2xl border border-border text-red-400 transition-colors duration-300">
                 <AlertCircle className="w-8 h-8 mb-2" />
                 <span className="text-sm">No history found.</span>
             </div>
@@ -875,18 +875,18 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     if (items.length === 0) return null;
 
     return (
-        <div className="bg-background-100 p-6 rounded-2xl shadow-sm border border-primary-200 relative transition-colors duration-300">
+        <div className="bg-muted p-6 rounded-2xl shadow-sm border border-border relative transition-colors duration-300">
             {isNormalizing && (
-                <div className="absolute inset-0 z-20 bg-background-100/40 backdrop-blur-[2px] flex items-center justify-center rounded-2xl animate-in fade-in duration-300">
-                    <div className="bg-background-100 px-6 py-4 rounded-2xl shadow-2xl border border-primary-200 flex flex-col items-center gap-3">
-                        <Loader2 className="w-10 h-10 text-primary-500 animate-spin" />
-                        <span className="text-sm font-bold text-text-800">Normalizing Units...</span>
-                        <span className="text-xs text-text-500">Applying custom quantities</span>
+                <div className="absolute inset-0 z-20 bg-muted/40 backdrop-blur-[2px] flex items-center justify-center rounded-2xl animate-in fade-in duration-300">
+                    <div className="bg-muted px-6 py-4 rounded-2xl shadow-2xl border border-border flex flex-col items-center gap-3">
+                        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                        <span className="text-sm font-bold text-foreground">Normalizing Units...</span>
+                        <span className="text-xs text-muted-foreground">Applying custom quantities</span>
                     </div>
                 </div>
             )}
             {loadingItem && chartData.length > 0 && (
-                <div className="absolute top-4 right-4 flex items-center gap-2 bg-primary-200 text-primary-700 px-3 py-1.5 rounded-full text-xs font-medium z-10 animate-pulse">
+                <div className="absolute top-4 right-4 flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-xs font-medium z-10 animate-pulse">
                     <Loader2 className="w-3 h-3 animate-spin" />
                     Adding {loadingItem}...
                 </div>
@@ -908,22 +908,22 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                                         resolution === 'monthly' ? 'One point per month' :
                                             'One point per year'
                         }>
-                            <span className="text-xs font-medium text-text-500 uppercase tracking-wider cursor-help border-b border-dashed border-primary-200">Density:</span>
+                            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-help border-b border-dashed border-border">Density:</span>
                         </Tooltip>
 
                         <div className="relative">
                             <button
                                 onClick={() => setIsDensityOpen(!isDensityOpen)}
                                 onBlur={() => setTimeout(() => setIsDensityOpen(false), 200)}
-                                className="flex items-center gap-2 bg-background-50 border border-primary-200 text-text-800 text-sm rounded-lg hover:border-primary-400 hover:bg-primary-200/30 px-3 py-1.5 active:scale-[0.96] transition-transform duration-200 w-32 justify-between"
+                                className="flex items-center gap-2 bg-background border border-border text-foreground text-sm rounded-lg hover:border-ring hover:bg-accent px-3 py-1.5 active:scale-[0.96] transition-transform duration-200 w-32 justify-between"
                             >
                                 <span className="truncate">{getDensityLabel()}</span>
-                                <ChevronDown size={14} className="text-text-500 flex-shrink-0" />
+                                <ChevronDown size={14} className="text-muted-foreground flex-shrink-0" />
                             </button>
 
                             {/* Custom Dropdown Menu */}
                             {isDensityOpen && (
-                                <div className="absolute top-full left-0 mt-1 w-32 bg-background-100 rounded-lg shadow-xl border border-primary-200 py-1 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="absolute top-full left-0 mt-1 w-32 bg-muted rounded-lg shadow-xl border border-border py-1 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
                                     {['auto', 'daily', 'weekly', 'monthly', 'yearly'].map(opt => (
                                         <button
                                             key={opt}
@@ -931,7 +931,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                                                 setResolution(opt);
                                                 setIsDensityOpen(false);
                                             }}
-                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-primary-200/30 transition-colors ${resolution === opt ? 'text-primary-500 font-medium bg-primary-200/30' : 'text-text-800'}`}
+                                            className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors ${resolution === opt ? 'text-primary font-medium bg-accent' : 'text-foreground'}`}
                                         >
                                             {opt === 'auto' ? 'Auto' : opt.charAt(0).toUpperCase() + opt.slice(1)}
                                         </button>
@@ -943,14 +943,14 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
                     {/* Aggregation (MOVED RIGHT OF DENSITY) */}
                     {getEffectiveResolution() !== 'daily' && (
-                        <div className="flex bg-background-50 rounded-lg p-1">
+                        <div className="flex bg-background rounded-lg p-1">
                             {['avg', 'min', 'max'].map(mode => (
                                 <Tooltip key={mode} content={mode === 'avg' ? 'Average Price' : mode === 'min' ? 'Lowest Price' : 'Highest Price'}>
                                     <button
                                         onClick={() => setAggregation(mode)}
                                         className={`px-3 py-1 text-xs font-medium rounded-md active:scale-[0.96] transition-transform duration-200 ${aggregation === mode
-                                            ? 'bg-primary-500 text-white shadow-sm ring-1 ring-primary-600'
-                                            : 'text-text-500 hover:text-text-800 hover:bg-primary-200/30'
+                                            ? 'bg-primary text-primary-foreground shadow-sm ring-1 ring-ring'
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                                             }`}
                                     >
                                         {mode === 'avg' ? 'Avg' : mode === 'min' ? 'Low' : 'High'}
@@ -963,8 +963,8 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 </div>
 
                 {/* Right Side: Date Range */}
-                <div className="flex items-center gap-2 bg-background-50 rounded-xl px-3 py-2 border border-primary-200">
-                    <Calendar className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                <div className="flex items-center gap-2 bg-background rounded-xl px-3 py-2 border border-border">
+                    <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
                     <Tooltip content="Select start date">
                         <DateInput
                             value={startDate}
@@ -973,7 +973,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                             max={endDate}
                         />
                     </Tooltip>
-                    <span className="text-text-500 text-sm font-medium">to</span>
+                    <span className="text-muted-foreground text-sm font-medium">to</span>
                     <Tooltip content="Select end date">
                         <DateInput
                             value={endDate}
@@ -1044,7 +1044,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             </div>
 
             {/* Footer Info */}
-            <div className="mt-4 flex justify-between items-center text-xs text-text-500 border-t border-primary-200/50 pt-3">
+            <div className="mt-4 flex justify-between items-center text-xs text-muted-foreground border-t border-border/50 pt-3">
                 <p>{items.length} item{items.length > 1 ? 's' : ''} active</p>
                 <p>{finalChartData.length} data points shown</p>
             </div>

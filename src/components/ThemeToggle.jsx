@@ -37,7 +37,7 @@ const ThemeToggle = () => {
     return (
         <button
             onClick={() => setIsDark(!isDark)}
-            className="relative p-2.5 rounded-xl bg-primary-200 hover:bg-primary-400/40 transition-all duration-300 group overflow-hidden border border-primary-200 motion-preset-fade motion-duration-300"
+            className="relative p-2.5 rounded-xl bg-muted hover:bg-primary/10 transition-all duration-300 group overflow-hidden border border-border motion-preset-fade motion-duration-300"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
@@ -54,7 +54,7 @@ const ThemeToggle = () => {
                 {/* Sun icon */}
                 <Sun
                     size={20}
-                    className={`absolute inset-0 text-primary-500 transition-all duration-300 ${isDark
+                    className={`absolute inset-0 text-primary transition-all duration-300 ${isDark
                         ? 'opacity-0 rotate-90 scale-0'
                         : 'opacity-100 rotate-0 scale-100'
                         }`}
@@ -62,7 +62,7 @@ const ThemeToggle = () => {
                 {/* Moon icon */}
                 <Moon
                     size={20}
-                    className={`absolute inset-0 text-primary-400 transition-all duration-300 ${isDark
+                    className={`absolute inset-0 text-primary transition-all duration-300 ${isDark
                         ? 'opacity-100 rotate-0 scale-100'
                         : 'opacity-0 -rotate-90 scale-0'
                         }`}

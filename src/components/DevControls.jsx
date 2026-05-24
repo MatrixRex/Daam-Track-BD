@@ -43,10 +43,10 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
     };
 
     return (
-        <div className="flex items-center gap-2 bg-background-100 p-1 pr-2 rounded-full border border-primary-200 shadow-sm motion-preset-fade motion-duration-200">
+        <div className="flex items-center gap-2 bg-muted p-1 pr-2 rounded-full border border-border shadow-sm motion-preset-fade motion-duration-200">
             
             {/* 1. Quick Add Section */}
-            <div className="flex items-center gap-1.5 pl-2 border-r border-primary-200 pr-2">
+            <div className="flex items-center gap-1.5 pl-2 border-r border-border pr-2">
                 <div className="relative group/input">
                     <input
                         type="number"
@@ -54,7 +54,7 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
                         max="50"
                         value={addCount}
                         onChange={(e) => setAddCount(parseInt(e.target.value) || 1)}
-                        className="w-10 h-7 text-center bg-transparent text-xs font-bold text-text-800 focus:outline-none"
+                        className="w-10 h-7 text-center bg-transparent text-xs font-bold text-foreground focus:outline-none"
                         title="Number of items to add"
                     />
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover/input:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
@@ -64,7 +64,7 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
 
                 <button
                     onClick={handleQuickAdd}
-                    className="flex items-center gap-1 px-2 py-1 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-[10px] font-bold transition-all shadow-sm active:scale-95 group relative"
+                    className="flex items-center gap-1 px-2 py-1 bg-primary hover:bg-primary/90 text-white rounded-full text-[10px] font-bold transition-all shadow-sm active:scale-95 group relative"
                     title="Add Random Items"
                 >
                     <Zap size={10} fill="currentColor" />
@@ -83,8 +83,8 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
                 className={`
                     flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold transition-all
                     ${useRemote
-                        ? 'text-primary-700 hover:bg-primary-50'
-                        : 'text-secondary-700 hover:bg-secondary-50'
+                        ? 'text-primary hover:bg-primary/10'
+                        : 'text-secondary hover:bg-secondary/10'
                     }
                 `}
                 title={`Switch to ${useRemote ? 'Local' : 'Remote'} Data`}

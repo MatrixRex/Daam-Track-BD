@@ -191,20 +191,20 @@ function App() {
   }, [selectedItems, isSorted, sortDirection, itemStats, normTargets]);
 
   return (
-    <div className="min-h-screen bg-background-50 font-sans text-text-800 transition-colors duration-300">
+    <div className="min-h-screen bg-background font-sans text-foreground transition-colors duration-300">
 
       {/* --- HEADER SECTION --- */}
-      <div className="bg-background-100 border-b border-primary-200 shadow-sm sticky top-0 z-30 transition-colors duration-300 motion-preset-fade motion-duration-300">
+      <div className="bg-muted border-b border-border shadow-sm sticky top-0 z-30 transition-colors duration-300 motion-preset-fade motion-duration-300">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between md:grid md:grid-cols-3 gap-4">
 
           {/* Logo */}
           <div className="flex items-center gap-4 justify-start">
             <div className="flex items-center gap-2">
-              <div className="bg-primary-400 p-2 rounded-lg text-white">
+              <div className="bg-primary p-2 rounded-lg text-white">
                 <TrendingUp size={24} />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-800">
-                Daam<span className="text-primary-500">Trace</span>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                Daam<span className="text-primary">Trace</span>
               </h1>
             </div>
 
@@ -239,7 +239,7 @@ function App() {
               onMouseLeave={() => setIsExportOpen(false)}
             >
               <button
-                className="p-2 rounded-lg bg-background-100 border border-primary-200 text-text-800 hover:bg-primary-200/30 transition-colors"
+                className="p-2 rounded-lg bg-muted border border-border text-foreground hover:bg-accent transition-colors"
                 title="Export Chart & Data"
               >
                 <Download size={20} />
@@ -249,29 +249,29 @@ function App() {
               {isExportOpen && (
               <div className="absolute right-0 z-50 pointer-events-none" style={{ top: 'calc(100% - 20px)' }}>
                 <div className="pt-7 pointer-events-auto">
-                <div className="w-56 bg-background-100 rounded-xl shadow-xl border border-primary-200 py-1 motion-preset-blur-down motion-duration-200 pointer-events-auto">
-                <div className="px-3 py-2 border-b border-primary-200/50">
-                  <span className="text-xs font-semibold text-text-500 uppercase tracking-wider">Export As</span>
+                <div className="w-56 bg-muted rounded-xl shadow-xl border border-border py-1 motion-preset-blur-down motion-duration-200 pointer-events-auto">
+                <div className="px-3 py-2 border-b border-border/50">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Export As</span>
                 </div>
 
                 {selectedItems.length === 0 ? (
                   <div className="px-4 py-6 text-center">
-                    <p className="text-sm text-text-400">Add items to the comparison list to enable export.</p>
+                    <p className="text-sm text-muted-foreground">Add items to the comparison list to enable export.</p>
                   </div>
                 ) : (<>
 
                 {/* Image (PNG) */}
-                <div className="flex items-center hover:bg-primary-200/30 transition-colors group/item">
+                <div className="flex items-center hover:bg-accent transition-colors group/item">
                   <button
                     onClick={() => chartRef.current?.exportImage('download')}
-                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-text-800 flex items-center gap-2"
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-foreground flex items-center gap-2"
                   >
                     <ImageIcon size={14} className="text-blue-500" />
                     <span>Image (PNG)</span>
                   </button>
                   <button
                     onClick={() => chartRef.current?.exportImage('copy')}
-                    className="p-2 mr-2 text-text-500 hover:text-text-800 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    className="p-2 mr-2 text-muted-foreground hover:text-foreground opacity-0 group-hover/item:opacity-100 transition-opacity"
                     title="Copy Image to Clipboard"
                   >
                     <Copy size={14} />
@@ -279,17 +279,17 @@ function App() {
                 </div>
 
                 {/* Excel (XLSX) */}
-                <div className="flex items-center hover:bg-primary-200/30 transition-colors group/item">
+                <div className="flex items-center hover:bg-accent transition-colors group/item">
                   <button
                     onClick={() => chartRef.current?.exportData('xlsx', 'download')}
-                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-text-800 flex items-center gap-2"
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-foreground flex items-center gap-2"
                   >
                     <FileSpreadsheet size={14} className="text-emerald-500" />
                     <span>Excel (XLSX)</span>
                   </button>
                   <button
                     onClick={() => chartRef.current?.exportData('xlsx', 'copy')}
-                    className="p-2 mr-2 text-text-500 hover:text-text-800 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    className="p-2 mr-2 text-muted-foreground hover:text-foreground opacity-0 group-hover/item:opacity-100 transition-opacity"
                     title="Copy Data (TSV) to Clipboard"
                   >
                     <Copy size={14} />
@@ -297,17 +297,17 @@ function App() {
                 </div>
 
                 {/* CSV File */}
-                <div className="flex items-center hover:bg-primary-200/30 transition-colors group/item">
+                <div className="flex items-center hover:bg-accent transition-colors group/item">
                   <button
                     onClick={() => chartRef.current?.exportData('csv', 'download')}
-                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-text-800 flex items-center gap-2"
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-foreground flex items-center gap-2"
                   >
                     <FileText size={14} className="text-amber-500" />
                     <span>CSV File</span>
                   </button>
                   <button
                     onClick={() => chartRef.current?.exportData('csv', 'copy')}
-                    className="p-2 mr-2 text-text-500 hover:text-text-800 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    className="p-2 mr-2 text-muted-foreground hover:text-foreground opacity-0 group-hover/item:opacity-100 transition-opacity"
                     title="Copy CSV to Clipboard"
                   >
                     <Copy size={14} />
@@ -315,17 +315,17 @@ function App() {
                 </div>
 
                 {/* JSON Data */}
-                <div className="flex items-center hover:bg-primary-200/30 transition-colors group/item">
+                <div className="flex items-center hover:bg-accent transition-colors group/item">
                   <button
                     onClick={() => chartRef.current?.exportData('json', 'download')}
-                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-text-800 flex items-center gap-2"
+                    className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-foreground flex items-center gap-2"
                   >
                     <FileJson size={14} className="text-purple-500" />
                     <span>JSON Data</span>
                   </button>
                   <button
                     onClick={() => chartRef.current?.exportData('json', 'copy')}
-                    className="p-2 mr-2 text-text-500 hover:text-text-800 opacity-0 group-hover/item:opacity-100 transition-opacity"
+                    className="p-2 mr-2 text-muted-foreground hover:text-foreground opacity-0 group-hover/item:opacity-100 transition-opacity"
                     title="Copy JSON to Clipboard"
                   >
                     <Copy size={14} />
@@ -347,7 +347,7 @@ function App() {
       </div>
 
       {/* --- MOBILE SEARCH (Visible only on small screens) --- */}
-      <div className="md:hidden p-4 bg-background-100 border-b border-primary-200 transition-colors duration-300 motion-preset-fade motion-duration-300">
+      <div className="md:hidden p-4 bg-muted border-b border-border transition-colors duration-300 motion-preset-fade motion-duration-300">
         <SearchBar
           onSelect={handleAddItem}
           items={allItems}
@@ -385,10 +385,10 @@ function App() {
             {/* Column 2: Stats Sidebar (20%) */}
             <div className="lg:col-span-1 flex flex-col min-h-0 overflow-hidden">
               <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-text-500 dark:text-text-400">Comparison</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground dark:text-muted-foreground">Comparison</h3>
                 <div className="flex items-center gap-1">
-                  <div className="group/clear flex items-center bg-background-50 rounded-lg p-0.5 border border-primary-200 transition-all duration-300">
-                    <span className="max-w-0 opacity-0 group-hover/clear:max-w-[80px] group-hover/clear:mx-1.5 group-hover/clear:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-text-500 select-none">
+                  <div className="group/clear flex items-center bg-background rounded-lg p-0.5 border border-border transition-all duration-300">
+                    <span className="max-w-0 opacity-0 group-hover/clear:max-w-[80px] group-hover/clear:mx-1.5 group-hover/clear:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-muted-foreground select-none">
                       Clear All
                     </span>
                     <button
@@ -399,8 +399,8 @@ function App() {
                       <Trash2 size={12} />
                     </button>
                   </div>
-                  <div className="group/sort flex items-center bg-background-50 rounded-lg p-0.5 border border-primary-200 transition-all duration-300">
-                  <span className="max-w-0 opacity-0 group-hover/sort:max-w-[150px] group-hover/sort:mx-1.5 group-hover/sort:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-text-500 select-none">
+                  <div className="group/sort flex items-center bg-background rounded-lg p-0.5 border border-border transition-all duration-300">
+                  <span className="max-w-0 opacity-0 group-hover/sort:max-w-[150px] group-hover/sort:mx-1.5 group-hover/sort:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-muted-foreground select-none">
                     {!isSorted ? "sort-price-off" : sortDirection === 'asc' ? "sort-price-Increasing" : "sort-price-Decreasing"}
                   </span>
                   <button
@@ -408,8 +408,8 @@ function App() {
                     className={clsx(
                       "p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px]",
                       isSorted 
-                        ? "bg-background-200 text-primary-500 shadow-sm" 
-                        : "text-text-500 hover:text-text-800"
+                        ? "bg-accent text-primary shadow-sm" 
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                     title={isSorted ? "Turn sort off" : "Sort by price"}
                   >
@@ -418,7 +418,7 @@ function App() {
                   <button
                     onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
                     className={clsx(
-                      "rounded-md text-text-500 dark:text-text-400 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-white/50 dark:hover:bg-background-800 transition-all duration-300 ease-out flex items-center justify-center",
+                      "rounded-md text-muted-foreground dark:text-muted-foreground hover:text-primary dark:hover:text-primary hover:bg-white/50 dark:hover:bg-accent transition-all duration-300 ease-out flex items-center justify-center",
                       isSorted 
                         ? "w-[22px] h-[22px] opacity-100 scale-100 pointer-events-auto ml-1" 
                         : "w-0 h-[22px] opacity-0 scale-75 pointer-events-none overflow-hidden"

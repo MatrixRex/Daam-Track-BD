@@ -86,11 +86,11 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
             style={style}
         >
             <div className={clsx(
-                "w-72 bg-background-100 rounded-2xl shadow-2xl border border-primary-200 overflow-hidden",
+                "w-72 bg-muted rounded-2xl shadow-2xl border border-border overflow-hidden",
                 "animate-in fade-in zoom-in-95 duration-200"
             )}>
                 {/* Image Section */}
-                <div className="relative h-48 bg-background-50 flex items-center justify-center overflow-hidden">
+                <div className="relative h-48 bg-background flex items-center justify-center overflow-hidden">
                     <img
                         src={`${DATA_BASE_URL}/images/${currentItem.image}`}
                         alt={currentItem.name}
@@ -100,38 +100,38 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
                             e.target.nextSibling.style.display = 'flex';
                         }}
                     />
-                    <div className="hidden w-full h-full items-center justify-center text-text-500 text-4xl font-bold">
+                    <div className="hidden w-full h-full items-center justify-center text-muted-foreground text-4xl font-bold">
                         {currentItem.name.charAt(0)}
                     </div>
 
                     {/* Floating Badge */}
-                    <div className="absolute top-3 right-3 px-2 py-1 bg-primary-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
+                    <div className="absolute top-3 right-3 px-2 py-1 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
                         {currentItem.category}
                     </div>
                 </div>
 
                 {/* Content Section */}
                 <div className="p-5">
-                    <h3 className="text-lg font-bold text-text-800 leading-tight mb-1">
+                    <h3 className="text-lg font-bold text-foreground leading-tight mb-1">
                         {currentItem.name}
                     </h3>
-                    <div className="text-sm text-text-500 mb-4">
+                    <div className="text-sm text-muted-foreground mb-4">
                         Per {currentItem.unit}
                     </div>
 
-                    <div className="flex flex-col border-t border-primary-200/30 pt-4 mt-2">
+                    <div className="flex flex-col border-t border-border/30 pt-4 mt-2">
                         <div className="flex items-center justify-between gap-2 mb-2">
                             <div className="flex flex-col">
-                                <span className="text-xs text-text-500 uppercase font-bold tracking-tighter">
+                                <span className="text-xs text-muted-foreground uppercase font-bold tracking-tighter">
                                     {normTargets ? 'Normalized Price' : 'Current Price'}
                                 </span>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-xl sm:text-2xl font-black text-primary-500">
+                                    <span className="text-xl sm:text-2xl font-black text-primary">
                                         ৳{normTargets
                                             ? Math.round(getNormalizedPrice(currentStats?.current ?? currentItem.price, currentItem.unit, normTargets))
                                             : (currentStats?.current ?? currentItem.price)}
                                     </span>
-                                    <span className="text-xs text-text-500">
+                                    <span className="text-xs text-muted-foreground">
                                         / {normTargets
                                             ? getTargetUnitLabel(parseUnit(currentItem.unit).type, normTargets[parseUnit(currentItem.unit).type], currentItem.unit)
                                             : currentItem.unit}
@@ -144,7 +144,7 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
                                 <div className={clsx(
                                     "px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm",
                                     currentStats.change > 0 ? "bg-red-50 dark:bg-red-900/40 text-red-600 border border-red-100 dark:border-red-800/30" :
-                                        "bg-primary-200 text-primary-700 border border-primary-200/30"
+                                        "bg-primary/10 text-primary border border-border/30"
                                     )}>
                                     {currentStats.change > 0 ? '▲' : '▼'}
                                     ৳{normTargets
@@ -158,14 +158,14 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
                         {currentStats && (
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-1.5">
-                                    <div className="w-5 h-5 rounded bg-primary-200/40 flex items-center justify-center text-[10px] font-black text-primary-700 border border-primary-200/60">L</div>
-                                    <span className="text-xs font-bold text-text-800">
+                                    <div className="w-5 h-5 rounded bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary border border-border/60">L</div>
+                                    <span className="text-xs font-bold text-foreground">
                                         ৳{normTargets ? Math.round(getNormalizedPrice(currentStats.min, currentItem.unit, normTargets)) : currentStats.min}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     <div className="w-5 h-5 rounded bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-[10px] font-black text-red-500 dark:text-red-400 border border-red-100 dark:border-red-800/20">H</div>
-                                    <span className="text-xs font-bold text-text-800">
+                                    <span className="text-xs font-bold text-foreground">
                                         ৳{normTargets ? Math.round(getNormalizedPrice(currentStats.max, currentItem.unit, normTargets)) : currentStats.max}
                                     </span>
                                 </div>
@@ -175,7 +175,7 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
                 </div>
 
                 {/* Footer Accent */}
-                <div className="h-1.5 w-full bg-gradient-to-r from-primary-500 via-primary-400 to-primary-500" />
+                <div className="h-1.5 w-full bg-gradient-to-r from-primary via-primary to-primary" />
             </div>
         </div>
     );

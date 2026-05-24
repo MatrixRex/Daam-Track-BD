@@ -95,10 +95,10 @@ const DateInput = ({ value, onChange, label, min, max }) => {
 
   return (
     <div
-      className="relative flex items-center bg-background-100 border border-primary-200 rounded-lg px-3 py-1.5 hover:border-primary-400 hover:bg-primary-200/30 transition-colors cursor-pointer"
+      className="relative flex items-center bg-muted border border-border rounded-lg px-3 py-1.5 hover:border-ring hover:bg-accent transition-colors cursor-pointer"
       onClick={openPicker}
     >
-      <span className="text-sm font-medium text-text-800 pointer-events-none">
+      <span className="text-sm font-medium text-foreground pointer-events-none">
         {displayValue}
       </span>
       <input
@@ -668,16 +668,16 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
   // Loading state
   if (loading && chartData.length === 0) {
     return (
-      <div className="h-[500px] flex flex-col items-center justify-center bg-background-100 rounded-2xl border border-primary-200">
-        <Loader2 className="w-8 h-8 text-primary-500 animate-spin mb-2" />
-        <span className="text-sm text-text-500">{loadingItem ? `Loading ${loadingItem}...` : 'Loading...'}</span>
+      <div className="h-[500px] flex flex-col items-center justify-center bg-muted rounded-2xl border border-border">
+        <Loader2 className="w-8 h-8 text-primary animate-spin mb-2" />
+        <span className="text-sm text-muted-foreground">{loadingItem ? `Loading ${loadingItem}...` : 'Loading...'}</span>
       </div>
     );
   }
 
   if (items.length > 0 && chartData.length === 0 && !loading) {
     return (
-      <div className="h-[500px] flex flex-col items-center justify-center bg-background-100 rounded-2xl border border-primary-200 text-red-400">
+      <div className="h-[500px] flex flex-col items-center justify-center bg-muted rounded-2xl border border-border text-red-400">
         <AlertCircle className="w-8 h-8 mb-2" />
         <span className="text-sm">No history found.</span>
       </div>
@@ -694,9 +694,9 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
   });
 
   return (
-    <div className="bg-background-100 p-6 rounded-2xl shadow-sm border border-primary-200 relative">
+    <div className="bg-muted p-6 rounded-2xl shadow-sm border border-border relative">
       {loadingItem && chartData.length > 0 && (
-        <div className="absolute top-4 right-4 flex items-center gap-2 bg-primary-200 text-primary-700 px-3 py-1.5 rounded-full text-xs font-medium z-10 animate-pulse">
+        <div className="absolute top-4 right-4 flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-xs font-medium z-10 animate-pulse">
           <Loader2 className="w-3 h-3 animate-spin" />
           Adding {loadingItem}...
         </div>
@@ -705,8 +705,8 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
       {/* Header */}
       <div className="flex flex-wrap justify-between items-start mb-6 gap-4">
         <div>
-          <h3 className="text-sm font-semibold text-text-500 uppercase tracking-wider">Price Comparison</h3>
-          <p className="text-xs text-text-500 mt-1">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Price Comparison</h3>
+          <p className="text-xs text-muted-foreground mt-1">
             {items.length} item{items.length > 1 ? 's' : ''} • {processedData.length} data points
           </p>
         </div>
@@ -717,14 +717,14 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
       <div className="flex items-center gap-4">
         {/* Aggregation Selection (Only if not Daily) */}
         {getEffectiveResolution() !== 'daily' && (
-          <div className="flex bg-background-50 rounded-lg p-1">
+          <div className="flex bg-background rounded-lg p-1">
             {['avg', 'min', 'max'].map(mode => (
               <button
                 key={mode}
                 onClick={() => setAggregation(mode)}
                 className={`px-3 py-1 text-xs font-medium rounded-md active:scale-[0.96] transition-transform duration-200 ${aggregation === mode
-                  ? 'bg-primary-500 text-white shadow-sm ring-1 ring-primary-600'
-                  : 'text-text-500 hover:text-text-800 hover:bg-primary-200/30'
+                  ? 'bg-primary text-primary-foreground shadow-sm ring-1 ring-ring'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   }`}
               >
                 {mode === 'avg' ? 'Avg' : mode === 'min' ? 'Low' : 'High'}
@@ -737,7 +737,7 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
         <select
           value={resolution}
           onChange={(e) => setResolution(e.target.value)}
-          className="bg-background-50 border border-primary-200 text-text-800 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2"
+          className="bg-background border border-border text-foreground text-sm rounded-lg focus:ring-ring focus:border-ring block p-2"
         >
           <option value="auto">Auto ({getEffectiveResolution()})</option>
           <option value="daily">Daily</option>
@@ -747,15 +747,15 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
         </select>
 
         {/* Date Range Filter */}
-        <div className="flex items-center gap-2 bg-background-50 rounded-xl px-3 py-2 border border-primary-200">
-          <Calendar className="w-4 h-4 text-primary-500 flex-shrink-0" />
+        <div className="flex items-center gap-2 bg-background rounded-xl px-3 py-2 border border-border">
+          <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
           <DateInput
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             label="Start date"
             max={endDate}
           />
-          <span className="text-text-500 text-sm font-medium">to</span>
+          <span className="text-muted-foreground text-sm font-medium">to</span>
           <DateInput
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
