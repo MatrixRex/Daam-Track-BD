@@ -376,20 +376,34 @@ function App() {
                   <div className="flex items-center bg-[#F5E6D3] dark:bg-[#3D3460] rounded-lg p-0.5 border border-[#D4E6DC] dark:border-[#4A3F6B]">
                     <button
                       onClick={() => setIsSorted(!isSorted)}
-                      className={`p-1 rounded-md transition-all ${isSorted ? 'bg-white dark:bg-[#6B5B95] text-[#7A9F7A] dark:text-white shadow-sm' : 'text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0]'}`}
+                      className={clsx(
+                        "p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px]",
+                        isSorted 
+                          ? "bg-white dark:bg-[#6B5B95] text-[#7A9F7A] dark:text-white shadow-sm" 
+                          : "text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#5C5247] dark:hover:text-[#B8AED0]"
+                      )}
                       title={isSorted ? "Turn sort off" : "Sort by price"}
                     >
                       <ArrowDownWideNarrow size={12} />
                     </button>
-                    {isSorted && (
-                      <button
-                        onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                        className="p-1 rounded-md text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] hover:bg-white/50 dark:hover:bg-[#3D3460] transition-all"
-                        title={sortDirection === 'asc' ? "Lowest first" : "Highest first"}
-                      >
-                        {sortDirection === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                      className={clsx(
+                        "rounded-md text-[#8B7E6B] dark:text-[#6B5B95] hover:text-[#7A9F7A] dark:hover:text-[#9D8EC9] hover:bg-white/50 dark:hover:bg-[#3D3460] transition-all duration-300 ease-out flex items-center justify-center",
+                        isSorted 
+                          ? "w-[22px] h-[22px] opacity-100 scale-100 pointer-events-auto ml-1" 
+                          : "w-0 h-[22px] opacity-0 scale-75 pointer-events-none overflow-hidden"
+                      )}
+                      title={sortDirection === 'asc' ? "Lowest first" : "Highest first"}
+                    >
+                      <ArrowUp 
+                        size={12} 
+                        className={clsx(
+                          "transition-transform duration-300 ease-in-out",
+                          sortDirection === 'desc' ? "rotate-180" : "rotate-0"
+                        )} 
+                      />
+                    </button>
                   </div>
                 </div>
                 
