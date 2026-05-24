@@ -57,7 +57,7 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
                         className="w-10 h-7 text-center bg-transparent text-xs font-bold text-text-800 focus:outline-none"
                         title="Number of items to add"
                     />
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded group-hover/input:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover/input:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                         Items to add
                     </div>
                 </div>
@@ -71,7 +71,7 @@ function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
                     <span>Quick Add</span>
                     
                     {/* Tooltip */}
-                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                         Add {addCount} random products
                     </div>
                 </button>
