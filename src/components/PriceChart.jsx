@@ -793,12 +793,12 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
               contentStyle={{
                 borderRadius: '12px',
                 border: 'none',
-                backgroundColor: isDark ? 'rgba(10, 41, 41, 0.95)' : 'rgba(214, 245, 245, 0.95)',
-                color: isDark ? '#cacecc' : '#313533',
-                boxShadow: isDark ? '0 10px 15px -3px rgb(5 20 20 / 0.5)' : '0 10px 15px -3px rgb(49 53 51 / 0.1)',
+                backgroundColor: isDark ? 'oklch(0.205 0 0 / 0.95)' : 'oklch(0.97 0 0 / 0.95)',
+                color: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.145 0 0)',
+                boxShadow: isDark ? '0 10px 15px -3px oklch(0 0 0 / 0.5)' : '0 10px 15px -3px oklch(0 0 0 / 0.1)',
                 padding: '12px'
               }}
-              cursor={<CustomCursor stroke={isDark ? '#428a79' : '#75bdac'} strokeWidth={1} strokeDasharray="5 5" strokeOpacity={0.4} />}
+              cursor={<CustomCursor stroke={isDark ? 'oklch(0.795 0.184 86.047)' : 'oklch(0.852 0.199 91.936)'} strokeWidth={1} strokeDasharray="5 5" strokeOpacity={0.4} />}
               labelFormatter={(label, payload) => {
                 // Find a payload entry that has fullDate (prefer non-ext entries)
                 const entry = payload?.find(p => p.payload?.fullDate);

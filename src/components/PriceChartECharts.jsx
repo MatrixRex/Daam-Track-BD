@@ -311,7 +311,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             const rawUrl = chart.getDataURL({
                 type: 'png',
                 pixelRatio: 2,
-                backgroundColor: isDark ? '#0a2929' : '#d6f5f5'
+                backgroundColor: isDark ? 'oklch(0.145 0 0)' : 'oklch(1 0 0)'
             });
 
             // Revert legend AND grid
@@ -729,18 +729,18 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             },
             tooltip: {
                 trigger: 'axis',
-                backgroundColor: isDark ? 'rgba(10, 41, 41, 0.95)' : 'rgba(214, 245, 245, 0.95)',
+                backgroundColor: isDark ? 'oklch(0.205 0 0 / 0.95)' : 'oklch(0.97 0 0 / 0.95)',
                 borderRadius: 12,
                 borderWidth: 0,
                 padding: 12,
-                textStyle: { color: isDark ? '#cacecc' : '#313533' },
+                textStyle: { color: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.145 0 0)' },
                 extraCssText: isDark
-                    ? 'box-shadow: 0 10px 15px -3px rgb(5 20 20 / 0.5);'
-                    : 'box-shadow: 0 10px 15px -3px rgb(49 53 51 / 0.1);',
+                    ? 'box-shadow: 0 10px 15px -3px oklch(0 0 0 / 0.5);'
+                    : 'box-shadow: 0 10px 15px -3px oklch(0 0 0 / 0.1);',
                 axisPointer: {
                     type: 'line', // Ensure we use a line
                     lineStyle: {
-                        color: isDark ? '#75bdac' : '#428a79',
+                        color: isDark ? 'oklch(0.795 0.184 86.047)' : 'oklch(0.852 0.199 91.936)',
                         width: 1,
                         type: 'dashed',
                         opacity: 0.4
