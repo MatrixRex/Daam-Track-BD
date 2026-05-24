@@ -44,19 +44,19 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
 
                 return (
                     <div
-                        key={item.name}
+                        key={`${item.name}-${normTargets?.enabled ? 'norm' : 'raw'}`}
                         onClick={() => onSelect(item.name)}
                         onMouseEnter={() => onHover(item.name)}
                         onMouseLeave={() => onHover(null)}
                         className={clsx(
                             "flex items-center gap-3 p-3 bg-muted rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out group cursor-pointer",
-                            "motion-preset-fade motion-duration-300",
+                            "motion-preset-fade motion-duration-200",
                             "ring-2 border",
                             isSelected 
                                 ? "ring-ring border-transparent bg-accent translate-x-1.5 shadow-md" 
                                 : "ring-transparent hover:ring-ring/35 border-border hover:border-transparent hover:translate-x-0.5"
                         )}
-                        style={{ borderLeft: `3px solid ${color}` }}
+                        style={{ borderLeft: `3px solid ${color}`, animationDelay: `${index * 40}ms` }}
                     >
                         {/* Compact Thumbnail */}
                         <div className="w-10 h-10 rounded-lg bg-background p-1 flex-shrink-0 border border-border overflow-hidden">

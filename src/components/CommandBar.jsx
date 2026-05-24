@@ -16,8 +16,8 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetView }) {
                 <button
                     onClick={() => onUpdateNorm({ ...normTargets, enabled: !normTargets.enabled })}
                     className={clsx(
-                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
-                        normTargets.enabled ? "bg-primary" : "bg-muted"
+                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none border",
+                        normTargets.enabled ? "bg-primary border-transparent" : "bg-muted border-border"
                     )}
                 >
                     <span
@@ -27,15 +27,18 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetView }) {
                         )}
                     />
                 </button>
-                <span className="text-sm font-bold text-foreground">
-                    Normalize Price
+                <span className={clsx(
+                    "text-sm font-bold transition-colors duration-300",
+                    normTargets.enabled ? "text-foreground" : "text-muted-foreground"
+                )}>
+                    Normalize Units
                 </span>
             </div>
 
             {/* Numeric Inputs */}
             <div className={clsx(
                 "flex flex-wrap items-center gap-6 transition-all duration-300",
-                !normTargets.enabled && "opacity-40 pointer-events-none grayscale"
+                normTargets.enabled ? "opacity-100" : "opacity-0 pointer-events-none"
             )}>
                 {categories.map((cat) => (
                     <div key={cat.id} className="flex items-center gap-2 group">
@@ -56,13 +59,19 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetView }) {
                 ))}
             </div>
 
-            {/* Actions Spacer */}
-            <div className="flex-1" />
+            <div className={clsx(
+                "flex-1 transition-all duration-300",
+                normTargets.enabled ? "opacity-100" : "opacity-0 pointer-events-none"
+            )} />
 
-            {/* Reset View */}
             <button
                 onClick={onResetView}
-                className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-muted-foreground hover:bg-background rounded-xl transition-all"
+                className={clsx(
+                    "flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl transition-all duration-300",
+                    normTargets.enabled
+                        ? "opacity-100 text-muted-foreground hover:bg-background pointer-events-auto"
+                        : "opacity-0 pointer-events-none text-muted-foreground"
+                )}
                 title="Zoom Out Data"
             >
                 <RotateCcw className="w-4 h-4" />

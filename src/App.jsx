@@ -384,8 +384,8 @@ function App() {
 
             {/* Column 2: Stats Sidebar (20%) */}
             <div className="lg:col-span-1 flex flex-col min-h-0 overflow-hidden">
-              <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground dark:text-muted-foreground">Comparison</h3>
+              <div className="flex items-center justify-between px-2 py-4 flex-shrink-0">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground dark:text-muted-foreground">Items</h3>
                 <div className="flex items-center gap-1">
                   <div className="group/clear flex items-center bg-background rounded-lg p-0.5 border border-border transition-all duration-300">
                     <span className="max-w-0 opacity-0 group-hover/clear:max-w-[80px] group-hover/clear:mx-1.5 group-hover/clear:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-muted-foreground select-none">
