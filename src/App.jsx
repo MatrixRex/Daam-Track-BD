@@ -373,7 +373,10 @@ function App() {
               <div className="sticky top-24">
                 <div className="flex items-center justify-between mb-4 px-2">
                   <h3 className="text-xs font-bold uppercase tracking-widest text-[#8B7E6B] dark:text-[#6B5B95]">Comparison</h3>
-                  <div className="flex items-center bg-[#F5E6D3] dark:bg-[#3D3460] rounded-lg p-0.5 border border-[#D4E6DC] dark:border-[#4A3F6B]">
+                  <div className="group/sort flex items-center bg-[#F5E6D3] dark:bg-[#3D3460] rounded-lg p-0.5 border border-[#D4E6DC] dark:border-[#4A3F6B] transition-all duration-300">
+                    <span className="max-w-0 opacity-0 group-hover/sort:max-w-[150px] group-hover/sort:mx-1.5 group-hover/sort:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-[#8B7E6B] dark:text-[#B8AED0] select-none">
+                      {!isSorted ? "sort-price-off" : sortDirection === 'asc' ? "sort-price-Increasing" : "sort-price-Decreasing"}
+                    </span>
                     <button
                       onClick={() => setIsSorted(!isSorted)}
                       className={clsx(
