@@ -729,12 +729,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             },
             tooltip: {
                 trigger: 'axis',
-                position: (point, params, dom, rect, size) => {
-                    const minViewY = 80;
-                    const tooltipHalf = size.contentSize[1] / 2;
-                    const y = Math.max(minViewY + tooltipHalf - rect.y, point[1]);
-                    return [point[0], y];
-                },
+                confine: true,
                 backgroundColor: isDark ? 'oklch(0.205 0 0 / 0.95)' : 'oklch(0.97 0 0 / 0.95)',
                 borderRadius: 12,
                 borderWidth: 0,
