@@ -56,6 +56,7 @@ function App() {
     count: 1,
     enabled: false
   });
+  const [isExportOpen, setIsExportOpen] = useState(false);
 
   const compareListRef = useRef(null);
   const chartRef = useRef(null);
@@ -232,7 +233,11 @@ function App() {
           {/* Right: Actions */}
           <div className="flex items-center justify-end gap-3">
             {/* Export Button */}
-            <div className="relative group">
+            <div
+              className="relative"
+              onMouseEnter={() => setIsExportOpen(true)}
+              onMouseLeave={() => setIsExportOpen(false)}
+            >
               <button
                 className="p-2 rounded-lg bg-background-100 border border-primary-200 text-text-800 hover:bg-primary-200/30 transition-colors"
                 title="Export Chart & Data"
@@ -241,7 +246,9 @@ function App() {
               </button>
 
               {/* Export Dropdown */}
-              <div className="absolute right-0 top-full mt-2 w-56 bg-background-100 rounded-xl shadow-xl border border-primary-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right motion-preset-blur-down motion-duration-200">
+              {isExportOpen && (
+              <div className="absolute right-0 top-full z-50 pt-4">
+                <div className="-mt-2 w-56 bg-background-100 rounded-xl shadow-xl border border-primary-200 py-1 motion-preset-blur-down motion-duration-200">
                 <div className="px-3 py-2 border-b border-primary-200/50">
                   <span className="text-xs font-semibold text-text-500 uppercase tracking-wider">Export As</span>
                 </div>
@@ -319,6 +326,8 @@ function App() {
                 </div>
 
               </div>
+              </div>
+              )}
             </div>
 
             <ThemeToggle />
