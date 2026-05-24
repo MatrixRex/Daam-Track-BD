@@ -82,6 +82,12 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                                     / {unitLabel}
                                 </span>
                             </div>
+                            {(itemStat?.change ?? 0) > 0 && (
+                                <div className="w-full h-0.5 rounded-full bg-red-400/60 mt-1.5" />
+                            )}
+                            {(itemStat?.change ?? 0) < 0 && (
+                                <div className="w-full h-0.5 rounded-full bg-green-400/60 mt-1.5" />
+                            )}
                         </div>
 
                         {/* Delete button */}
