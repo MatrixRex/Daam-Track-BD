@@ -372,10 +372,10 @@ function App() {
         </div>
 
         {selectedItems.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden motion-preset-fade motion-duration-300">
+          <div className="grid grid-cols-1 lg:grid-cols-[6fr_2fr_2fr] gap-4 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden motion-preset-fade motion-duration-300">
 
-            {/* Column 1: Chart (Flexible) */}
-            <div className="lg:col-span-6 xl:col-span-7 min-h-[500px]">
+            {/* Column 1: Chart (60%) */}
+            <div className="lg:col-span-1 min-h-[500px]">
               <PriceChart
                 ref={chartRef}
                 items={selectedItems}
@@ -387,8 +387,8 @@ function App() {
               />
             </div>
 
-            {/* Column 2: Stats Sidebar (Fixed-ish) */}
-            <div className="lg:col-span-3 xl:col-span-2 flex flex-col min-h-0 overflow-hidden">
+            {/* Column 2: Stats Sidebar (20%) */}
+            <div className="lg:col-span-1 flex flex-col min-h-0 overflow-hidden">
               <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-text-500 dark:text-text-400">Comparison</h3>
                 <div className="group/sort flex items-center bg-background-50 rounded-lg p-0.5 border border-primary-200 transition-all duration-300">
@@ -442,8 +442,8 @@ function App() {
               </div>
             </div>
 
-            {/* Column 3: Details Panel */}
-            <div className="lg:col-span-3 xl:col-span-3 flex flex-col min-h-0 overflow-hidden">
+            {/* Column 3: Details Panel (20%) */}
+            <div className="lg:col-span-1 flex flex-col min-h-0 overflow-hidden">
               <ItemDetailsPanel
                 item={selectedItems.find(i => i.name === selectedDetailItemName)}
                 stats={itemStats[selectedDetailItemName]}
