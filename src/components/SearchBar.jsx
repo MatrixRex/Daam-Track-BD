@@ -28,6 +28,10 @@ export default function SearchBar({
 
     // Ref for clicking outside to close dropdown
     const searchRef = useRef(null);
+    
+    // States and refs for dynamic dropdown height transition
+    const [dropdownHeight, setDropdownHeight] = useState(0);
+    const innerRef = useRef(null);
 
     // Initialize uFuzzy & Memoize Haystack
     const uf = useMemo(() => new uFuzzy(), []);
@@ -61,6 +65,27 @@ export default function SearchBar({
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    // 5. Observe dropdown content height changes to animate container size
+    useEffect(() => {
+        if (!isOpen || results.length === 0) {
+            setDropdownHeight(0);
+            return;
+        }
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                // Buffer to account for border widths if any
+                setDropdownHeight(entry.contentRect.height);
+            }
+        });
+
+        if (innerRef.current) {
+            resizeObserver.observe(innerRef.current);
+        }
+
+        return () => resizeObserver.disconnect();
+    }, [isOpen, results]);
 
     return (
         <div ref={searchRef} className="relative w-full max-w-2xl mx-auto z-50">
@@ -107,11 +132,14 @@ export default function SearchBar({
                 )}
             </div>
 
-            {/* Dropdown Results */}
             {isOpen && results.length > 0 && (
                 <div className="absolute w-full md:w-[150%] lg:w-[180%] md:left-1/2 md:-translate-x-1/2 mt-2 z-50">
-                    <div className="bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl shadow-2xl dark:shadow-[#1E1A2E]/70 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden motion-preset-blur-down motion-duration-300">
-                        <ul className="max-h-[60vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 p-3">
+                    <div 
+                        className="bg-[#FFFDF8] dark:bg-[#2A2442] rounded-2xl shadow-2xl dark:shadow-[#1E1A2E]/70 border border-[#D4E6DC] dark:border-[#4A3F6B] overflow-hidden motion-preset-blur-down motion-duration-300 transition-[height] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                        style={{ height: dropdownHeight ? `${dropdownHeight}px` : '0px' }}
+                    >
+                        <div ref={innerRef}>
+                            <ul className="max-h-[60vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 p-3">
                             {results.map((item, index) => {
                                 const isSelected = selectedItems.some(i => i.name === item.name);
                                 return (
@@ -208,6 +236,7 @@ export default function SearchBar({
                         </ul>
                     </div>
                 </div>
+            </div>
             )}
 
             {/* "No Results" State */}
