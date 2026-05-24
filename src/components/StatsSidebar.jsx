@@ -54,7 +54,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                             "ring-2 border",
                             isSelected 
                                 ? "ring-[#7A9F7A] dark:ring-[#9D8EC9] border-transparent bg-white dark:bg-[#1E1A2E] translate-x-1.5 shadow-md" 
-                                : "ring-transparent border-[#D4E6DC] dark:border-[#4A3F6B] hover:translate-x-0.5"
+                                : "ring-transparent hover:ring-[#7A9F7A]/35 dark:hover:ring-[#9D8EC9]/35 border-[#D4E6DC] dark:border-[#4A3F6B] hover:border-transparent hover:translate-x-0.5"
                         )}
                         style={{ borderLeft: `3px solid ${color}` }}
                     >
@@ -76,7 +76,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
 
                         {/* Info Section */}
                         <div className="flex-1 min-w-0">
-                            <h4 className="text-xs font-bold text-[#5C5247] dark:text-white truncate group-hover:text-[#7A9F7A] dark:group-hover:text-[#9D8EC9]">
+                            <h4 className="text-xs font-bold text-[#5C5247] dark:text-white truncate">
                                 {item.name}
                             </h4>
                             <div className="flex items-center gap-1.5 mt-0.5">
