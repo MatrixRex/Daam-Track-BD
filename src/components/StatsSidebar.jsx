@@ -21,7 +21,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
     }
 
     return (
-        <div className="flex flex-col gap-3 h-full max-h-[calc(100vh-250px)] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="flex flex-col gap-3">
             {items.map((item, index) => {
                 const color = colors[index % colors.length]?.stroke || '#7A9F7A';
                 const itemStat = stats.find(s => s.name === item.name);

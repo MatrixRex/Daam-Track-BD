@@ -34,7 +34,7 @@ export default function ItemDetailsPanel({ item, stats, normTargets, onClose, on
     : change;
 
   return (
-    <div key={item.name} className="flex flex-col bg-background-100 border border-primary-200 rounded-3xl shadow-xl overflow-hidden h-full min-h-[600px] motion-preset-blur-right motion-duration-300">
+    <div key={item.name} className="flex flex-col bg-background-100 border border-primary-200 rounded-3xl shadow-xl overflow-hidden flex-1 min-h-0 motion-preset-blur-right motion-duration-300">
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-primary-200/40 bg-background-50/30">
         <div className="flex items-center gap-2">

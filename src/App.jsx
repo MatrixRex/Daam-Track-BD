@@ -359,10 +359,10 @@ function App() {
       </div>
 
       {/* --- MAIN CONTENT AREA --- */}
-      <div className="w-full max-w-[1920px] mx-auto px-1 sm:px-2 lg:px-4 py-6">
+      <div className="w-full max-w-[1920px] mx-auto px-1 sm:px-2 lg:px-4 py-6 flex flex-col overflow-hidden h-[calc(100vh-80px)]">
 
         {/* --- COMMAND & SELECTION BAR --- */}
-        <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col gap-4 mb-6 flex-shrink-0">
           <CommandBar
             normTargets={normTargets}
             onUpdateNorm={setNormTargets}
@@ -372,7 +372,7 @@ function App() {
         </div>
 
         {selectedItems.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full motion-preset-fade motion-duration-300">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden motion-preset-fade motion-duration-300">
 
             {/* Column 1: Chart (Flexible) */}
             <div className="lg:col-span-6 xl:col-span-7 min-h-[500px]">
@@ -388,47 +388,47 @@ function App() {
             </div>
 
             {/* Column 2: Stats Sidebar (Fixed-ish) */}
-            <div className="lg:col-span-3 xl:col-span-2">
-              <div className="sticky top-24">
-                <div className="flex items-center justify-between mb-4 px-2">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-text-500 dark:text-text-400">Comparison</h3>
-                  <div className="group/sort flex items-center bg-background-50 rounded-lg p-0.5 border border-primary-200 transition-all duration-300">
-                    <span className="max-w-0 opacity-0 group-hover/sort:max-w-[150px] group-hover/sort:mx-1.5 group-hover/sort:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-text-500 select-none">
-                      {!isSorted ? "sort-price-off" : sortDirection === 'asc' ? "sort-price-Increasing" : "sort-price-Decreasing"}
-                    </span>
-                    <button
-                      onClick={() => setIsSorted(!isSorted)}
+            <div className="lg:col-span-3 xl:col-span-2 flex flex-col min-h-0 overflow-hidden">
+              <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-text-500 dark:text-text-400">Comparison</h3>
+                <div className="group/sort flex items-center bg-background-50 rounded-lg p-0.5 border border-primary-200 transition-all duration-300">
+                  <span className="max-w-0 opacity-0 group-hover/sort:max-w-[150px] group-hover/sort:mx-1.5 group-hover/sort:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-text-500 select-none">
+                    {!isSorted ? "sort-price-off" : sortDirection === 'asc' ? "sort-price-Increasing" : "sort-price-Decreasing"}
+                  </span>
+                  <button
+                    onClick={() => setIsSorted(!isSorted)}
+                    className={clsx(
+                      "p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px]",
+                      isSorted 
+                        ? "bg-background-200 text-primary-500 shadow-sm" 
+                        : "text-text-500 hover:text-text-800"
+                    )}
+                    title={isSorted ? "Turn sort off" : "Sort by price"}
+                  >
+                    <ArrowDownWideNarrow size={12} />
+                  </button>
+                  <button
+                    onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                    className={clsx(
+                      "rounded-md text-text-500 dark:text-text-400 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-white/50 dark:hover:bg-background-800 transition-all duration-300 ease-out flex items-center justify-center",
+                      isSorted 
+                        ? "w-[22px] h-[22px] opacity-100 scale-100 pointer-events-auto ml-1" 
+                        : "w-0 h-[22px] opacity-0 scale-75 pointer-events-none overflow-hidden"
+                    )}
+                    title={sortDirection === 'asc' ? "Lowest first" : "Highest first"}
+                  >
+                    <ArrowUp 
+                      size={12} 
                       className={clsx(
-                        "p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px]",
-                        isSorted 
-                          ? "bg-background-200 text-primary-500 shadow-sm" 
-                          : "text-text-500 hover:text-text-800"
-                      )}
-                      title={isSorted ? "Turn sort off" : "Sort by price"}
-                    >
-                      <ArrowDownWideNarrow size={12} />
-                    </button>
-                    <button
-                      onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                      className={clsx(
-                        "rounded-md text-text-500 dark:text-text-400 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-white/50 dark:hover:bg-background-800 transition-all duration-300 ease-out flex items-center justify-center",
-                        isSorted 
-                          ? "w-[22px] h-[22px] opacity-100 scale-100 pointer-events-auto ml-1" 
-                          : "w-0 h-[22px] opacity-0 scale-75 pointer-events-none overflow-hidden"
-                      )}
-                      title={sortDirection === 'asc' ? "Lowest first" : "Highest first"}
-                    >
-                      <ArrowUp 
-                        size={12} 
-                        className={clsx(
-                          "transition-transform duration-300 ease-in-out",
-                          sortDirection === 'desc' ? "rotate-180" : "rotate-0"
-                        )} 
-                      />
-                    </button>
-                  </div>
+                        "transition-transform duration-300 ease-in-out",
+                        sortDirection === 'desc' ? "rotate-180" : "rotate-0"
+                      )} 
+                    />
+                  </button>
                 </div>
-                
+              </div>
+              
+              <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2">
                 <StatsSidebar
                   items={sortedItems}
                   stats={Object.values(itemStats)}
@@ -443,16 +443,14 @@ function App() {
             </div>
 
             {/* Column 3: Details Panel */}
-            <div className="lg:col-span-3 xl:col-span-3">
-              <div className="sticky top-24">
-                <ItemDetailsPanel
-                  item={selectedItems.find(i => i.name === selectedDetailItemName)}
-                  stats={itemStats[selectedDetailItemName]}
-                  normTargets={normTargets.enabled ? normTargets : null}
-                  onClose={() => setSelectedDetailItemName(null)}
-                  onRemove={(item) => handleRemoveItem(item.name)}
-                />
-              </div>
+            <div className="lg:col-span-3 xl:col-span-3 flex flex-col min-h-0 overflow-hidden">
+              <ItemDetailsPanel
+                item={selectedItems.find(i => i.name === selectedDetailItemName)}
+                stats={itemStats[selectedDetailItemName]}
+                normTargets={normTargets.enabled ? normTargets : null}
+                onClose={() => setSelectedDetailItemName(null)}
+                onRemove={(item) => handleRemoveItem(item.name)}
+              />
             </div>
 
           </div>
