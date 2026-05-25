@@ -226,6 +226,8 @@ function App() {
                 selectedItems={selectedItems}
                 normTargets={normTargets.enabled ? normTargets : null}
                 itemStats={itemStats}
+                autoFocus={selectedItems.length === 0}
+                emptyState={selectedItems.length === 0}
               />
             </div>
           </div>
@@ -355,6 +357,8 @@ function App() {
           selectedItems={selectedItems}
           normTargets={normTargets.enabled ? normTargets : null}
           itemStats={itemStats}
+          autoFocus={selectedItems.length === 0}
+          emptyState={selectedItems.length === 0}
         />
       </div>
 
@@ -475,9 +479,7 @@ function App() {
           </div>
         ) : (
           /* Empty State */
-          <div className="mt-12">
-            <EmptyStateSkeleton />
-          </div>
+          <EmptyStateSkeleton />
         )}
 
       </div>

@@ -199,3 +199,32 @@ html {
 .recharts-surface g:focus {
   outline: none !important;
 }
+
+/* Custom utility for the breathing search glow in empty skeleton state */
+@utility animate-breathing-glow {
+  animation: breathing-glow 3s ease-in-out infinite;
+}
+
+@keyframes breathing-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px 2px oklch(75.277% 0.17607 60.235 / 0.15);
+    border-color: oklch(75.277% 0.17607 60.235 / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 28px 10px oklch(75.277% 0.17607 60.235 / 0.55);
+    border-color: oklch(75.277% 0.17607 60.235 / 0.75);
+  }
+}
+
+.dark {
+  @keyframes breathing-glow {
+    0%, 100% {
+      box-shadow: 0 0 15px 2px oklch(78.121% 0.16725 65.319 / 0.15);
+      border-color: oklch(78.121% 0.16725 65.319 / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 28px 10px oklch(78.121% 0.16725 65.319 / 0.45);
+      border-color: oklch(78.121% 0.16725 65.319 / 0.65);
+    }
+  }
+}

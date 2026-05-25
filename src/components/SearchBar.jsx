@@ -12,7 +12,9 @@ export default function SearchBar({
     loading = false, 
     selectedItems = [], 
     normTargets, 
-    itemStats = {} 
+    itemStats = {},
+    autoFocus = false,
+    emptyState = false
 }) {
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +22,17 @@ export default function SearchBar({
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [sideRect, setSideRect] = useState(null);
     const [detailItem, setDetailItem] = useState(null);
+
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        if (autoFocus && inputRef.current) {
+            const timer = setTimeout(() => {
+                inputRef.current?.focus();
+            }, 150);
+            return () => clearTimeout(timer);
+        }
+    }, [autoFocus]);
 
     // Detect touch device to disable hover
     const isTouchDevice = useMemo(() => {
@@ -91,12 +104,16 @@ export default function SearchBar({
         <div ref={searchRef} className="relative w-full max-w-2xl mx-auto z-50">
 
             {/* Search Input Area */}
-            <div className="relative group">
+            <div className={clsx(
+                "relative group rounded-xl transition-all duration-300",
+                emptyState && "animate-breathing-glow"
+            )}>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Search className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 </div>
 
                 <input
+                    ref={inputRef}
                     type="text"
                     className={clsx(
                         "block w-full pl-11 pr-12 py-4 bg-muted border border-border rounded-xl",
