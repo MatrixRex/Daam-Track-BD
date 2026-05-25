@@ -2,7 +2,7 @@ import React from 'react';
 import { RotateCcw, Scale, Droplet, Hash } from 'lucide-react';
 import clsx from 'clsx';
 
-export default function CommandBar({ normTargets, onUpdateNorm, onResetView }) {
+export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) {
     const categories = [
         { id: 'mass', label: 'Weight', icon: Scale, unit: 'kg' },
         { id: 'volume', label: 'Volume', icon: Droplet, unit: 'L' },
@@ -52,7 +52,7 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetView }) {
                                 className="w-12 bg-transparent text-sm font-bold text-foreground outline-none text-center"
                                 step="any"
                                 min="0"
-                            />
+                             />
                             <span className="text-[10px] font-bold text-muted-foreground ml-1">{cat.unit}</span>
                         </div>
                     </div>
@@ -65,14 +65,14 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetView }) {
             )} />
 
             <button
-                onClick={onResetView}
+                onClick={onResetUnits}
                 className={clsx(
                     "flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl transition-all duration-300",
                     normTargets.enabled
                         ? "opacity-100 text-muted-foreground hover:bg-background pointer-events-auto"
                         : "opacity-0 pointer-events-none text-muted-foreground"
                 )}
-                title="Zoom Out Data"
+                title="Reset Normalization Units"
             >
                 <RotateCcw className="w-4 h-4" />
                 Reset

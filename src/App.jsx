@@ -165,12 +165,14 @@ function App() {
     nextColorIndexRef.current = 0;
   }, []);
 
-  const handleResetView = useCallback(() => {
-    // This could reset Zoom or Date range if exposed by the chart
-    if (chartRef.current) {
-        // We'll just toast for now or trigger a chart method if it exists
-        toast.info("Resetting view...");
-    }
+  const handleResetUnits = useCallback(() => {
+    setNormTargets(prev => ({
+      ...prev,
+      mass: 1,
+      volume: 1,
+      count: 1
+    }));
+    toast.info("Normalized units reset to default (1)");
   }, []);
 
   const sortedItems = useMemo(() => {
@@ -373,7 +375,7 @@ function App() {
               <CommandBar
                 normTargets={normTargets}
                 onUpdateNorm={setNormTargets}
-                onResetView={handleResetView}
+                onResetUnits={handleResetUnits}
               />
               <PriceChart
                 ref={chartRef}
