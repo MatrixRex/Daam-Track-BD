@@ -639,7 +639,7 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
       const prices = filteredChartData.map(d => d[item.name]).filter(p => p !== undefined);
       if (!prices.length) return null;
       const current = prices[prices.length - 1];
-      const prev = prices.length > 1 ? prices[prices.length - 2] : current;
+      const prev = prices.length > 1 ? prices[0] : current;
       return {
         name: item.name,
         color: getItemColor(item.name),
