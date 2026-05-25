@@ -10,6 +10,14 @@
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-heading: "Alan Sans", var(--font-sans);
 
+  /* Reduced Border Radii for sleeker, modern minimalist aesthetics */
+  --radius-3xl: 1rem;
+  --radius-2xl: 0.75rem;
+  --radius-xl: 0.5rem;
+  --radius-lg: 0.375rem;
+  --radius-md: 0.25rem;
+  --radius-sm: 0.125rem;
+
   /* Fluid Base Typography & Mathematical Minor Third (1.2) Scale */
   --text-base: clamp(0.95rem, 0.85rem + 0.5vw, 1.05rem);
   --text-xs: calc(var(--text-base) / 1.44);
@@ -82,7 +90,7 @@
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
+    --radius: 0.375rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.681 0.162 75.834);
