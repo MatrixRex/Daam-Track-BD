@@ -448,7 +448,7 @@ function App() {
                   <Tooltip content="Clear All">
                     <button
                       onClick={handleClearAll}
-                      className="p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
+                      className="p-1 rounded-lg transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -459,7 +459,7 @@ function App() {
                       <button
                         onClick={() => setIsSorted(!isSorted)}
                         className={clsx(
-                          "p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px] active:scale-95",
+                          "p-1 rounded-lg transition-all duration-300 flex items-center justify-center h-[22px] w-[22px] active:scale-95",
                           isSorted 
                             ? "bg-accent text-primary shadow-sm" 
                             : "text-muted-foreground hover:text-foreground"
@@ -473,7 +473,7 @@ function App() {
                       <button
                         onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
                         className={clsx(
-                          "rounded-md text-muted-foreground dark:text-muted-foreground hover:text-primary dark:hover:text-primary hover:bg-white/50 dark:hover:bg-accent transition-all duration-300 ease-out flex items-center justify-center active:scale-95",
+                          "rounded-lg text-muted-foreground dark:text-muted-foreground hover:text-primary dark:hover:text-primary hover:bg-white/50 dark:hover:bg-accent transition-all duration-300 ease-out flex items-center justify-center active:scale-95",
                           isSorted 
                             ? "w-[22px] h-[22px] opacity-100 scale-100 pointer-events-auto ml-0.5" 
                             : "w-0 h-[22px] opacity-0 scale-75 pointer-events-none overflow-hidden"
@@ -532,7 +532,7 @@ function App() {
                         setSelectedDate(null);
                         setSelectedDateData(null);
                       }}
-                      className="p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
+                      className="p-1 rounded-lg transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
                     >
                       <Trash2 size={13} />
                     </button>

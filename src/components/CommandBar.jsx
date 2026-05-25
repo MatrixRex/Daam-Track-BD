@@ -17,13 +17,13 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
                 <button
                     onClick={() => onUpdateNorm({ ...normTargets, enabled: !normTargets.enabled })}
                     className={clsx(
-                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none border",
+                        "relative inline-flex h-6 w-11 items-center rounded-lg transition-colors focus:outline-none border",
                         normTargets.enabled ? "bg-primary border-transparent" : "bg-muted border-border"
                     )}
                 >
                     <span
                         className={clsx(
-                            "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                            "inline-block h-4 w-4 transform rounded-md bg-white transition-transform",
                             normTargets.enabled ? "translate-x-6" : "translate-x-1"
                         )}
                     />
@@ -74,7 +74,7 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
                 <Tooltip content="Reset Units" align="right">
                     <button
                         onClick={onResetUnits}
-                        className="p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
+                        className="p-1 rounded-lg transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
                     >
                         <RotateCcw size={13} />
                     </button>
