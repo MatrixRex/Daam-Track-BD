@@ -36,13 +36,13 @@ const Tooltip = ({ content, children, delay = 400, align = "center" }) => {
             {children}
             {isVisible && (
                 <div className={clsx(
-                    "absolute top-full mt-2 px-2.5 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-wider rounded shadow-lg whitespace-nowrap z-50 pointer-events-none motion-preset-fade motion-duration-200",
+                    "absolute bottom-full mb-2 px-2.5 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-wider rounded shadow-lg whitespace-nowrap z-50 pointer-events-none motion-preset-fade motion-duration-200",
                     align === "center" && "left-1/2 -translate-x-1/2",
                     align === "right" && "right-0 translate-x-0"
                 )}>
                     {content}
                     <div className={clsx(
-                        "absolute bottom-full border-4 border-transparent border-b-slate-800",
+                        "absolute top-full border-4 border-transparent border-t-slate-800",
                         align === "center" && "left-1/2 -translate-x-1/2",
                         align === "right" && "right-2.5 translate-x-0"
                     )}></div>
