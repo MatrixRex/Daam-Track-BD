@@ -1,8 +1,8 @@
 import React from 'react';
-import { DATA_BASE_URL } from '../config';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 import clsx from 'clsx';
 import { TrendingUp, Trash2 } from 'lucide-react';
+import ProductImage from './ProductImage';
 
 export default function StatsSidebar({ items, stats, colors, normTargets, onHover, selectedItemName, onSelect, onRemove }) {
 
@@ -53,21 +53,14 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                         )}
                         style={{ borderLeft: `3px solid ${color}`, animationDelay: `${index * 40}ms` }}
                     >
-                        {/* Compact Thumbnail */}
-                        <div className="w-10 h-10 rounded-lg bg-background p-1 flex-shrink-0 border border-border overflow-hidden">
-                            <img
-                                src={`${DATA_BASE_URL}/images/${item.image}`}
-                                alt={item.name}
-                                className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-110"
-                                onError={(e) => {
-                                    e.target.style.display = 'none';
-                                    e.target.nextSibling.style.display = 'flex';
-                                }}
-                            />
-                            <div className="hidden w-full h-full items-center justify-center text-muted-foreground text-xs font-bold uppercase">
-                                {item.name.charAt(0)}
-                            </div>
-                        </div>
+                        {/* Compact Thumbnail (With premium dynamic fallback) */}
+                        <ProductImage
+                            item={item}
+                            color={color}
+                            className="w-10 h-10 rounded-lg flex-shrink-0 border border-border overflow-hidden"
+                            imgClassName="mix-blend-multiply dark:mix-blend-normal dark:brightness-110"
+                            fallbackSize="text-sm"
+                        />
 
                         {/* Info Section */}
                         <div className="flex-1 min-w-0">

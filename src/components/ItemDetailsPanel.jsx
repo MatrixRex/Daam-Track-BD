@@ -1,8 +1,8 @@
 import React from 'react';
-import { DATA_BASE_URL } from '../config';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 import { TrendingUp, TrendingDown, Minus, Info, Maximize2 } from 'lucide-react';
 import clsx from 'clsx';
+import ProductImage from './ProductImage';
 
 export default function ItemDetailsPanel({ item, stats, normTargets }) {
   if (!item) {
@@ -18,6 +18,8 @@ export default function ItemDetailsPanel({ item, stats, normTargets }) {
       </div>
     );
   }
+
+  const itemColor = stats?.color?.stroke || stats?.color;
 
   const currentPrice = stats?.current ?? item.price;
   const normalizedPrice = normTargets?.enabled 
@@ -36,20 +38,22 @@ export default function ItemDetailsPanel({ item, stats, normTargets }) {
   return (
     <div key={`${item.name}-${normTargets?.enabled ? 'norm' : 'raw'}`} className="flex flex-col bg-muted border border-border rounded-3xl shadow-xl overflow-hidden flex-1 min-h-0 motion-preset-blur-right motion-duration-300">
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-        {/* Visual Hero */}
+        {/* Visual Hero (With premium dynamic fallback) */}
         <div className="relative group mb-8">
-          <div className="w-full aspect-square rounded-3xl bg-accent p-8 border border-border shadow-sm flex items-center justify-center overflow-hidden transition-transform duration-500 hover:scale-[1.02]">
-            <img
-              src={`${DATA_BASE_URL}/images/${item.image}`}
-              alt={item.name}
-              className="w-full h-full object-contain"
-            />
+          <ProductImage
+            item={item}
+            color={itemColor}
+            className="w-full aspect-square rounded-3xl border border-border shadow-sm overflow-hidden transition-transform duration-500 hover:scale-[1.02]"
+            imgClassName="w-full h-full object-contain"
+            fallbackSize="text-7xl"
+            imagePadding="p-8"
+            imageBg="bg-accent"
+          >
             <div className="absolute inset-0 bg-gradient-to-t from-background-50/20 to-transparent pointer-events-none" />
-          </div>
-          
-          <div className="absolute top-4 right-4 px-3 py-1.5 bg-accent rounded-full shadow-md text-[10px] font-semibold uppercase tracking-wider text-primary border border-border/50">
-            {item.category}
-          </div>
+            <div className="absolute top-4 right-4 px-3 py-1.5 bg-accent rounded-full shadow-md text-[10px] font-semibold uppercase tracking-wider text-primary border border-border/50 z-10">
+              {item.category}
+            </div>
+          </ProductImage>
         </div>
 
         {/* Primary Info */}

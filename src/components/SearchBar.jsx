@@ -2,9 +2,9 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import uFuzzy from '@leeoniya/ufuzzy';
 import { Search, X, ChevronRight, Check } from 'lucide-react';
 import clsx from 'clsx';
-import { DATA_BASE_URL } from '../config';
 import ItemHoverCard from './ItemHoverCard';
 import ItemDetailModal from './ItemDetailModal';
+import ProductImage from './ProductImage';
 
 export default function SearchBar({ 
     onSelect, 
@@ -159,6 +159,7 @@ export default function SearchBar({
                             <ul className="max-h-[60vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 p-3">
                             {results.map((item, index) => {
                                 const isSelected = selectedItems.some(i => i.name === item.name);
+                                const itemColor = itemStats[item.name]?.color?.stroke || itemStats[item.name]?.color;
                                 return (
                                     <li
                                         key={index}
@@ -193,23 +194,14 @@ export default function SearchBar({
                                                 : "hover:bg-accent hover:border-primary/30 hover:shadow-sm cursor-pointer"
                                         )}
                                     >
-                                        {/* Product Image (With smart fallback) */}
-                                        <div className="w-10 h-10 rounded-lg bg-background p-1 flex-shrink-0 border border-border overflow-hidden">
-                                            <img
-                                                src={`${DATA_BASE_URL}/images/${item.image}`}
-                                                alt={item.name}
-                                                className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-90"
-                                                loading="lazy"
-                                                onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    e.target.nextSibling.style.display = 'flex';
-                                                }}
-                                            />
-                                            {/* Fallback Icon if image fails */}
-                                            <div className="hidden w-full h-full items-center justify-center bg-background text-muted-foreground text-xs font-bold">
-                                                {item.name.charAt(0)}
-                                            </div>
-                                        </div>
+                                        {/* Product Image (With premium dynamic fallback) */}
+                                        <ProductImage
+                                            item={item}
+                                            color={itemColor}
+                                            className="w-10 h-10 rounded-lg flex-shrink-0 border border-border overflow-hidden"
+                                            imgClassName="mix-blend-multiply dark:mix-blend-normal dark:brightness-90"
+                                            fallbackSize="text-sm"
+                                        />
 
                                         {/* Text Info */}
                                         <div className="flex-1 min-w-0">

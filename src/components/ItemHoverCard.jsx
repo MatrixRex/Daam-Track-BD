@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { DATA_BASE_URL } from '../config';
 import clsx from 'clsx';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
+import ProductImage from './ProductImage';
 
 export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right', normTargets, stats }) {
     const [activeData, setActiveData] = useState(null);
@@ -80,6 +80,8 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
         left: clampedLeft,
     };
 
+    const itemColor = currentStats?.color?.stroke || currentStats?.color;
+
     return (
         <div
             className="fixed z-[100] pointer-events-none transition-opacity duration-200"
@@ -89,26 +91,18 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
                 "w-72 bg-muted rounded-2xl shadow-2xl border border-border overflow-hidden",
                 "animate-in fade-in zoom-in-95 duration-200"
             )}>
-                {/* Image Section */}
-                <div className="relative h-48 bg-background flex items-center justify-center overflow-hidden">
-                    <img
-                        src={`${DATA_BASE_URL}/images/${currentItem.image}`}
-                        alt={currentItem.name}
-                        className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-110"
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                        }}
-                    />
-                    <div className="hidden w-full h-full items-center justify-center text-muted-foreground text-4xl font-bold">
-                        {currentItem.name.charAt(0)}
-                    </div>
-
-                    {/* Floating Badge */}
-                    <div className="absolute top-3 right-3 px-2 py-1 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm">
-                        {currentItem.category}
-                    </div>
-                </div>
+                {/* Image Section (With premium dynamic fallback) */}
+                <ProductImage
+                    item={currentItem}
+                    color={itemColor}
+                    className="h-48"
+                    imgClassName="mix-blend-multiply dark:mix-blend-normal dark:brightness-110"
+                    fallbackSize="text-4xl"
+                    imagePadding="p-0"
+                    imageBg="bg-background"
+                    showBadge={true}
+                    badgeClassName="absolute top-3 right-3 px-2 py-1 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm z-10"
+                />
 
                 {/* Content Section */}
                 <div className="p-5">

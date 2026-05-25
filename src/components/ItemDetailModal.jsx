@@ -1,11 +1,13 @@
 import React from 'react';
-import { DATA_BASE_URL } from '../config';
 import { X } from 'lucide-react';
 import clsx from 'clsx';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
+import ProductImage from './ProductImage';
 
 export default function ItemDetailModal({ item, onClose, normTargets, stats }) {
     if (!item) return null;
+
+    const itemColor = stats?.color?.stroke || stats?.color;
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -21,26 +23,18 @@ export default function ItemDetailModal({ item, onClose, normTargets, stats }) {
                     <X className="w-6 h-6" />
                 </button>
 
-                {/* Image Section */}
-                <div className="relative h-64 bg-background flex items-center justify-center p-8">
-                    <img
-                        src={`${DATA_BASE_URL}/images/${item.image}`}
-                        alt={item.name}
-                        className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:brightness-110 drop-shadow-2xl"
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                        }}
-                    />
-                    <div className="hidden w-full h-full items-center justify-center text-muted-foreground text-6xl font-bold">
-                        {item.name.charAt(0)}
-                    </div>
-
-                    {/* Floating Badge */}
-                    <div className="absolute top-6 left-6 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-widest rounded-full shadow-lg">
-                        {item.category}
-                    </div>
-                </div>
+                {/* Image Section (With premium dynamic fallback) */}
+                <ProductImage
+                    item={item}
+                    color={itemColor}
+                    className="h-64"
+                    imgClassName="mix-blend-multiply dark:mix-blend-normal dark:brightness-110 drop-shadow-2xl"
+                    fallbackSize="text-6xl"
+                    imagePadding="p-8"
+                    imageBg="bg-background"
+                    showBadge={true}
+                    badgeClassName="absolute top-6 left-6 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-widest rounded-full shadow-lg z-10"
+                />
 
                 {/* Content Section */}
                 <div className="p-8">
