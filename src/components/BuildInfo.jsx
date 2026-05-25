@@ -6,14 +6,12 @@
 
 const BuildInfo = () => {
     const buildTag = import.meta.env.VITE_BUILD_TAG;
-    const buildDate = import.meta.env.VITE_BUILD_DATE;
 
     // Check if we're in dev mode (env variables missing)
-    const isDevMode = !buildTag || !buildDate;
+    const isDevMode = !buildTag;
 
     // Use tag if available, otherwise 'dev'
     const displayVersion = isDevMode ? 'dev' : buildTag;
-    const displayDate = isDevMode ? 'local' : buildDate;
 
     // Construct the GitHub tag/release URL
     const tagUrl = isDevMode
@@ -48,8 +46,6 @@ const BuildInfo = () => {
             <span>•</span>
             <span>Version:</span>
             {versionElement}
-            <span>•</span>
-            <span>{displayDate}</span>
         </div>
     );
 };
