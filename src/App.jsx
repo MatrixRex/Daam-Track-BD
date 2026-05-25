@@ -441,7 +441,7 @@ function App() {
             </div>
 
             {/* Column 2: Stats Sidebar (20%) */}
-            <div className="lg:col-span-1 flex flex-col gap-4 min-h-0 overflow-hidden">
+            <div className="lg:col-span-1 flex flex-col gap-4 min-h-0 overflow-visible z-10">
               <div className="flex items-center justify-between px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">Items</h3>
                 <div className="flex items-center gap-1.5">
@@ -455,7 +455,7 @@ function App() {
                   </Tooltip>
 
                   <div className="flex items-center bg-background rounded-lg p-0.5 border border-border">
-                    <Tooltip content={isSorted ? "Turn sort off" : "Sort by price"}>
+                    <Tooltip content={isSorted ? "Turn sort off" : "Sort by price"} align="right">
                       <button
                         onClick={() => setIsSorted(!isSorted)}
                         className={clsx(
@@ -469,7 +469,7 @@ function App() {
                       </button>
                     </Tooltip>
                     
-                    <Tooltip content={sortDirection === 'asc' ? "Lowest first" : "Highest first"}>
+                    <Tooltip content={sortDirection === 'asc' ? "Lowest first" : "Highest first"} align="right">
                       <button
                         onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
                         className={clsx(
@@ -515,7 +515,7 @@ function App() {
             </div>
 
             {/* Column 3: Details Panel (20%) */}
-            <div className="flex flex-col gap-4 min-h-0 overflow-hidden">
+            <div className="flex flex-col gap-4 min-h-0 overflow-visible">
               <div className="flex items-center justify-between px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">
                   {selectedDetailItemName 

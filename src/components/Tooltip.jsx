@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import clsx from 'clsx';
 
-const Tooltip = ({ content, children, delay = 400 }) => {
+const Tooltip = ({ content, children, delay = 400, align = "center" }) => {
     const [isVisible, setIsVisible] = useState(false);
     const timeoutRef = useRef(null);
 
@@ -34,9 +35,17 @@ const Tooltip = ({ content, children, delay = 400 }) => {
         >
             {children}
             {isVisible && (
-                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-wider rounded shadow-lg whitespace-nowrap z-50 pointer-events-none motion-preset-fade motion-duration-200">
+                <div className={clsx(
+                    "absolute top-full mt-2 px-2.5 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-wider rounded shadow-lg whitespace-nowrap z-50 pointer-events-none motion-preset-fade motion-duration-200",
+                    align === "center" && "left-1/2 -translate-x-1/2",
+                    align === "right" && "right-0 translate-x-0"
+                )}>
                     {content}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800"></div>
+                    <div className={clsx(
+                        "absolute bottom-full border-4 border-transparent border-b-slate-800",
+                        align === "center" && "left-1/2 -translate-x-1/2",
+                        align === "right" && "right-2.5 translate-x-0"
+                    )}></div>
                 </div>
             )}
         </div>
