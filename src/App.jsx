@@ -14,6 +14,7 @@ import CommandBar from './components/CommandBar';
 import StatsSidebar from './components/StatsSidebar';
 import ItemDetailsPanel from './components/ItemDetailsPanel';
 import SelectedDatePanel from './components/SelectedDatePanel';
+import Tooltip from './components/Tooltip';
 import { ChevronRight, Scale } from 'lucide-react';
 import clsx from 'clsx';
 import { getNormalizedPrice } from './utils/quantityUtils';
@@ -443,55 +444,52 @@ function App() {
             <div className="lg:col-span-1 flex flex-col gap-4 min-h-0 overflow-hidden">
               <div className="flex items-center justify-between px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">Items</h3>
-                <div className="flex items-center gap-1">
-                  <div className="group/clear flex items-center bg-background rounded-lg p-0.5 border border-border transition-all duration-300">
-                    <span className="max-w-0 opacity-0 group-hover/clear:max-w-[80px] group-hover/clear:mx-1.5 group-hover/clear:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-muted-foreground select-none">
-                      Clear All
-                    </span>
+                <div className="flex items-center gap-1.5">
+                  <Tooltip content="Clear All">
                     <button
                       onClick={handleClearAll}
-                      className="p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px] text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-                      title="Remove all items"
+                      className="p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
                     >
-                      <Trash2 size={12} />
+                      <Trash2 size={13} />
                     </button>
+                  </Tooltip>
+
+                  <div className="flex items-center bg-background rounded-lg p-0.5 border border-border">
+                    <Tooltip content={isSorted ? "Turn sort off" : "Sort by price"}>
+                      <button
+                        onClick={() => setIsSorted(!isSorted)}
+                        className={clsx(
+                          "p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px] active:scale-95",
+                          isSorted 
+                            ? "bg-accent text-primary shadow-sm" 
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <ArrowDownWideNarrow size={12} />
+                      </button>
+                    </Tooltip>
+                    
+                    <Tooltip content={sortDirection === 'asc' ? "Lowest first" : "Highest first"}>
+                      <button
+                        onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                        className={clsx(
+                          "rounded-md text-muted-foreground dark:text-muted-foreground hover:text-primary dark:hover:text-primary hover:bg-white/50 dark:hover:bg-accent transition-all duration-300 ease-out flex items-center justify-center active:scale-95",
+                          isSorted 
+                            ? "w-[22px] h-[22px] opacity-100 scale-100 pointer-events-auto ml-0.5" 
+                            : "w-0 h-[22px] opacity-0 scale-75 pointer-events-none overflow-hidden"
+                        )}
+                      >
+                        <ArrowUp 
+                          size={12} 
+                          className={clsx(
+                            "transition-transform duration-300 ease-in-out",
+                            sortDirection === 'desc' ? "rotate-180" : "rotate-0"
+                          )} 
+                        />
+                      </button>
+                    </Tooltip>
                   </div>
-                  <div className="group/sort flex items-center bg-background rounded-lg p-0.5 border border-border transition-all duration-300">
-                  <span className="max-w-0 opacity-0 group-hover/sort:max-w-[150px] group-hover/sort:mx-1.5 group-hover/sort:opacity-100 transition-all duration-300 ease-out overflow-hidden whitespace-nowrap text-[10px] font-bold text-muted-foreground select-none">
-                    {!isSorted ? "sort-price-off" : sortDirection === 'asc' ? "sort-price-Increasing" : "sort-price-Decreasing"}
-                  </span>
-                  <button
-                    onClick={() => setIsSorted(!isSorted)}
-                    className={clsx(
-                      "p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[22px] w-[22px]",
-                      isSorted 
-                        ? "bg-accent text-primary shadow-sm" 
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                    title={isSorted ? "Turn sort off" : "Sort by price"}
-                  >
-                    <ArrowDownWideNarrow size={12} />
-                  </button>
-                  <button
-                    onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                    className={clsx(
-                      "rounded-md text-muted-foreground dark:text-muted-foreground hover:text-primary dark:hover:text-primary hover:bg-white/50 dark:hover:bg-accent transition-all duration-300 ease-out flex items-center justify-center",
-                      isSorted 
-                        ? "w-[22px] h-[22px] opacity-100 scale-100 pointer-events-auto ml-1" 
-                        : "w-0 h-[22px] opacity-0 scale-75 pointer-events-none overflow-hidden"
-                    )}
-                    title={sortDirection === 'asc' ? "Lowest first" : "Highest first"}
-                  >
-                    <ArrowUp 
-                      size={12} 
-                      className={clsx(
-                        "transition-transform duration-300 ease-in-out",
-                        sortDirection === 'desc' ? "rotate-180" : "rotate-0"
-                      )} 
-                    />
-                  </button>
                 </div>
-              </div>
             </div>
             
             <div 
