@@ -554,6 +554,7 @@ function App() {
                 >
                   <SelectedDatePanel
                     items={sortedItems}
+                    stats={Object.values(itemStats)}
                     dateData={selectedDateData}
                     colors={COLORS}
                     normTargets={normTargets.enabled ? normTargets : null}
