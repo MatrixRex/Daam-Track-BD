@@ -85,7 +85,7 @@ export default function ProductImage({
     fallbackSize = "text-base", // e.g. text-xs, text-xl, text-4xl, text-6xl
     showBadge = false,
     badgeClassName = "",
-    imagePadding = "p-1",       // Padding when image is loaded
+    imagePadding = "p-0",       // Padding when image is loaded
     imageBg = "bg-background",  // Background color when image is loaded
     children,                   // Custom overlays or overlays
 }) {
