@@ -1041,7 +1041,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 </div>
 
                 {/* Right Side: Date Range */}
-                <div className="flex items-center gap-2 bg-background rounded-xl px-3 py-2 border border-border">
+                <div className="flex items-center gap-2 bg-background rounded-2xl px-3 py-2 border border-border">
                     <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
                     <Tooltip content="Select start date">
                         <DateInput

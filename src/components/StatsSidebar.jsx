@@ -8,7 +8,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
 
     if (items.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 text-center bg-muted border border-dashed border-border rounded-3xl h-full min-h-[400px]">
+            <div className="flex flex-col items-center justify-center p-8 text-center bg-muted border border-dashed border-border rounded-2xl h-full min-h-[400px]">
                 <div className="w-16 h-16 mb-4 rounded-2xl bg-background flex items-center justify-center text-muted-foreground">
                     <TrendingUp className="w-8 h-8 opacity-20" />
                 </div>

@@ -7,8 +7,8 @@ import ProductImage from './ProductImage';
 export default function ItemDetailsPanel({ item, stats, normTargets }) {
   if (!item) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center bg-muted border border-dashed border-border rounded-3xl h-[600px]">
-        <div className="w-20 h-20 mb-6 rounded-3xl bg-background flex items-center justify-center text-muted-foreground opacity-50">
+      <div className="flex flex-col items-center justify-center p-8 text-center bg-muted border border-dashed border-border rounded-2xl h-[600px]">
+        <div className="w-20 h-20 mb-6 rounded-2xl bg-background flex items-center justify-center text-muted-foreground opacity-50">
           <Info className="w-10 h-10" />
         </div>
         <h3 className="text-xl font-semibold text-foreground mb-3">Product Insights</h3>
@@ -36,14 +36,14 @@ export default function ItemDetailsPanel({ item, stats, normTargets }) {
     : change;
 
   return (
-    <div key={`${item.name}-${normTargets?.enabled ? 'norm' : 'raw'}`} className="flex flex-col bg-muted border border-border rounded-3xl shadow-xl overflow-hidden flex-1 min-h-0 motion-preset-blur-right motion-duration-300">
+    <div key={`${item.name}-${normTargets?.enabled ? 'norm' : 'raw'}`} className="flex flex-col bg-muted border border-border rounded-2xl shadow-xl overflow-hidden flex-1 min-h-0 motion-preset-blur-right motion-duration-300">
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
         {/* Visual Hero (With premium dynamic fallback) */}
         <div className="relative group mb-8">
           <ProductImage
             item={item}
             color={itemColor}
-            className="w-full aspect-square rounded-3xl border border-border shadow-sm overflow-hidden transition-transform duration-500 hover:scale-[1.02]"
+            className="w-full aspect-square rounded-2xl border border-border shadow-sm overflow-hidden transition-transform duration-500 hover:scale-[1.02]"
             imgClassName="w-full h-full object-contain"
             fallbackSize="text-7xl"
             imagePadding="p-8"

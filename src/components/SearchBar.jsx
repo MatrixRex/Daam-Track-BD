@@ -107,7 +107,7 @@ export default function SearchBar({
 
             {/* Search Input Area */}
             <div className={clsx(
-                "relative group rounded-xl transition-all duration-300",
+                "relative group rounded-2xl transition-all duration-300",
                 emptyState && "animate-breathing-glow"
             )}>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -118,7 +118,7 @@ export default function SearchBar({
                     ref={inputRef}
                     type="text"
                     className={clsx(
-                        "block w-full pl-11 pr-12 py-4 bg-muted border border-border rounded-xl",
+                        "block w-full pl-11 pr-12 py-4 bg-muted border border-border rounded-2xl",
                         "text-foreground placeholder-text-500",
                         "focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring",
                         "shadow-sm hover:shadow-md transition-all duration-200",
@@ -190,7 +190,7 @@ export default function SearchBar({
                                             }
                                         }}
                                         className={clsx(
-                                            "flex items-center gap-3 p-2.5 rounded-xl border border-border/40 transition-all duration-200 group relative",
+                                            "flex items-center gap-3 p-2.5 rounded-2xl border border-border/40 transition-all duration-200 group relative",
                                             isSelected
                                                 ? "bg-primary/5 cursor-default opacity-70"
                                                 : "hover:bg-accent hover:border-primary/30 hover:shadow-sm cursor-pointer"
@@ -252,7 +252,7 @@ export default function SearchBar({
 
             {/* "No Results" State */}
             {isOpen && query && results.length === 0 && (
-                <div className="absolute w-full mt-2 bg-muted rounded-xl shadow-lg border border-border p-8 text-center motion-preset-blur-down motion-duration-300">
+                <div className="absolute w-full mt-2 bg-muted rounded-2xl shadow-lg border border-border p-8 text-center motion-preset-blur-down motion-duration-300">
                     <p className="text-muted-foreground">No items found for "{query}"</p>
                 </div>
             )}
