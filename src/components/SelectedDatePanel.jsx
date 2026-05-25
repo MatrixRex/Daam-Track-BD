@@ -76,7 +76,7 @@ export default function SelectedDatePanel({ items, stats = [], dateData, colors,
                   "flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-sm select-none border",
                   diff > 0 
                     ? "bg-red-50 dark:bg-red-950/20 text-red-500 border-red-200/30" 
-                    : "bg-primary/10 dark:bg-primary/5 text-primary border-primary/20"
+                    : "bg-green-50 dark:bg-green-950/20 text-green-500 border-green-200/30"
                 )}>
                   {diff > 0 ? (
                     <>

@@ -79,10 +79,10 @@ export default function ItemDetailsPanel({ item, stats, normTargets }) {
             </div>
             {change !== 0 ? (
               <div className={clsx(
-                "mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm",
+                "mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border",
                 change > 0 
-                  ? "bg-red-50 text-red-500" 
-                  : "bg-primary/10 text-primary"
+                  ? "bg-red-50 text-red-500 border-red-200/30" 
+                  : "bg-green-50 dark:bg-green-950/20 text-green-500 border-green-200/30"
               )}>
                 {change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                 ৳{Math.abs(normalizedChange)} {change > 0 ? 'Increase' : 'Savings'}
