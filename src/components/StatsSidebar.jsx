@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { TrendingUp, Trash2 } from 'lucide-react';
 import ProductImage from './ProductImage';
 
-export default function StatsSidebar({ items, stats, colors, normTargets, onHover, selectedItemName, onSelect, onRemove }) {
+export default function StatsSidebar({ items, stats, colors, normTargets, onHover, selectedItemName, onSelect, onRemove, deletingItems = [] }) {
 
     if (items.length === 0) {
         return (
@@ -26,6 +26,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                 const color = colors[index % colors.length]?.stroke || '#7A9F7A';
                 const itemStat = stats.find(s => s.name === item.name);
                 const isSelected = selectedItemName === item.name;
+                const isDeleting = deletingItems.includes(item.name);
                 
                 // Normalization Logic
                 const currentPrice = itemStat?.current ?? item.price;
@@ -40,18 +41,24 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                 return (
                     <div
                         key={`${item.name}-${normTargets?.enabled ? 'norm' : 'raw'}`}
-                        onClick={() => onSelect(item.name)}
-                        onMouseEnter={() => onHover(item.name)}
-                        onMouseLeave={() => onHover(null)}
+                        onClick={() => !isDeleting && onSelect(item.name)}
+                        onMouseEnter={() => !isDeleting && onHover(item.name)}
+                        onMouseLeave={() => !isDeleting && onHover(null)}
                         className={clsx(
                             "flex items-center gap-3 p-3 bg-muted rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out group cursor-pointer relative overflow-hidden",
-                            "motion-preset-fade motion-duration-200",
                             "ring-2 border",
                             isSelected 
                                 ? "ring-ring border-transparent bg-accent translate-x-1.5 shadow-md" 
-                                : "ring-transparent hover:ring-ring/35 border-border hover:border-transparent hover:translate-x-0.5"
+                                : "ring-transparent hover:ring-ring/35 border-border hover:border-transparent hover:translate-x-0.5",
+                            isDeleting 
+                                ? "opacity-0 -translate-x-full !max-h-0 !p-0 !m-0 !border-0 !shadow-none pointer-events-none scale-y-0 duration-200 ease-in-out"
+                                : "max-h-[200px] opacity-100 scale-y-100 motion-preset-fade motion-duration-200"
                         )}
-                        style={{ borderLeft: `3px solid ${color}`, animationDelay: `${index * 40}ms` }}
+                        style={{ 
+                            borderLeft: isDeleting ? '0px solid transparent' : `3px solid ${color}`, 
+                            animationDelay: `${index * 40}ms`,
+                            transitionProperty: 'all, max-height, padding, margin, opacity, transform'
+                        }}
                     >
                         {/* Compact Thumbnail (With premium dynamic fallback) */}
                         <ProductImage

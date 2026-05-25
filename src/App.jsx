@@ -57,6 +57,7 @@ function App() {
     enabled: false
   });
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [deletingItems, setDeletingItems] = useState([]);
 
   const compareListRef = useRef(null);
   const chartRef = useRef(null);
@@ -145,36 +146,6 @@ function App() {
     });
   }, [getItemColor]);
 
-  // Remove item from comparison
-  const handleRemoveItem = useCallback((itemName) => {
-    setSelectedItems(prev => prev.filter(i => i.name !== itemName));
-    if (hoveredItemObj?.name === itemName) {
-      setHoveredItemObj(null);
-    }
-    if (selectedDetailItemName === itemName) {
-      setSelectedDetailItemName(null);
-    }
-  }, [hoveredItemObj, selectedDetailItemName]);
-
-  // Clear all items
-  const handleClearAll = useCallback(() => {
-    setSelectedItems([]);
-    setSelectedDetailItemName(null);
-    // Reset color assignments when all items are cleared
-    colorAssignmentsRef.current.clear();
-    nextColorIndexRef.current = 0;
-  }, []);
-
-  const handleResetUnits = useCallback(() => {
-    setNormTargets(prev => ({
-      ...prev,
-      mass: 1,
-      volume: 1,
-      count: 1
-    }));
-    toast.info("Normalized units reset to default (1)");
-  }, []);
-
   const sortedItems = useMemo(() => {
     if (!isSorted) return selectedItems;
 
@@ -191,6 +162,69 @@ function App() {
       return sortDirection === 'asc' ? priceA - priceB : priceB - priceA;
     });
   }, [selectedItems, isSorted, sortDirection, itemStats, normTargets]);
+
+  // Remove item from comparison
+  const handleRemoveItem = useCallback((itemName) => {
+    // Clear detail panel and hover state immediately for a snappier feel
+    if (hoveredItemObj?.name === itemName) {
+      setHoveredItemObj(null);
+    }
+    if (selectedDetailItemName === itemName) {
+      setSelectedDetailItemName(null);
+    }
+
+    setDeletingItems(prev => [...prev, itemName]);
+
+    setTimeout(() => {
+      setSelectedItems(prev => prev.filter(i => i.name !== itemName));
+      setDeletingItems(prev => prev.filter(name => name !== itemName));
+    }, 200); // 200ms duration for exit animation (snappier!)
+  }, [hoveredItemObj, selectedDetailItemName]);
+
+  // Clear all items with a staggered cascade delete effect from bottom to top
+  const handleClearAll = useCallback(() => {
+    if (sortedItems.length === 0) return;
+
+    // Clear detail panel immediately
+    setSelectedDetailItemName(null);
+
+    const itemsToClear = [...sortedItems]; // Use sortedItems to respect visual bottom-to-top layout!
+    const delayStep = 35; // Speed up delay to 35ms for an extremely snappy feel
+    const exitDuration = 200; // Speed up single animation to 200ms
+
+    // Stagger adding items to the deleting list (bottom-to-top cascade)
+    itemsToClear.forEach((item, index) => {
+      const delay = (itemsToClear.length - 1 - index) * delayStep;
+      setTimeout(() => {
+        setDeletingItems(prev => {
+          if (prev.includes(item.name)) return prev;
+          return [...prev, item.name];
+        });
+      }, delay);
+    });
+
+    // Wait until the last item (top-most) completes its exit animation
+    const totalDuration = (itemsToClear.length - 1) * delayStep + exitDuration;
+
+    setTimeout(() => {
+      setSelectedItems([]);
+      setDeletingItems([]);
+      // Reset color assignments when all items are cleared
+      colorAssignmentsRef.current.clear();
+      nextColorIndexRef.current = 0;
+    }, totalDuration);
+  }, [sortedItems]);
+
+  const handleResetUnits = useCallback(() => {
+    setNormTargets(prev => ({
+      ...prev,
+      mass: 1,
+      volume: 1,
+      count: 1
+    }));
+    toast.info("Normalized units reset to default (1)");
+  }, []);
+
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground transition-colors duration-300">
@@ -453,6 +487,7 @@ function App() {
                   onHover={setHoveredItem}
                   selectedItemName={selectedDetailItemName}
                   onSelect={(name) => setSelectedDetailItemName(prev => prev === name ? null : name)}
+                  deletingItems={deletingItems}
                 />
               </div>
             </div>
