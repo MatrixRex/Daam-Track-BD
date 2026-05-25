@@ -525,17 +525,18 @@ function App() {
                       : "Details"}
                 </h3>
                 {(selectedDetailItemName || selectedDate) && (
-                  <button
-                    onClick={() => {
-                      setSelectedDetailItemName(null);
-                      setSelectedDate(null);
-                      setSelectedDateData(null);
-                    }}
-                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-muted-foreground hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
-                  >
-                    <Trash2 size={12} />
-                    Clear
-                  </button>
+                  <Tooltip content="Clear" align="right">
+                    <button
+                      onClick={() => {
+                        setSelectedDetailItemName(null);
+                        setSelectedDate(null);
+                        setSelectedDateData(null);
+                      }}
+                      className="p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </Tooltip>
                 )}
               </div>
               {selectedDetailItemName ? (

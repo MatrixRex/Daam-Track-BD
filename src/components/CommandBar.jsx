@@ -1,6 +1,7 @@
 import React from 'react';
 import { RotateCcw, Scale, Droplet, Hash } from 'lucide-react';
 import clsx from 'clsx';
+import Tooltip from './Tooltip';
 
 export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) {
     const categories = [
@@ -64,19 +65,21 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
                 normTargets.enabled ? "opacity-100" : "opacity-0 pointer-events-none"
             )} />
 
-            <button
-                onClick={onResetUnits}
-                className={clsx(
-                    "flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl transition-all duration-300",
-                    normTargets.enabled
-                        ? "opacity-100 text-muted-foreground hover:bg-background pointer-events-auto"
-                        : "opacity-0 pointer-events-none text-muted-foreground"
-                )}
-                title="Reset Normalization Units"
-            >
-                <RotateCcw className="w-4 h-4" />
-                Reset
-            </button>
+            <div className={clsx(
+                "transition-all duration-300 flex items-center justify-center",
+                normTargets.enabled
+                    ? "opacity-100 scale-100 pointer-events-auto"
+                    : "opacity-0 scale-75 pointer-events-none"
+            )}>
+                <Tooltip content="Reset Units" align="right">
+                    <button
+                        onClick={onResetUnits}
+                        className="p-1 rounded-md transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
+                    >
+                        <RotateCcw size={13} />
+                    </button>
+                </Tooltip>
+            </div>
         </div>
     );
 }
