@@ -34,9 +34,9 @@ const Tooltip = ({ content, children, delay = 400 }) => {
         >
             {children}
             {isVisible && (
-                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-wider rounded shadow-lg whitespace-nowrap z-50 pointer-events-none motion-preset-fade motion-duration-200">
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-wider rounded shadow-lg whitespace-nowrap z-50 pointer-events-none motion-preset-fade motion-duration-200">
                     {content}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-slate-800"></div>
                 </div>
             )}
         </div>
