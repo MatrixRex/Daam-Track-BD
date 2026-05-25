@@ -326,13 +326,34 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             const chart = echartsRef.current?.getEchartsInstance();
             if (!chart) return;
 
-            // Show legend temporarily for the screenshot
+            // Get computed theme styles from the parent card element to match perfectly
+            const dom = chart.getDom();
+            const cardDom = dom?.parentElement;
+            const computedStyle = cardDom ? window.getComputedStyle(cardDom) : null;
+            const cardBgColor = computedStyle ? computedStyle.backgroundColor : (isDark ? 'oklch(0.145 0 0)' : 'oklch(1 0 0)');
+
+            // Show legend and spacing temporarily for the screenshot
             const currentOption = chart.getOption();
             const currentBottom = currentOption.grid[0]?.bottom || 40;
+            const currentTop = currentOption.grid[0]?.top || 20;
             const legendHeight = Math.ceil(items.length / 3) * 30 + 20; // Approx 30px per row + padding
 
+            // Store original dimensions for pixel-perfect restoration
+            const originalWidth = chart.getWidth();
+            const originalHeight = chart.getHeight();
+
+            // Set beautiful high-res 16:9 ratio for the exported image
+            chart.resize({
+                width: 1200,
+                height: 675,
+                silent: true
+            });
+
             chart.setOption({
-                grid: { bottom: currentBottom + legendHeight },
+                grid: { 
+                    top: 90, // Safe spacious header area (180px on canvas) to prevent overlapping
+                    bottom: currentBottom + legendHeight 
+                },
                 legend: {
                     show: true,
                     bottom: 10,
@@ -349,17 +370,27 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             // Get Data URL (Raw)
             const rawUrl = chart.getDataURL({
                 type: 'png',
-                pixelRatio: 2,
-                backgroundColor: isDark ? 'oklch(0.145 0 0)' : 'oklch(1 0 0)'
+                pixelRatio: 2, // 2400x1350 ultra-sharp export
+                backgroundColor: cardBgColor // Perfectly matches the card's active theme background!
             });
 
-            // Revert legend AND grid
+            // Revert legend AND grid spacing
             chart.setOption({
                 legend: { show: false },
-                grid: { bottom: currentBottom }
+                grid: { 
+                    top: currentTop,
+                    bottom: currentBottom 
+                }
             });
 
-            // Post-process for rounded corners
+            // Revert to original chart dimensions instantly
+            chart.resize({
+                width: originalWidth,
+                height: originalHeight,
+                silent: true
+            });
+
+            // Post-process for rounded corners and premium header logomark
             const addRoundedCorners = (url, radius = 20) => {
                 return new Promise((resolve, reject) => {
                     const img = new Image();
@@ -387,6 +418,111 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
                         // Draw image
                         ctx.drawImage(img, 0, 0);
+
+                        // Add beautiful, premium logomark and brand in the top header
+                        ctx.save();
+                        
+                        // Extract computed colors dynamically for the canvas drawing to match active theme perfectly
+                        const textColor = computedStyle ? computedStyle.color : (isDark ? '#ffffff' : '#141517');
+                        const primaryEl = document.querySelector('.text-primary') || document.querySelector('.bg-primary');
+                        const themePrimaryColor = primaryEl 
+                            ? (window.getComputedStyle(primaryEl).color || window.getComputedStyle(primaryEl).backgroundColor) 
+                            : '#FD8F00';
+                            
+                        const subColor = textColor.includes('rgb') 
+                            ? textColor.replace('rgb', 'rgba').replace(')', ', 0.6)') 
+                            : (isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(75, 85, 99, 0.75)');
+                        const domainColor = textColor.includes('rgb')
+                            ? textColor.replace('rgb', 'rgba').replace(')', ', 0.45)')
+                            : (isDark ? 'rgba(255, 255, 255, 0.45)' : 'rgba(100, 116, 139, 0.45)');
+                        
+                        // Font scaling based on canvas width (respecting pixelRatio)
+                        const baseSize = Math.max(14, Math.round(w * 0.015));
+                        const padX = Math.max(24, Math.round(w * 0.035));
+                        
+                        // ECharts top grid space is 90px CSS, which is 180px canvas height (with pixelRatio=2)
+                        const headerHeight = 90 * 2;
+                        
+                        // Row 1 layout parameters:
+                        const logoX = padX;
+                        const logoSize = Math.round(baseSize * 1.35); // Perfect balance of logo size
+                        const logoY = 32; // Fixed spacing from top of canvas
+                        const titleY = logoY + logoSize / 2; // Aligned with middle of logo
+                        
+                        // 1. Draw rounded rectangle for the Logomark (using dynamic primary brand color)
+                        const r = Math.round(logoSize * 0.2);
+                        ctx.beginPath();
+                        ctx.moveTo(logoX + r, logoY);
+                        ctx.lineTo(logoX + logoSize - r, logoY);
+                        ctx.quadraticCurveTo(logoX + logoSize, logoY, logoX + logoSize, logoY + r);
+                        ctx.lineTo(logoX + logoSize, logoY + logoSize - r);
+                        ctx.quadraticCurveTo(logoX + logoSize, logoY + logoSize, logoX + logoSize - r, logoY + logoSize);
+                        ctx.lineTo(logoX + r, logoY + logoSize);
+                        ctx.quadraticCurveTo(logoX, logoY + logoSize, logoX, logoY + logoSize - r);
+                        ctx.lineTo(logoX, logoY + r);
+                        ctx.quadraticCurveTo(logoX, logoY, logoX + r, logoY);
+                        ctx.closePath();
+                        ctx.fillStyle = themePrimaryColor;
+                        ctx.fill();
+
+                        // 2. Draw white trending-up line inside the logomark (M20 70 L40 50 L60 65 L80 30 scaled)
+                        ctx.beginPath();
+                        ctx.moveTo(logoX + 0.2 * logoSize, logoY + 0.7 * logoSize);
+                        ctx.lineTo(logoX + 0.4 * logoSize, logoY + 0.5 * logoSize);
+                        ctx.lineTo(logoX + 0.6 * logoSize, logoY + 0.65 * logoSize);
+                        ctx.lineTo(logoX + 0.8 * logoSize, logoY + 0.3 * logoSize);
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = Math.max(2, Math.round(logoSize * 0.08));
+                        ctx.lineCap = 'round';
+                        ctx.lineJoin = 'round';
+                        ctx.stroke();
+                        
+                        // 3. Draw Brand Name "DaamTrace" (Row 1 - next to logo)
+                        const textX = logoX + logoSize + Math.round(baseSize * 0.45);
+                        
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'middle';
+                        
+                        const brandText1 = 'Daam';
+                        const brandText2 = 'Trace';
+                        
+                        // Draw "Daam"
+                        ctx.font = `bold ${Math.round(baseSize * 1.15)}px system-ui, -apple-system, sans-serif`;
+                        ctx.fillStyle = textColor;
+                        ctx.fillText(brandText1, textX, titleY);
+                        
+                        const width1 = ctx.measureText(brandText1).width;
+                        
+                        // Draw "Trace" in brand orange/theme primary
+                        ctx.fillStyle = themePrimaryColor;
+                        ctx.fillText(brandText2, textX + width1, titleY);
+                        
+                        // 4. Draw Subtitle "Bangladeshi commodity price tracker" (Row 2 - below logo and title)
+                        // Left-aligned with the logoX edge
+                        const subtitleY = logoY + logoSize + Math.round(baseSize * 0.48);
+                        
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = subColor;
+                        ctx.font = `500 ${Math.round(baseSize * 0.65)}px system-ui, -apple-system, sans-serif`;
+                        ctx.fillText('Bangladeshi commodity price tracker', logoX, subtitleY);
+                        
+                        // 5. Draw Domain Name "daam.pro.bd" on the right side of the header (aligned with Row 1)
+                        ctx.textAlign = 'right';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = domainColor;
+                        ctx.font = `500 ${Math.round(baseSize * 0.75)}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
+                        ctx.fillText('daam.pro.bd', w - padX, titleY);
+                        
+                        // 6. Draw a subtle, sleek separator line separating header from the chart
+                        ctx.beginPath();
+                        ctx.moveTo(padX, headerHeight - 12);
+                        ctx.lineTo(w - padX, headerHeight - 12);
+                        ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                        
+                        ctx.restore();
 
                         // Return blob
                         canvas.toBlob((blob) => {
