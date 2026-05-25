@@ -757,30 +757,38 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
         const selectedRow = finalChartData.find(row => row.date === selectedDate);
         const selectedDateShort = selectedRow?.dateShort;
 
-        if (series.length > 0 && selectedDateShort) {
+        if (series.length > 0) {
             const firstSeries = series.find(s => !s.id.endsWith('_ext')) || series[0];
-            firstSeries.markLine = {
-                symbol: ['none', 'none'],
-                silent: true,
-                label: {
-                    show: true,
-                    position: 'end',
-                    formatter: 'Selected',
-                    fontSize: 10,
-                    color: isDark ? '#cacecc' : '#313533',
-                    backgroundColor: isDark ? 'oklch(0.205 0 0)' : 'oklch(0.97 0 0)',
-                    padding: [2, 4],
-                    borderRadius: 4
-                },
-                lineStyle: {
-                    color: isDark ? '#a78bfa' : '#8b5cf6', // purple indicator line
-                    width: 1.5,
-                    type: 'dashed'
-                },
-                data: [
-                    { xAxis: selectedDateShort }
-                ]
-            };
+            if (selectedDateShort) {
+                firstSeries.markLine = {
+                    symbol: ['none', 'none'],
+                    silent: true,
+                    animation: false, // Turn off slide-up entry animation to prevent sluggish artifacts
+                    label: {
+                        show: true,
+                        position: 'end',
+                        formatter: 'Selected',
+                        fontSize: 10,
+                        color: isDark ? '#cacecc' : '#313533',
+                        backgroundColor: isDark ? 'oklch(0.205 0 0)' : 'oklch(0.97 0 0)',
+                        padding: [2, 4],
+                        borderRadius: 4
+                    },
+                    lineStyle: {
+                        color: isDark ? '#a78bfa' : '#8b5cf6', // purple indicator line
+                        width: 1.5,
+                        type: 'dashed'
+                    },
+                    data: [
+                        { xAxis: selectedDateShort }
+                    ]
+                };
+            } else {
+                // Explicitly clear markLine by setting empty data array
+                firstSeries.markLine = {
+                    data: []
+                };
+            }
         }
 
         const xAxisMode = getEffectiveResolution();
