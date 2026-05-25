@@ -87,7 +87,7 @@ const DateInput = ({ value, onChange, label, min, max }) => {
     );
 };
 
-const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, onStatsUpdate, normTargets }, ref) => {
+const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, onStatsUpdate, normTargets, selectedDate, onDateSelect, onSelectedDateDataChange }, ref) => {
     const { runQuery, loading: engineLoading } = useDuckDB();
     const echartsRef = useRef(null);
     const dataCache = useRef(new Map());
@@ -99,6 +99,45 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     const [isNormalizing, setIsNormalizing] = useState(false);
     const [finalChartData, setFinalChartData] = useState([]);
     const localHoveredRef = useRef(null); // Ref for lag-free tooltip updates
+
+    const finalChartDataRef = useRef(finalChartData);
+    useEffect(() => {
+        finalChartDataRef.current = finalChartData;
+    }, [finalChartData]);
+
+    const onDateSelectRef = useRef(onDateSelect);
+    useEffect(() => {
+        onDateSelectRef.current = onDateSelect;
+    }, [onDateSelect]);
+
+    const onSelectedDateDataChangeRef = useRef(onSelectedDateDataChange);
+    useEffect(() => {
+        onSelectedDateDataChangeRef.current = onSelectedDateDataChange;
+    }, [onSelectedDateDataChange]);
+
+    // Sync selected date prices with parent
+    useEffect(() => {
+        if (!selectedDate) {
+            onSelectedDateDataChangeRef.current?.(null);
+            return;
+        }
+        const matchedRow = finalChartData.find(row => row.date === selectedDate);
+        if (matchedRow) {
+            const prices = {};
+            items.forEach(item => {
+                const price = matchedRow[item.name] ?? matchedRow[`${item.name}_ext`];
+                prices[item.name] = price;
+            });
+            onSelectedDateDataChangeRef.current?.({
+                date: selectedDate,
+                dateShort: matchedRow.dateShort,
+                fullDate: matchedRow.fullDate,
+                prices
+            });
+        } else {
+            onSelectedDateDataChangeRef.current?.(null);
+        }
+    }, [selectedDate, finalChartData, items]);
 
     // Maintain color consistency
     const colorAssignmentsRef = useRef(new Map());
@@ -714,6 +753,36 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             }
         });
 
+        // Add a vertical markLine for the selected date on the first series
+        const selectedRow = finalChartData.find(row => row.date === selectedDate);
+        const selectedDateShort = selectedRow?.dateShort;
+
+        if (series.length > 0 && selectedDateShort) {
+            const firstSeries = series.find(s => !s.id.endsWith('_ext')) || series[0];
+            firstSeries.markLine = {
+                symbol: ['none', 'none'],
+                silent: true,
+                label: {
+                    show: true,
+                    position: 'end',
+                    formatter: 'Selected',
+                    fontSize: 10,
+                    color: isDark ? '#cacecc' : '#313533',
+                    backgroundColor: isDark ? 'oklch(0.205 0 0)' : 'oklch(0.97 0 0)',
+                    padding: [2, 4],
+                    borderRadius: 4
+                },
+                lineStyle: {
+                    color: isDark ? '#a78bfa' : '#8b5cf6', // purple indicator line
+                    width: 1.5,
+                    type: 'dashed'
+                },
+                data: [
+                    { xAxis: selectedDateShort }
+                ]
+            };
+        }
+
         const xAxisMode = getEffectiveResolution();
 
         return {
@@ -827,7 +896,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             animationEasing: 'cubicOut',
             animationEasingUpdate: 'cubicOut', // Smooth updates
         };
-    }, [items, finalChartData, getItemColor, hoveredItem, getEffectiveResolution, isDark, normTargets]);
+    }, [items, finalChartData, getItemColor, hoveredItem, getEffectiveResolution, isDark, normTargets, selectedDate]);
 
 
     // Manual Option Management for 'replaceMerge'
@@ -995,6 +1064,23 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     style={{ height: '100%', width: '100%' }}
                     onChartReady={(chart) => {
                         chart.setOption(option, { replaceMerge: ['series'] });
+
+                        // Register canvas click on zrender
+                        chart.getZr().on('click', (params) => {
+                            const zrX = params.event?.zrX ?? params.event?.offsetX ?? params.offsetX;
+                            const zrY = params.event?.zrY ?? params.event?.offsetY ?? params.offsetY;
+                            const pointInPixel = [zrX, zrY];
+
+                            if (chart.containPixel('grid', pointInPixel)) {
+                                const pointInData = chart.convertFromPixel('grid', pointInPixel);
+                                const xIndex = Math.round(pointInData[0]);
+                                const data = finalChartDataRef.current;
+                                if (xIndex >= 0 && xIndex < data.length) {
+                                    const dateItem = data[xIndex];
+                                    onDateSelectRef.current?.(dateItem.date);
+                                }
+                            }
+                        });
                     }}
                     onEvents={{
                         'mousemove': (params) => {

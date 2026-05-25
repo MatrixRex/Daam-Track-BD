@@ -45,13 +45,13 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                         onMouseEnter={() => !isDeleting && onHover(item.name)}
                         onMouseLeave={() => !isDeleting && onHover(null)}
                         className={clsx(
-                            "flex items-center gap-3 p-3 bg-muted rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out group cursor-pointer relative overflow-hidden",
+                            "flex items-center gap-3 p-3 bg-muted rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out group cursor-pointer relative overflow-hidden h-[68px]",
                             "ring-2 border",
                             isSelected 
                                 ? "ring-ring border-transparent bg-accent translate-x-1.5 shadow-md" 
                                 : "ring-transparent hover:ring-ring/35 border-border hover:border-transparent hover:translate-x-0.5",
                             isDeleting 
-                                ? "opacity-0 -translate-x-full !max-h-0 !p-0 !m-0 !border-0 !shadow-none pointer-events-none scale-y-0 duration-200 ease-in-out"
+                                ? "opacity-0 -translate-x-full !max-h-0 !h-0 !p-0 !m-0 !border-0 !shadow-none pointer-events-none scale-y-0 duration-200 ease-in-out"
                                 : "max-h-[200px] opacity-100 scale-y-100 motion-preset-fade motion-duration-200"
                         )}
                         style={{ 
@@ -82,12 +82,16 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                                     / {unitLabel}
                                 </span>
                             </div>
-                            {(itemStat?.change ?? 0) > 0 && (
-                                <div className="w-full h-0.5 rounded-full bg-red-400/60 mt-1.5" />
-                            )}
-                            {(itemStat?.change ?? 0) < 0 && (
-                                <div className="w-full h-0.5 rounded-full bg-green-400/60 mt-1.5" />
-                            )}
+                            <div 
+                              className={clsx(
+                                "w-full h-0.5 rounded-full mt-1.5 transition-colors duration-300",
+                                (itemStat?.change ?? 0) > 0 
+                                  ? "bg-red-400/60" 
+                                  : (itemStat?.change ?? 0) < 0 
+                                    ? "bg-green-400/60" 
+                                    : "bg-transparent"
+                              )} 
+                            />
                         </div>
 
                         {/* Delete button */}

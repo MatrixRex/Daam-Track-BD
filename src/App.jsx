@@ -13,6 +13,7 @@ import { Toaster, toast } from 'sonner';
 import CommandBar from './components/CommandBar';
 import StatsSidebar from './components/StatsSidebar';
 import ItemDetailsPanel from './components/ItemDetailsPanel';
+import SelectedDatePanel from './components/SelectedDatePanel';
 import { ChevronRight, Scale } from 'lucide-react';
 import clsx from 'clsx';
 import { getNormalizedPrice } from './utils/quantityUtils';
@@ -44,6 +45,8 @@ function App() {
   const [isSorted, setIsSorted] = useState(true);
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
   const [selectedDetailItemName, setSelectedDetailItemName] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDateData, setSelectedDateData] = useState(null);
   const [normTargets, setNormTargets] = useState({
     mass: 1,
     volume: 1,
@@ -52,6 +55,25 @@ function App() {
   });
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [deletingItems, setDeletingItems] = useState([]);
+
+  const leftScrollRef = useRef(null);
+  const rightScrollRef = useRef(null);
+
+  const handleLeftScroll = () => {
+    if (leftScrollRef.current && rightScrollRef.current) {
+      if (rightScrollRef.current.scrollTop !== leftScrollRef.current.scrollTop) {
+        rightScrollRef.current.scrollTop = leftScrollRef.current.scrollTop;
+      }
+    }
+  };
+
+  const handleRightScroll = () => {
+    if (leftScrollRef.current && rightScrollRef.current) {
+      if (leftScrollRef.current.scrollTop !== rightScrollRef.current.scrollTop) {
+        leftScrollRef.current.scrollTop = rightScrollRef.current.scrollTop;
+      }
+    }
+  };
 
   const chartRef = useRef(null);
 
@@ -174,6 +196,8 @@ function App() {
 
     // Clear detail panel immediately
     setSelectedDetailItemName(null);
+    setSelectedDate(null);
+    setSelectedDateData(null);
 
     const itemsToClear = [...sortedItems]; // Use sortedItems to respect visual bottom-to-top layout!
     const delayStep = 35; // Speed up delay to 35ms for an extremely snappy feel
@@ -406,12 +430,18 @@ function App() {
                 setHoveredItem={setHoveredItem}
                 onStatsUpdate={handleStatsUpdate}
                 normTargets={normTargets.enabled ? normTargets : null}
+                selectedDate={selectedDate}
+                onDateSelect={(date) => {
+                  setSelectedDate(date);
+                  setSelectedDetailItemName(null);
+                }}
+                onSelectedDateDataChange={setSelectedDateData}
               />
             </div>
 
             {/* Column 2: Stats Sidebar (20%) */}
             <div className="lg:col-span-1 flex flex-col gap-4 min-h-0 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-4 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
+              <div className="flex items-center justify-between px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">Items</h3>
                 <div className="flex items-center gap-1">
                   <div className="group/clear flex items-center bg-background rounded-lg p-0.5 border border-border transition-all duration-300">
@@ -464,7 +494,11 @@ function App() {
               </div>
             </div>
             
-            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2 pt-1.5">
+            <div 
+              ref={leftScrollRef}
+              onScroll={handleLeftScroll}
+              className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2 pt-1.5"
+            >
                 <StatsSidebar
                   items={sortedItems}
                   stats={Object.values(itemStats)}
@@ -473,7 +507,10 @@ function App() {
                   onRemove={(item) => handleRemoveItem(item.name)}
                   onHover={setHoveredItem}
                   selectedItemName={selectedDetailItemName}
-                  onSelect={(name) => setSelectedDetailItemName(prev => prev === name ? null : name)}
+                  onSelect={(name) => {
+                    setSelectedDetailItemName(prev => prev === name ? null : name);
+                    setSelectedDate(null);
+                  }}
                   deletingItems={deletingItems}
                 />
               </div>
@@ -481,11 +518,21 @@ function App() {
 
             {/* Column 3: Details Panel (20%) */}
             <div className="flex flex-col gap-4 min-h-0 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-4 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
-                <h3 className="text-sm font-bold text-foreground">Details</h3>
-                {selectedDetailItemName && (
+              <div className="flex items-center justify-between px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
+                <h3 className="text-sm font-bold text-foreground">
+                  {selectedDetailItemName 
+                    ? "Details" 
+                    : selectedDateData 
+                      ? `Prices (${selectedDateData.dateShort})` 
+                      : "Details"}
+                </h3>
+                {(selectedDetailItemName || selectedDate) && (
                   <button
-                    onClick={() => setSelectedDetailItemName(null)}
+                    onClick={() => {
+                      setSelectedDetailItemName(null);
+                      setSelectedDate(null);
+                      setSelectedDateData(null);
+                    }}
                     className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-muted-foreground hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                   >
                     <Trash2 size={12} />
@@ -493,11 +540,39 @@ function App() {
                   </button>
                 )}
               </div>
-              <ItemDetailsPanel
-                item={selectedItems.find(i => i.name === selectedDetailItemName)}
-                stats={itemStats[selectedDetailItemName]}
-                normTargets={normTargets.enabled ? normTargets : null}
-              />
+              {selectedDetailItemName ? (
+                <ItemDetailsPanel
+                  item={selectedItems.find(i => i.name === selectedDetailItemName)}
+                  stats={itemStats[selectedDetailItemName]}
+                  normTargets={normTargets.enabled ? normTargets : null}
+                />
+              ) : selectedDateData ? (
+                <div 
+                  ref={rightScrollRef} 
+                  onScroll={handleRightScroll}
+                  className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2 pt-1.5"
+                >
+                  <SelectedDatePanel
+                    items={sortedItems}
+                    dateData={selectedDateData}
+                    colors={COLORS}
+                    normTargets={normTargets.enabled ? normTargets : null}
+                    onSelect={(name) => {
+                      setSelectedDetailItemName(name);
+                      setSelectedDate(null);
+                      setSelectedDateData(null);
+                    }}
+                    onHover={setHoveredItem}
+                    deletingItems={deletingItems}
+                  />
+                </div>
+              ) : (
+                <ItemDetailsPanel
+                  item={null}
+                  stats={null}
+                  normTargets={normTargets.enabled ? normTargets : null}
+                />
+              )}
             </div>
 
           </div>
