@@ -9,8 +9,10 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
     // Delay popup visibility but hide instantly on mouse leave (item === null)
     useEffect(() => {
         if (!item) {
-            setActiveData(null);
-            return;
+            const clearTimer = setTimeout(() => {
+                setActiveData(null);
+            }, 0);
+            return () => clearTimeout(clearTimer);
         }
 
         const timer = setTimeout(() => {

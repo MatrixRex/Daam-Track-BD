@@ -9,20 +9,21 @@ import { Loader2, AlertCircle, Calendar } from 'lucide-react';
 const useAnimatedDomain = (targetDomain, onAnimationComplete) => {
   const [currentDomain, setCurrentDomain] = useState(targetDomain);
   const animationRef = useRef(null);
-  const isAnimatingRef = useRef(false);
+
+  const targetMin = targetDomain[0];
+  const targetMax = targetDomain[1];
 
   useEffect(() => {
-    if (!isFinite(targetDomain[0]) || !isFinite(targetDomain[1])) return;
+    if (!isFinite(targetMin) || !isFinite(targetMax)) return;
 
     const start = currentDomain;
-    const end = targetDomain;
+    const end = [targetMin, targetMax];
 
     if (Math.abs(start[0] - end[0]) < 1 && Math.abs(start[1] - end[1]) < 1) {
       setCurrentDomain(end);
       return;
     }
 
-    isAnimatingRef.current = true;
     const startTime = performance.now();
     const duration = 600;
 
@@ -39,7 +40,6 @@ const useAnimatedDomain = (targetDomain, onAnimationComplete) => {
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
-        isAnimatingRef.current = false;
         if (onAnimationComplete) onAnimationComplete();
       }
     };
@@ -49,9 +49,10 @@ const useAnimatedDomain = (targetDomain, onAnimationComplete) => {
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [targetDomain[0], targetDomain[1]]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetMin, targetMax]);
 
-  return { currentDomain, isAnimating: isAnimatingRef.current };
+  return { currentDomain };
 };
 
 // Helper to get date string in YYYY-MM-DD format
@@ -368,6 +369,7 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
       };
       fetchAll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, engineLoading, fetchItemData, buildChartData]);
 
   // Generate all dates in range and fill with data

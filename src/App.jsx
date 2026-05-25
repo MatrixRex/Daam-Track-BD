@@ -10,14 +10,12 @@ import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown, Downloa
 import { useMemo } from 'react';
 import { DATA_BASE_URL } from './config';
 import { Toaster, toast } from 'sonner';
-import ItemHoverCard from './components/ItemHoverCard';
-import ItemDetailModal from './components/ItemDetailModal';
 import CommandBar from './components/CommandBar';
 import StatsSidebar from './components/StatsSidebar';
 import ItemDetailsPanel from './components/ItemDetailsPanel';
 import { ChevronRight, Scale } from 'lucide-react';
 import clsx from 'clsx';
-import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from './utils/quantityUtils';
+import { getNormalizedPrice } from './utils/quantityUtils';
 
 // Extended color palette for unlimited comparisons
 const COLORS = [
@@ -45,10 +43,6 @@ function App() {
   const [itemStats, setItemStats] = useState({});
   const [isSorted, setIsSorted] = useState(true);
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
-  const [hoveredItemObj, setHoveredItemObj] = useState(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [sideRect, setSideRect] = useState(null);
-  const [detailItem, setDetailItem] = useState(null);
   const [selectedDetailItemName, setSelectedDetailItemName] = useState(null);
   const [normTargets, setNormTargets] = useState({
     mass: 1,
@@ -59,7 +53,6 @@ function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [deletingItems, setDeletingItems] = useState([]);
 
-  const compareListRef = useRef(null);
   const chartRef = useRef(null);
 
   // 1a. Fetch Product Catalog (Meta Index)
@@ -79,10 +72,7 @@ function App() {
       });
   }, []);
 
-  // Detect touch device to disable hover
-  const isTouchDevice = useMemo(() => {
-    return (typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
-  }, []);
+
 
   // Optimize stats update to prevent infinite loops if reference unstable
   const handleStatsUpdate = useCallback((newStats) => {
@@ -166,9 +156,6 @@ function App() {
   // Remove item from comparison
   const handleRemoveItem = useCallback((itemName) => {
     // Clear detail panel and hover state immediately for a snappier feel
-    if (hoveredItemObj?.name === itemName) {
-      setHoveredItemObj(null);
-    }
     if (selectedDetailItemName === itemName) {
       setSelectedDetailItemName(null);
     }
@@ -179,7 +166,7 @@ function App() {
       setSelectedItems(prev => prev.filter(i => i.name !== itemName));
       setDeletingItems(prev => prev.filter(name => name !== itemName));
     }, 200); // 200ms duration for exit animation (snappier!)
-  }, [hoveredItemObj, selectedDetailItemName]);
+  }, [selectedDetailItemName]);
 
   // Clear all items with a staggered cascade delete effect from bottom to top
   const handleClearAll = useCallback(() => {
@@ -523,20 +510,7 @@ function App() {
       <BuildInfo />
       <Toaster position="bottom-right" theme="system" />
 
-      {/* Hover & Details Overlay Components */}
-      <ItemHoverCard
-        item={hoveredItemObj}
-        mousePos={mousePos}
-        sideRect={sideRect}
-        normTargets={normTargets.enabled ? normTargets : null}
-        stats={hoveredItemObj ? itemStats[hoveredItemObj.name] : null}
-      />
-      <ItemDetailModal
-        item={detailItem}
-        onClose={() => setDetailItem(null)}
-        normTargets={normTargets.enabled ? normTargets : null}
-        stats={detailItem ? itemStats[detailItem.name] : null}
-      />
+
     </div>
   );
 }

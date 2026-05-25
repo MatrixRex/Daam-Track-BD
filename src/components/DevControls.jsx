@@ -9,13 +9,13 @@ import { Database, FolderOpen, Zap, Plus } from 'lucide-react';
  * 2. Quick Add random items for testing chart/UI limits
  */
 function DevControls({ allItems = [], selectedItems = [], onAddItems }) {
-    // Only render in development
-    if (!import.meta.env.DEV) return null;
-
     const [addCount, setAddCount] = useState(5);
     const [useRemote, setUseRemote] = useState(() => {
         return localStorage.getItem('useRemoteData') === 'true';
     });
+
+    // Only render in development
+    if (!import.meta.env.DEV) return null;
 
     const toggleSource = () => {
         const newValue = !useRemote;

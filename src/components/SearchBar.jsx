@@ -82,8 +82,10 @@ export default function SearchBar({
     // 5. Observe dropdown content height changes to animate container size
     useEffect(() => {
         if (!isOpen || results.length === 0) {
-            setDropdownHeight(0);
-            return;
+            const clearTimer = setTimeout(() => {
+                setDropdownHeight(0);
+            }, 0);
+            return () => clearTimeout(clearTimer);
         }
 
         const resizeObserver = new ResizeObserver((entries) => {
