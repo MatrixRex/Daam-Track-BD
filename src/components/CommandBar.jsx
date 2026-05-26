@@ -182,7 +182,7 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
     ];
 
     return (
-        <div className="flex items-center gap-2 md:gap-4 px-2 md:px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm transition-all duration-300 motion-preset-fade motion-duration-300">
+        <div className="flex items-center gap-2 md:gap-4 px-2 md:px-4 h-12 md:h-16 bg-muted border border-border rounded-2xl shadow-sm transition-all duration-300 motion-preset-fade motion-duration-300">
             {/* Normalization Toggle */}
             <div className={clsx(
                 "flex items-center gap-2 md:gap-3",
