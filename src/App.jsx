@@ -228,7 +228,7 @@ function App() {
     <div className="min-h-screen bg-background font-sans text-foreground transition-colors duration-300">
 
       {/* --- HEADER SECTION --- */}
-      <div className="bg-muted border-b border-border shadow-sm sticky top-0 z-30 transition-colors duration-300 motion-preset-fade motion-duration-300">
+      <div className="bg-muted border-b border-border shadow-sm sticky top-0 z-50 transition-colors duration-300 motion-preset-fade motion-duration-300">
         <div className="relative mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between md:grid md:grid-cols-3 gap-4">
 
           {/* Logo */}
@@ -296,7 +296,7 @@ function App() {
                 {isExportOpen && (
                 <div className="absolute right-0 z-50 pointer-events-none" style={{ top: 'calc(100% - 20px)' }}>
                   <div className="pt-7 pointer-events-auto">
-                  <div className="w-56 bg-muted rounded-xl shadow-xl border border-border py-1 motion-preset-blur-down motion-duration-200 pointer-events-auto">
+                   <div className="w-56 bg-muted rounded-xl shadow-xl border border-border py-1 motion-preset-blur-down motion-duration-200 pointer-events-auto">
                   <div className="px-3 py-2 border-b border-border/50">
                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Export As</span>
                   </div>

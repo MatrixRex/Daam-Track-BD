@@ -133,8 +133,87 @@ export default function SearchBar({
         const [, info, order] = uf.search(haystack, cleanQuery, 5);
 
         if (order && order.length > 0) {
-            // Retrieve matched items using the sorted order double-indirection indices
-            return order.map(infoIdx => items[info.idx[infoIdx]]).slice(0, 24);
+            // Retrieve all matched items
+            const matchedItems = order.map(infoIdx => items[info.idx[infoIdx]]);
+            
+            const queryWords = cleanQuery.toLowerCase().split(/\s+/).filter(Boolean);
+            
+            const scoredItems = matchedItems.map(item => {
+                const nameLower = item.name.toLowerCase();
+                const nameWords = nameLower.split(/[^a-z0-9]+/i).filter(Boolean);
+                
+                let matchedLength = 0;
+                let exactMatches = 0;
+                const nameWordsMatched = new Array(nameWords.length).fill(false);
+                
+                for (const qw of queryWords) {
+                    let bestScore = 0;
+                    let bestIdx = -1;
+                    
+                    for (let i = 0; i < nameWords.length; i++) {
+                        if (nameWordsMatched[i]) continue;
+                        const nw = nameWords[i];
+                        
+                        let score = 0;
+                        if (nw === qw) {
+                            score = 1.0;
+                        } else if (nw.startsWith(qw)) {
+                            score = 0.9 * (qw.length / nw.length);
+                        } else if (qw.startsWith(nw)) {
+                            score = 0.8 * (nw.length / qw.length);
+                        } else if (nw.includes(qw)) {
+                            score = 0.5 * (qw.length / nw.length);
+                        }
+                        
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestIdx = i;
+                        }
+                    }
+                    
+                    if (bestScore > 0) {
+                        nameWordsMatched[bestIdx] = true;
+                        matchedLength += nameWords[bestIdx].length * bestScore;
+                        if (bestScore === 1.0) exactMatches++;
+                    }
+                }
+                
+                const totalNameLength = nameWords.reduce((sum, w) => sum + w.length, 0);
+                const nameCoverage = totalNameLength > 0 ? (matchedLength / totalNameLength) : 0;
+                
+                const totalQueryLength = queryWords.reduce((sum, w) => sum + w.length, 0);
+                const queryCoverage = totalQueryLength > 0 ? (matchedLength / totalQueryLength) : 0;
+                
+                // Combined match score (60% weight on name coverage, 40% on query coverage)
+                let score = nameCoverage * 0.6 + queryCoverage * 0.4;
+                
+                // Boost for matching words in name exactly (even out of order)
+                if (exactMatches === queryWords.length && nameWords.length === queryWords.length) {
+                    score += 2.0;
+                } else if (exactMatches === queryWords.length) {
+                    score += 1.0;
+                }
+                
+                // Tie-breaker boost for matches starting earlier in the name
+                let firstMatchIdx = -1;
+                for (let i = 0; i < nameWords.length; i++) {
+                    if (nameWordsMatched[i]) {
+                        firstMatchIdx = i;
+                        break;
+                    }
+                }
+                if (firstMatchIdx !== -1) {
+                    score += 0.05 * (1 - (firstMatchIdx / nameWords.length));
+                }
+                
+                return { item, score };
+            });
+            
+            // Sort by score descending and return top 24
+            return scoredItems
+                .sort((a, b) => b.score - a.score)
+                .map(entry => entry.item)
+                .slice(0, 24);
         }
         return [];
     }, [query, uf, haystack, items]);
