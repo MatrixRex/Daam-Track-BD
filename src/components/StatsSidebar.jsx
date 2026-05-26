@@ -34,19 +34,19 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                     ? Math.round(getNormalizedPrice(currentRawPrice, item.unit, normTargets))
                     : currentRawPrice;
                 
-                const hasSelectedPrice = selectedDateData && selectedDateData[item.name] !== undefined;
-                const selectedRawPrice = hasSelectedPrice ? selectedDateData[item.name] : currentRawPrice;
+                const hasSelectedPrice = selectedDateData && selectedDateData.prices && selectedDateData.prices[item.name] !== undefined;
+                const selectedRawPrice = hasSelectedPrice ? selectedDateData.prices[item.name] : currentRawPrice;
                 const selectedPrice = normTargets?.enabled
                     ? Math.round(getNormalizedPrice(selectedRawPrice, item.unit, normTargets))
                     : selectedRawPrice;
-
+ 
                 const unitLabel = normTargets?.enabled
                     ? getTargetUnitLabel(parseUnit(item.unit).type, normTargets[parseUnit(item.unit).type], item.unit)
                     : item.unit;
-
+ 
                 const isComparisonMode = !!selectedDateData;
                 const priceDiff = currentPrice - selectedPrice;
-
+ 
                 return (
                     <div
                         key={`${item.name}-${normTargets?.enabled ? 'norm' : 'raw'}`}
@@ -79,27 +79,29 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                             imgClassName="mix-blend-multiply dark:mix-blend-normal dark:brightness-110"
                             fallbackSize="text-sm"
                         />
-
+ 
                         {/* Info Section */}
                         <div className="flex-1 min-w-0">
                             <h4 className="text-xs font-bold text-foreground truncate">
                                 {item.name}
                             </h4>
-                            <div className="flex items-baseline justify-between mt-0.5 flex-wrap gap-x-2">
-                                <div className="flex items-center gap-1">
-                                    <span className="text-sm font-black text-foreground">
-                                        ৳{isComparisonMode ? selectedPrice : currentPrice}
+                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                <span className="text-sm font-black text-foreground">
+                                    ৳{isComparisonMode ? selectedPrice : currentPrice}
+                                </span>
+                                
+                                {isComparisonMode && (
+                                    <span className="text-[10px] font-bold text-muted-foreground/80">
+                                        (Cur: ৳{currentPrice})
                                     </span>
-                                    <span className="text-[10px] font-bold text-muted-foreground">
-                                        / {unitLabel}
-                                    </span>
-                                </div>
+                                )}
+                                
+                                <span className="text-[10px] font-bold text-muted-foreground">
+                                    / {unitLabel}
+                                </span>
 
                                 {isComparisonMode && (
-                                    <div className="flex items-center gap-1 text-[10px] font-bold shrink-0">
-                                        <span className="text-muted-foreground/80">
-                                            Cur: ৳{currentPrice}
-                                        </span>
+                                    <div className="flex items-center gap-1 text-[10px] font-bold shrink-0 ml-1">
                                         {priceDiff > 0 ? (
                                             <span className="text-red-500 bg-red-500/10 dark:bg-red-500/20 px-1 rounded flex items-center gap-0.5">
                                                 ▲ ৳{priceDiff}
