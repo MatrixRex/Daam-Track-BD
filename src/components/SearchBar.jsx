@@ -129,12 +129,15 @@ export default function SearchBar({
             return [];
         }
 
-        // Perform the search with outOfOrder = 5 and high thresholds to prevent null order on short queries
-        const [, info, order] = uf.search(haystack, cleanQuery, 5, 10000, 10000);
+        // Perform the search with outOfOrder = 5 using uFuzzy's default optimized thresholds
+        const [idx, info, order] = uf.search(haystack, cleanQuery, 5);
 
-        if (order && order.length > 0) {
+        // Fallback to raw match indices (idx) if uFuzzy's infoThresh/sortThresh (default 100) is exceeded and returns order = null
+        const matchedIndices = order ? order.map(infoIdx => info.idx[infoIdx]) : idx;
+
+        if (matchedIndices && matchedIndices.length > 0) {
             // Retrieve all matched items
-            const matchedItems = order.map(infoIdx => items[info.idx[infoIdx]]);
+            const matchedItems = matchedIndices.map(infoIdx => items[infoIdx]);
             
             const queryWords = cleanQuery.toLowerCase().split(/\s+/).filter(Boolean);
             
