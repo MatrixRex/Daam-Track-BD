@@ -142,7 +142,7 @@ const UI_TRANSLATIONS = {
     count: "সংখ্যা",
     
     // Search Bar
-    searchPlaceholder: "ডিম, চাল, পেঁয়াজ খুঁজুন...",
+    searchPlaceholder: "eggs, rice, beef খুঁজুন...",
     loadingProducts: "পণ্য লোড হচ্ছে...",
     selected: "নির্বাচিত",
     latest: "সর্বশেষ",
@@ -152,9 +152,9 @@ const UI_TRANSLATIONS = {
     // Empty State
     comparePricesTitle: "মূল্য ও ট্রেন্ড তুলনা করুন",
     comparePricesDesc: "পণ্যসমূহের দামের ইতিহাস দেখতে, মূল্য বৃদ্ধির গতিবিধি ট্র্যাক করতে এবং সঠিক কেনাকাটার সিদ্ধান্ত নিতে সার্চবার থেকে পণ্য নির্বাচন করুন।",
-    tryRice: 'চেষ্টা করুন "চাল"',
-    tryEgg: 'চেষ্টা করুন "ডিম"',
-    tryOnion: 'চেষ্টা করুন "পেঁয়াজ"',
+    tryRice: 'চেষ্টা করুন "Rice"',
+    tryEgg: 'চেষ্টা করুন "Egg"',
+    tryOnion: 'চেষ্টা করুন "Onion"',
     
     // Insights
     productInsights: "পণ্য বিশ্লেষণ",
