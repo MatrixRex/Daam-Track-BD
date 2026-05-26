@@ -1,7 +1,153 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { RotateCcw, Scale, Droplet, Hash } from 'lucide-react';
 import clsx from 'clsx';
 import Tooltip from './Tooltip';
+
+function DraggableNumericInput({ id, value, onChange, unit }) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const inputRef = useRef(null);
+    const startXRef = useRef(0);
+    const startValueRef = useRef(0);
+    const hasMovedRef = useRef(false);
+    const isDraggingRef = useRef(false);
+
+    useEffect(() => {
+        if (isEditing && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isEditing]);
+
+    const handleMouseDown = (e) => {
+        startXRef.current = e.clientX;
+        startValueRef.current = value;
+        hasMovedRef.current = false;
+        isDraggingRef.current = true;
+        setIsDragging(true);
+
+        const handleMouseMove = (moveEvent) => {
+            if (!isDraggingRef.current) return;
+            const deltaX = moveEvent.clientX - startXRef.current;
+            if (Math.abs(deltaX) > 5) {
+                hasMovedRef.current = true;
+            }
+
+            if (hasMovedRef.current) {
+                let newValue;
+                if (id === 'count') {
+                    const change = Math.round(deltaX / 8);
+                    newValue = Math.max(1, startValueRef.current + change);
+                } else {
+                    const change = parseFloat((deltaX / 80).toFixed(1));
+                    newValue = parseFloat(Math.max(0.1, startValueRef.current + change).toFixed(1));
+                }
+                onChange(newValue);
+            }
+        };
+
+        const handleMouseUp = () => {
+            isDraggingRef.current = false;
+            setIsDragging(false);
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+
+            if (!hasMovedRef.current) {
+                setIsEditing(true);
+            }
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    };
+
+    const handleTouchStart = (e) => {
+        const touch = e.touches[0];
+        startXRef.current = touch.clientX;
+        startValueRef.current = value;
+        hasMovedRef.current = false;
+        isDraggingRef.current = true;
+        setIsDragging(true);
+    };
+
+    const handleTouchMove = (e) => {
+        if (!isDraggingRef.current) return;
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - startXRef.current;
+        
+        if (Math.abs(deltaX) > 5) {
+            hasMovedRef.current = true;
+        }
+
+        if (hasMovedRef.current) {
+            if (e.cancelable) e.preventDefault();
+            let newValue;
+            if (id === 'count') {
+                const change = Math.round(deltaX / 8);
+                newValue = Math.max(1, startValueRef.current + change);
+            } else {
+                const change = parseFloat((deltaX / 80).toFixed(1));
+                newValue = parseFloat(Math.max(0.1, startValueRef.current + change).toFixed(1));
+            }
+            onChange(newValue);
+        }
+    };
+
+    const handleTouchEnd = () => {
+        isDraggingRef.current = false;
+        setIsDragging(false);
+        if (!hasMovedRef.current) {
+            setIsEditing(true);
+        }
+    };
+
+    if (isEditing) {
+        return (
+            <div className="flex items-center bg-background border border-ring rounded-lg px-1.5 py-0.5 md:px-2 md:py-1 shadow-[0_0_8px_rgba(253,143,0,0.2)] animate-in zoom-in-95 duration-100">
+                <input
+                    ref={inputRef}
+                    type="number"
+                    value={value}
+                    onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+                    onBlur={() => setIsEditing(false)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            setIsEditing(false);
+                        }
+                    }}
+                    className="w-10 md:w-12 bg-transparent text-sm font-bold text-foreground outline-none text-center"
+                    step="any"
+                    min="0"
+                />
+                <span className="text-[10px] font-bold text-muted-foreground ml-1">{unit}</span>
+            </div>
+        );
+    }
+
+    return (
+        <div
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{ touchAction: 'none' }}
+            className={clsx(
+                "flex items-center bg-background border rounded-lg px-1.5 py-0.5 md:px-2 md:py-1 cursor-ew-resize select-none transition-all duration-150",
+                isDragging 
+                    ? "border-primary/50 bg-primary/5 shadow-[0_0_8px_rgba(253,143,0,0.2)] scale-[1.04]" 
+                    : "border-border hover:border-ring hover:bg-accent/40 active:scale-[0.98]"
+            )}
+            title="Drag horizontally to adjust, tap to type"
+        >
+            <span className="w-10 md:w-12 text-sm font-bold text-foreground text-center">
+                {value}
+            </span>
+            <span className="text-[10px] font-bold text-muted-foreground ml-1">
+                {unit}
+            </span>
+        </div>
+    );
+}
 
 export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) {
     const categories = [
@@ -45,17 +191,12 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
                         <div key={cat.id} className="flex items-center gap-1.5 md:gap-2 group">
                             <cat.icon className="hidden md:block w-4 h-4 text-muted-foreground" />
                             <span className="hidden md:inline text-xs font-bold text-muted-foreground uppercase tracking-wider">{cat.label}</span>
-                            <div className="flex items-center bg-background border border-border rounded-lg px-1.5 py-0.5 md:px-2 md:py-1 focus-within:border-ring transition-all">
-                                <input
-                                    type="number"
-                                    value={normTargets[cat.id]}
-                                    onChange={(e) => onUpdateNorm({ ...normTargets, [cat.id]: parseFloat(e.target.value) || 0 })}
-                                    className="w-10 md:w-12 bg-transparent text-sm font-bold text-foreground outline-none text-center"
-                                    step="any"
-                                    min="0"
-                                 />
-                                <span className="text-[10px] font-bold text-muted-foreground ml-1">{cat.unit}</span>
-                            </div>
+                            <DraggableNumericInput
+                                id={cat.id}
+                                value={normTargets[cat.id]}
+                                unit={cat.unit}
+                                onChange={(newValue) => onUpdateNorm({ ...normTargets, [cat.id]: newValue })}
+                            />
                         </div>
                     ))}
                 </div>
