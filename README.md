@@ -1,6 +1,6 @@
-# DaamTrace 🇧🇩
+# দাম কত (DaamKoto) 🇧🇩
 
-DaamTrace is an open-source research project dedicated to tracking and visualizing commodity prices in Bangladesh over long periods. The goal is to build a transparent, historical record of daily necessities—such as rice, vegetables, fish, and other essentials—to analyze inflation trends and market volatility.
+দাম কত (DaamKoto) is an open-source research project dedicated to tracking and visualizing commodity prices in Bangladesh over long periods. The goal is to build a transparent, historical record of daily necessities—such as rice, vegetables, fish, and other essentials—to analyze inflation trends and market volatility.
 
 ![alt text](showcase_dark.jpg)
 

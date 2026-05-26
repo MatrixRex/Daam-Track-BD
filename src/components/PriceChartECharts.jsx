@@ -488,23 +488,23 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         ctx.lineJoin = 'round';
                         ctx.stroke();
                         
-                        // 3. Draw Brand Name "DaamTrace" (Row 1 - next to logo)
+                        // 3. Draw Brand Name "দাম কত" (Row 1 - next to logo)
                         const textX = logoX + logoSize + Math.round(baseSize * 0.45);
                         
                         ctx.textAlign = 'left';
                         ctx.textBaseline = 'middle';
                         
-                        const brandText1 = 'Daam';
-                        const brandText2 = 'Trace';
+                        const brandText1 = 'দাম ';
+                        const brandText2 = 'কত';
                         
-                        // Draw "Daam"
+                        // Draw "দাম "
                         ctx.font = `bold ${Math.round(baseSize * 1.15)}px system-ui, -apple-system, sans-serif`;
                         ctx.fillStyle = textColor;
                         ctx.fillText(brandText1, textX, titleY);
                         
                         const width1 = ctx.measureText(brandText1).width;
                         
-                        // Draw "Trace" in brand orange/theme primary
+                        // Draw "কত" in brand orange/theme primary
                         ctx.fillStyle = themePrimaryColor;
                         ctx.fillText(brandText2, textX + width1, titleY);
                         

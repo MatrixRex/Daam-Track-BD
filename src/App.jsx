@@ -302,7 +302,7 @@ function App() {
                   ? "w-0 opacity-0 md:w-auto md:opacity-100 text-xl sm:text-2xl" 
                   : "max-w-[200px] opacity-100 text-xl sm:text-2xl"
               )}>
-                Daam<span className="text-primary">Trace</span>
+                দাম <span className="text-primary">কত</span>
               </h1>
             </div>
 
