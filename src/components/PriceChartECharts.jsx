@@ -87,7 +87,7 @@ const DateInput = ({ value, onChange, label, min, max }) => {
     );
 };
 
-const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate, normTargets, selectedDate, onDateSelect, onSelectedDateDataChange }, ref) => {
+const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate, normTargets, selectedDate, onDateSelect, onSelectedDateDataChange, onDateRangeChange }, ref) => {
     const { runQuery, loading: engineLoading } = useDuckDB();
     const echartsRef = useRef(null);
     const dataCache = useRef(new Map());
@@ -153,6 +153,11 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     const [startDate, setStartDate] = useState(defaultRange.start);
     const [endDate, setEndDate] = useState(defaultRange.end);
     const today = getTodayDate();
+
+    // Sync date range back to parent
+    useEffect(() => {
+        onDateRangeChange?.({ start: startDate, end: endDate });
+    }, [startDate, endDate, onDateRangeChange]);
 
     // Resolution & Aggregation State
     const [resolution, setResolution] = useState('auto'); // 'auto', 'daily', 'weekly', 'monthly', 'yearly'

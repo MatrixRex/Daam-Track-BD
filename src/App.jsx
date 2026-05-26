@@ -35,6 +35,43 @@ const COLORS = [
   { stroke: '#A855F7', fill: '#A855F7' }, // Violet
 ];
 
+const EditableDateHeader = ({ selectedDate, selectedDateData, minDate, maxDate, onChange }) => {
+  const inputRef = useRef(null);
+
+  if (!selectedDateData) return null;
+
+  const handleHeaderClick = (e) => {
+    e.stopPropagation();
+    if (inputRef.current) {
+      inputRef.current.showPicker?.();
+    }
+  };
+
+  return (
+    <div 
+      onClick={handleHeaderClick}
+      className="inline-flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors duration-150 group relative"
+      title="Click to change date"
+    >
+      <span>Prices ({selectedDateData.dateShort})</span>
+      <span className="text-[10px] text-muted-foreground/60 group-hover:text-primary transition-colors">✎</span>
+      <input
+        ref={inputRef}
+        type="date"
+        value={selectedDate || ''}
+        onChange={(e) => {
+          if (e.target.value) {
+            onChange(e.target.value);
+          }
+        }}
+        min={minDate}
+        max={maxDate}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer pointer-events-auto"
+      />
+    </div>
+  );
+};
+
 function App() {
   // 1. Start DuckDB in background
   useDuckDB();
@@ -48,6 +85,10 @@ function App() {
   const [selectedDetailItemName, setSelectedDetailItemName] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDateData, setSelectedDateData] = useState(null);
+  const [chartDateRange, setChartDateRange] = useState({
+    start: '2025-11-30',
+    end: new Date().toISOString().split('T')[0]
+  });
   const [normTargets, setNormTargets] = useState({
     mass: 1,
     volume: 1,
@@ -519,6 +560,7 @@ function App() {
                   setSelectedDetailItemName(null);
                 }}
                 onSelectedDateDataChange={setSelectedDateData}
+                onDateRangeChange={setChartDateRange}
               />
             </div>
 
@@ -530,9 +572,17 @@ function App() {
                     ITEMS TRACKED ({selectedItems.length})
                   </span>
                   <span className="lg:hidden">
-                    {selectedDateData 
-                      ? `Prices (${selectedDateData.dateShort})` 
-                      : `ITEMS TRACKED (${selectedItems.length})`}
+                    {selectedDateData ? (
+                      <EditableDateHeader
+                        selectedDate={selectedDate}
+                        selectedDateData={selectedDateData}
+                        minDate={chartDateRange.start}
+                        maxDate={chartDateRange.end}
+                        onChange={setSelectedDate}
+                      />
+                    ) : (
+                      `ITEMS TRACKED (${selectedItems.length})`
+                    )}
                   </span>
                 </h3>
                 <div className="flex items-center gap-1.5">
@@ -627,9 +677,17 @@ function App() {
                 <h3 className="text-sm font-bold text-foreground">
                   {selectedDetailItemName 
                     ? "Details" 
-                    : selectedDateData 
-                      ? `Prices (${selectedDateData.dateShort})` 
-                      : "Details"}
+                    : selectedDateData ? (
+                      <EditableDateHeader
+                        selectedDate={selectedDate}
+                        selectedDateData={selectedDateData}
+                        minDate={chartDateRange.start}
+                        maxDate={chartDateRange.end}
+                        onChange={setSelectedDate}
+                      />
+                    ) : (
+                      "Details"
+                    )}
                 </h3>
                 {(selectedDetailItemName || selectedDateData) && (
                   <Tooltip content={selectedDetailItemName ? "Clear details" : "Clear selected date"} align="right">
