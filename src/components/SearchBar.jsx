@@ -249,7 +249,7 @@ export default function SearchBar({
             </div>
 
             {isOpen && results.length > 0 && (
-                <div className="absolute top-full right-0 w-[calc(100vw-32px)] md:w-[150%] lg:w-[180%] md:left-1/2 md:-translate-x-1/2 mt-2 z-50">
+                <div className="absolute top-full right-0 w-[calc(100vw-32px)] md:right-auto md:w-[150%] lg:w-[180%] md:left-1/2 md:-translate-x-1/2 mt-2 z-50">
                     <div 
                         className="bg-muted rounded-2xl shadow-2xl border border-border overflow-hidden motion-preset-blur-down motion-duration-300 transition-[height] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
                         style={{ height: dropdownHeight ? `${dropdownHeight}px` : '0px' }}
@@ -349,7 +349,7 @@ export default function SearchBar({
 
             {/* "No Results" State */}
             {isOpen && query && results.length === 0 && (
-                <div className="absolute top-full right-0 w-[calc(100vw-32px)] mt-2 bg-muted rounded-2xl shadow-lg border border-border p-8 text-center motion-preset-blur-down motion-duration-300 z-50">
+                <div className="absolute top-full right-0 w-[calc(100vw-32px)] md:right-auto md:left-0 md:w-full mt-2 bg-muted rounded-2xl shadow-lg border border-border p-8 text-center motion-preset-blur-down motion-duration-300 z-50">
                     <p className="text-muted-foreground">No items found for "{query}"</p>
                 </div>
             )}
