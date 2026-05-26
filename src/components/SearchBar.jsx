@@ -129,8 +129,8 @@ export default function SearchBar({
             return [];
         }
 
-        // Perform the search with outOfOrder = 5 to support jumbled words
-        const [, info, order] = uf.search(haystack, cleanQuery, 5);
+        // Perform the search with outOfOrder = 5 and high thresholds to prevent null order on short queries
+        const [, info, order] = uf.search(haystack, cleanQuery, 5, 10000, 10000);
 
         if (order && order.length > 0) {
             // Retrieve all matched items
