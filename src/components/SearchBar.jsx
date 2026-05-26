@@ -6,6 +6,57 @@ import ItemHoverCard from './ItemHoverCard';
 import ItemDetailModal from './ItemDetailModal';
 import ProductImage from './ProductImage';
 
+const CATEGORY_ALIASES = {
+    food: [
+        'fruits', 'vegetables', 'eggs', 'meat', 'fish', 'rice', 'dal', 
+        'oil', 'spices', 'dairy', 'grocery', 'snacks', 'beverages',
+        'fresh vegetables', 'fresh fruits', 'meat', 'frozen fish', 'tea & coffee',
+        'juice', 'soft drinks', 'condensed milk & cream', 'cream biscuits',
+        'salted biscuits', 'cookies', 'plain biscuits', 'toast & bakery biscuits',
+        'dips, spreads & syrups', 'flour', 'yogurt & sweets', 'jams & jellies',
+        'tomato sauces', 'liquid & uht milk', 'shemai & suji', 'cereals',
+        'baby food', 'chicken snacks', 'frozen parathas & roti', 'vegetable snacks',
+        'fish snacks', 'popcorn & nuts', 'pasta & macaroni', 'syrups & powder drinks',
+        'other table sauces'
+    ],
+    household: [
+        'cleaning', 'personal care', 'cleaning accessories', 'toilet cleaners',
+        'dishwashing supplies', 'air fresheners', 'pest control', 'trash bin & basket',
+        'basket & bucket', 'box & container', 'rack & organizer', 'kitchen accessories',
+        'napkins & paper products', 'tissue & wipes', 'disposables', 'electric & multiplug',
+        'tapes, glues & adhesive', 'batteries', 'tools & hardware', 'toner & ink',
+        'desk organizers', 'school supplies', 'erasers & correction fluid', 'printing paper'
+    ],
+    home: [
+        'cleaning', 'personal care', 'cleaning accessories', 'toilet cleaners',
+        'dishwashing supplies', 'air fresheners', 'pest control', 'trash bin & basket',
+        'basket & bucket', 'box & container', 'rack & organizer', 'kitchen accessories',
+        'napkins & paper products', 'tissue & wipes', 'disposables', 'electric & multiplug',
+        'tapes, glues & adhesive', 'batteries', 'tools & hardware', 'toner & ink',
+        'desk organizers', 'school supplies', 'erasers & correction fluid', 'printing paper'
+    ],
+    utility: [
+        'cleaning', 'personal care', 'cleaning accessories', 'toilet cleaners',
+        'dishwashing supplies', 'air fresheners', 'pest control', 'trash bin & basket',
+        'basket & bucket', 'box & container', 'rack & organizer', 'kitchen accessories',
+        'napkins & paper products', 'tissue & wipes', 'disposables', 'electric & multiplug',
+        'tapes, glues & adhesive', 'batteries', 'tools & hardware', 'toner & ink',
+        'desk organizers', 'school supplies', 'erasers & correction fluid', 'printing paper'
+    ],
+    personal: [
+        'hair care', 'baby skincare', 'baby oral care', "women's shower gel",
+        "men's soaps", "women's soaps", 'toothpastes', 'toothbrushes',
+        'mouthwash & others', 'female moisturizer', 'face wash & scrub',
+        'petroleum jelly', 'female deo', 'feminine care', 'sanitary napkins',
+        'baby accessories', 'newborn essentials', 'feeders', 'body & hair oil'
+    ],
+    baby: [
+        'baby skincare', 'baby oral care', 'baby food', 'baby accessories',
+        'newborn essentials', 'feeders'
+    ]
+};
+
+
 export default function SearchBar({ 
     onSelect, 
     items = [], 
@@ -49,7 +100,14 @@ export default function SearchBar({
     // Initialize uFuzzy & Memoize Haystack
     const uf = useMemo(() => new uFuzzy(), []);
     const haystack = useMemo(() => {
-        return items.map(item => `${item.name} ${item.category}`);
+        return items.map(item => {
+            const categoryLower = (item.category || '').toLowerCase();
+            const aliases = Object.entries(CATEGORY_ALIASES)
+                .filter(([_, categories]) => categories.includes(categoryLower))
+                .map(([aliasName]) => aliasName);
+            const aliasString = aliases.length > 0 ? ' ' + aliases.join(' ') : '';
+            return `${item.name} ${item.category}${aliasString}`;
+        });
     }, [items]);
 
     // 3. Handle Search Logic using uFuzzy
@@ -58,8 +116,18 @@ export default function SearchBar({
             return [];
         }
 
+        // Replace common delimiters (like commas, colons, semi-colons) with spaces and trim extra spaces
+        const cleanQuery = query
+            .replace(/[,;:]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        if (!cleanQuery) {
+            return [];
+        }
+
         // Perform the search with outOfOrder = 5 to support jumbled words
-        const [, info, order] = uf.search(haystack, query, 5);
+        const [, info, order] = uf.search(haystack, cleanQuery, 5);
 
         if (order && order.length > 0) {
             // Retrieve matched items using the sorted order double-indirection indices
