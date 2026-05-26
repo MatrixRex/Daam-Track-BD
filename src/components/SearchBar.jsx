@@ -65,7 +65,10 @@ export default function SearchBar({
     normTargets, 
     itemStats = {},
     autoFocus = false,
-    emptyState = false
+    emptyState = false,
+    isMobileExpanded = false,
+    onMobileExpandChange,
+    onSuggestionsListOpenChange
 }) {
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
@@ -103,7 +106,7 @@ export default function SearchBar({
         return items.map(item => {
             const categoryLower = (item.category || '').toLowerCase();
             const aliases = Object.entries(CATEGORY_ALIASES)
-                .filter(([_, categories]) => categories.includes(categoryLower))
+                .filter(([, categories]) => categories.includes(categoryLower))
                 .map(([aliasName]) => aliasName);
             const aliasString = aliases.length > 0 ? ' ' + aliases.join(' ') : '';
             return `${item.name} ${item.category}${aliasString}`;
@@ -135,6 +138,14 @@ export default function SearchBar({
         }
         return [];
     }, [query, uf, haystack, items]);
+
+    // Lift suggestion dropdown state up to notify if suggestions list is open (including "no results" state)
+    const showSuggestions = isOpen && (results.length > 0 || (query.trim() !== '' && results.length === 0));
+    useEffect(() => {
+        if (onSuggestionsListOpenChange) {
+            onSuggestionsListOpenChange(showSuggestions);
+        }
+    }, [showSuggestions, onSuggestionsListOpenChange]);
 
     // 4. Handle Click Outside
     useEffect(() => {
@@ -171,14 +182,30 @@ export default function SearchBar({
     }, [isOpen, results]);
 
     return (
-        <div ref={searchRef} className="relative w-full max-w-2xl mx-auto z-50">
+        <div ref={searchRef} className="relative w-full max-w-2xl md:mx-auto mr-0 ml-auto z-50 flex justify-end md:block">
 
             {/* Search Input Area */}
-            <div className={clsx(
-                "relative group rounded-2xl transition-all duration-300",
-                emptyState && "animate-breathing-glow"
-            )}>
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <div 
+                onClick={() => {
+                    if (!isMobileExpanded && onMobileExpandChange) {
+                        onMobileExpandChange(true);
+                    }
+                }}
+                className={clsx(
+                    "relative group transition-all duration-500 ease-out flex items-center",
+                    emptyState && "animate-breathing-glow",
+                    isMobileExpanded 
+                        ? "h-12 rounded-2xl w-full" 
+                        : "h-10 rounded-lg w-10 cursor-pointer bg-muted border border-border hover:bg-accent md:h-auto md:w-full md:rounded-2xl md:bg-transparent md:border-0 md:p-0 md:cursor-auto"
+                )}
+            >
+                {/* Search Icon */}
+                <div className={clsx(
+                    "absolute top-1/2 -translate-y-1/2 transition-all duration-500 ease-out pointer-events-none flex items-center justify-center",
+                    isMobileExpanded
+                        ? "left-[10px] text-muted-foreground"
+                        : "left-[10px] text-foreground md:left-4 md:text-muted-foreground"
+                )}>
                     <Search className="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 </div>
 
@@ -186,11 +213,10 @@ export default function SearchBar({
                     ref={inputRef}
                     type="text"
                     className={clsx(
-                        "block w-full pl-11 pr-12 py-4 bg-muted border border-border rounded-2xl",
-                        "text-foreground placeholder-text-500",
-                        "focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring",
-                        "shadow-sm hover:shadow-md transition-all duration-200",
-                        "disabled:bg-background disabled:cursor-not-allowed"
+                        "block w-full text-foreground placeholder-text-500 focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring shadow-sm hover:shadow-md disabled:bg-background disabled:cursor-not-allowed",
+                        isMobileExpanded
+                            ? "pl-11 pr-12 py-3 bg-muted border border-border rounded-2xl h-12 opacity-100 pointer-events-auto transition-all duration-500 ease-out"
+                            : "w-0 h-0 p-0 border-0 opacity-0 pointer-events-none md:block md:w-full md:pl-11 md:pr-12 md:py-4 md:bg-muted md:border md:border-border md:rounded-2xl md:h-auto md:opacity-100 md:pointer-events-auto"
                     )}
                     placeholder={loading ? "Loading products..." : "Search for eggs, rice, beef..."}
                     value={query}
@@ -204,15 +230,18 @@ export default function SearchBar({
                     disabled={loading}
                 />
 
-                {/* Clear Button */}
-                {query && (
+                {/* Clear or Collapse Button */}
+                {(query || isMobileExpanded) && (
                     <button
-                        onClick={() => {
+                        onClick={(e) => {
+                            e.stopPropagation(); // Avoid triggering parent expand toggle onClick!
                             setQuery('');
                             setIsOpen(false);
-                            onSelect(null); // Clear selection
+                            if (isMobileExpanded && onMobileExpandChange) {
+                                onMobileExpandChange(false);
+                            }
                         }}
-                        className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center z-20"
                     >
                         <X className="h-5 w-5 text-muted-foreground hover:text-foreground cursor-pointer" />
                     </button>

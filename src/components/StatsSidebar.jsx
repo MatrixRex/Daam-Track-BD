@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { TrendingUp, Trash2 } from 'lucide-react';
 import ProductImage from './ProductImage';
 
-export default function StatsSidebar({ items, stats, colors, normTargets, onHover, selectedItemName, onSelect, onRemove, deletingItems = [] }) {
+export default function StatsSidebar({ items, stats, colors, normTargets, onHover, selectedItemName, onSelect, onRemove, selectedDateData, deletingItems = [] }) {
 
     if (items.length === 0) {
         return (
@@ -29,14 +29,23 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                 const isDeleting = deletingItems.includes(item.name);
                 
                 // Normalization Logic
-                const currentPrice = itemStat?.current ?? item.price;
-                const normalizedPrice = normTargets?.enabled 
-                    ? Math.round(getNormalizedPrice(currentPrice, item.unit, normTargets))
-                    : currentPrice;
+                const currentRawPrice = itemStat?.current ?? item.price;
+                const currentPrice = normTargets?.enabled 
+                    ? Math.round(getNormalizedPrice(currentRawPrice, item.unit, normTargets))
+                    : currentRawPrice;
                 
+                const hasSelectedPrice = selectedDateData && selectedDateData[item.name] !== undefined;
+                const selectedRawPrice = hasSelectedPrice ? selectedDateData[item.name] : currentRawPrice;
+                const selectedPrice = normTargets?.enabled
+                    ? Math.round(getNormalizedPrice(selectedRawPrice, item.unit, normTargets))
+                    : selectedRawPrice;
+
                 const unitLabel = normTargets?.enabled
                     ? getTargetUnitLabel(parseUnit(item.unit).type, normTargets[parseUnit(item.unit).type], item.unit)
                     : item.unit;
+
+                const isComparisonMode = !!selectedDateData;
+                const priceDiff = currentPrice - selectedPrice;
 
                 return (
                     <div
@@ -49,7 +58,9 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                             "ring-2 border",
                             isSelected 
                                 ? "ring-ring border-transparent bg-accent translate-x-1.5 shadow-md" 
-                                : "ring-transparent hover:ring-ring/35 border-border hover:border-transparent hover:translate-x-0.5",
+                                : isComparisonMode
+                                    ? "ring-purple-500/10 border-purple-500/25 dark:border-purple-400/25 hover:border-purple-500/40 hover:ring-purple-500/20"
+                                    : "ring-transparent hover:ring-ring/35 border-border hover:border-transparent hover:translate-x-0.5",
                             isDeleting 
                                 ? "opacity-0 -translate-x-full !max-h-0 !h-0 !p-0 !m-0 !border-0 !shadow-none pointer-events-none scale-y-0 duration-200 ease-in-out"
                                 : "max-h-[200px] opacity-100 scale-y-100 motion-preset-fade motion-duration-200"
@@ -74,22 +85,47 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                             <h4 className="text-xs font-bold text-foreground truncate">
                                 {item.name}
                             </h4>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="text-sm font-black text-foreground">
-                                    ৳{normalizedPrice}
-                                </span>
-                                <span className="text-[10px] font-bold text-muted-foreground">
-                                    / {unitLabel}
-                                </span>
+                            <div className="flex items-baseline justify-between mt-0.5 flex-wrap gap-x-2">
+                                <div className="flex items-center gap-1">
+                                    <span className="text-sm font-black text-foreground">
+                                        ৳{isComparisonMode ? selectedPrice : currentPrice}
+                                    </span>
+                                    <span className="text-[10px] font-bold text-muted-foreground">
+                                        / {unitLabel}
+                                    </span>
+                                </div>
+
+                                {isComparisonMode && (
+                                    <div className="flex items-center gap-1 text-[10px] font-bold shrink-0">
+                                        <span className="text-muted-foreground/80">
+                                            Cur: ৳{currentPrice}
+                                        </span>
+                                        {priceDiff > 0 ? (
+                                            <span className="text-red-500 bg-red-500/10 dark:bg-red-500/20 px-1 rounded flex items-center gap-0.5">
+                                                ▲ ৳{priceDiff}
+                                            </span>
+                                        ) : priceDiff < 0 ? (
+                                            <span className="text-green-500 bg-green-500/10 dark:bg-green-500/20 px-1 rounded flex items-center gap-0.5">
+                                                ▼ ৳{Math.abs(priceDiff)}
+                                            </span>
+                                        ) : (
+                                            <span className="text-muted-foreground bg-muted dark:bg-zinc-800 px-1 rounded">
+                                                —
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                             <div 
                               className={clsx(
                                 "w-full h-0.5 rounded-full mt-1.5 transition-colors duration-300",
-                                (itemStat?.change ?? 0) > 0 
-                                  ? "bg-red-400/60" 
-                                  : (itemStat?.change ?? 0) < 0 
-                                    ? "bg-green-400/60" 
-                                    : "bg-transparent"
+                                isComparisonMode
+                                  ? "bg-purple-400/40"
+                                  : (itemStat?.change ?? 0) > 0 
+                                    ? "bg-red-400/60" 
+                                    : (itemStat?.change ?? 0) < 0 
+                                      ? "bg-green-400/60" 
+                                      : "bg-transparent"
                               )} 
                             />
                         </div>

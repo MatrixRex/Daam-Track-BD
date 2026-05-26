@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import { useDuckDB } from '../hooks/useDuckDB';
-import { Loader2, AlertCircle, Calendar, ChevronDown } from 'lucide-react';
+import { Loader2, AlertCircle, Calendar, ChevronDown, Settings } from 'lucide-react';
 import Tooltip from './Tooltip';
 import ExcelJS from 'exceljs';
 import { toast } from 'sonner';
@@ -153,6 +153,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     const [resolution, setResolution] = useState('auto'); // 'auto', 'daily', 'weekly', 'monthly', 'yearly'
     const [aggregation, setAggregation] = useState('avg'); // 'avg', 'max', 'min'
     const [isDensityOpen, setIsDensityOpen] = useState(false);
+    const [isMobileDatePickerOpen, setIsMobileDatePickerOpen] = useState(false);
 
     // Generate filtered/extended data (Same logic)
     const filteredChartData = useMemo(() => {
@@ -927,12 +928,13 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             }
         }
 
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
         const xAxisMode = getEffectiveResolution();
 
         return {
             grid: {
-                left: 20,
-                right: 20,
+                left: isMobile ? 6 : 20,
+                right: isMobile ? 6 : 20,
                 top: 20,
                 bottom: xAxisMode === 'detailed' ? 60 : 40,
                 containLabel: true,
@@ -1089,7 +1091,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     if (items.length === 0) return null;
 
     return (
-        <div className="bg-muted p-6 rounded-2xl shadow-sm border border-border relative transition-colors duration-300">
+        <div className="bg-muted p-3 md:p-6 rounded-2xl shadow-sm border border-border relative transition-colors duration-300">
             {isNormalizing && (
                 <div className="absolute inset-0 z-20 bg-muted/40 backdrop-blur-[2px] flex items-center justify-center rounded-2xl animate-in fade-in duration-300">
                     <div className="bg-muted px-6 py-4 rounded-2xl shadow-2xl border border-border flex flex-col items-center gap-3">
@@ -1107,8 +1109,8 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             )}
 
             {/* Header */}
-            {/* UPDATED LAYOUT: Left = Density | Aggregation, Right = Date Range */}
-            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+            {/* DESKTOP CONTROLS HEADER (hidden on mobile) */}
+            <div className="hidden md:flex flex-wrap justify-between items-center mb-6 gap-4">
 
                 {/* Left Side: Density & Aggregation */}
                 <div className="flex items-center gap-4">
@@ -1201,7 +1203,107 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
             </div>
 
-            <div className="h-[400px] w-full">
+            {/* MOBILE CONTROLS HEADER (shown only on mobile) */}
+            <div className="md:hidden flex justify-between items-center mb-6 gap-2">
+                {/* Density Pill Button */}
+                <div className="relative">
+                    <button
+                        onClick={() => setIsDensityOpen(!isDensityOpen)}
+                        className="flex items-center gap-1.5 bg-muted border border-border text-foreground text-xs font-bold rounded-2xl hover:bg-accent px-3 py-2 active:scale-[0.96] transition-all shadow-sm"
+                    >
+                        <span>Density: {resolution === 'auto' ? 'Auto' : resolution.charAt(0).toUpperCase() + resolution.slice(1)}</span>
+                        <Settings size={12} className="text-muted-foreground" />
+                    </button>
+
+                    {/* Mobile Density Dropdown Overlay */}
+                    {isDensityOpen && (
+                        <div className="absolute top-full left-0 mt-1.5 w-36 bg-card rounded-2xl shadow-2xl border border-border py-1.5 z-30 animate-in fade-in slide-in-from-top-2 duration-200">
+                            {['auto', 'daily', 'weekly', 'monthly', 'yearly'].map(opt => (
+                                <button
+                                    key={opt}
+                                    onClick={() => {
+                                        setResolution(opt);
+                                        setIsDensityOpen(false);
+                                    }}
+                                    className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-accent transition-colors ${resolution === opt ? 'text-primary bg-accent' : 'text-foreground'}`}
+                                >
+                                    {opt === 'auto' ? 'Auto' : opt.charAt(0).toUpperCase() + opt.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Aggregation (Inline on mobile if resolution is not daily) */}
+                {getEffectiveResolution() !== 'daily' && (
+                    <div className="flex bg-background border border-border rounded-xl p-0.5">
+                        {['avg', 'min', 'max'].map(mode => (
+                            <button
+                                key={mode}
+                                onClick={() => setAggregation(mode)}
+                                className={`px-2 py-1 text-[10px] font-bold rounded-lg transition-all ${aggregation === mode
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground'
+                                    }`}
+                            >
+                                {mode === 'avg' ? 'Avg' : mode === 'min' ? 'Low' : 'High'}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {/* Mobile Date Range Pill Button */}
+                <div className="relative">
+                    <button
+                        onClick={() => setIsMobileDatePickerOpen(!isMobileDatePickerOpen)}
+                        className="flex items-center gap-1.5 bg-muted border border-border text-foreground text-xs font-bold rounded-2xl hover:bg-accent px-3 py-2 active:scale-[0.96] transition-all shadow-sm"
+                    >
+                        <Calendar size={12} className="text-primary animate-pulse" />
+                        <span>{(() => {
+                            if (!startDate) return '';
+                            const parts = startDate.split('-');
+                            return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0].substring(2)}` : startDate;
+                        })()} - {(() => {
+                            if (!endDate) return '';
+                            const parts = endDate.split('-');
+                            return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0].substring(2)}` : endDate;
+                        })()}</span>
+                    </button>
+
+                    {/* Mobile Date Range Picker Overlay */}
+                    {isMobileDatePickerOpen && (
+                        <div className="absolute top-full right-0 mt-1.5 bg-card rounded-2xl shadow-2xl border border-border p-4 z-30 flex flex-col gap-3.5 animate-in fade-in slide-in-from-top-2 duration-200 min-w-[220px]">
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Start Date</span>
+                                <DateInput
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    label="Start date"
+                                    max={endDate}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">End Date</span>
+                                <DateInput
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    label="End date"
+                                    min={startDate}
+                                    max={today}
+                                />
+                            </div>
+                            <button
+                                onClick={() => setIsMobileDatePickerOpen(false)}
+                                className="mt-1 w-full bg-primary text-primary-foreground font-bold py-1.5 px-3 rounded-xl text-xs active:scale-[0.96] transition-all shadow-sm hover:opacity-90"
+                            >
+                                Apply Range
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="h-[200px] md:h-[400px] w-full">
                 <ReactECharts
                     ref={echartsRef}
                     option={{}} // Controlled manually via useEffect
