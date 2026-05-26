@@ -218,6 +218,7 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
   const { runQuery, loading: engineLoading } = useDuckDB();
   const dataCache = useRef(new Map());
   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -791,29 +792,31 @@ const PriceChart = React.memo(({ items = [], colors = [], hoveredItem, onStatsUp
               unit="৳"
               domain={[currentDomain[0], currentDomain[1]]}
             />
-            <Tooltip
-              wrapperStyle={{ zIndex: 100 }}
-              contentStyle={{
-                borderRadius: '12px',
-                border: 'none',
-                backgroundColor: isDark ? 'oklch(0.205 0 0 / 0.95)' : 'oklch(0.97 0 0 / 0.95)',
-                color: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.145 0 0)',
-                boxShadow: isDark ? '0 10px 15px -3px oklch(0 0 0 / 0.5)' : '0 10px 15px -3px oklch(0 0 0 / 0.1)',
-                padding: '12px'
-              }}
-              cursor={<CustomCursor stroke={isDark ? 'oklch(0.795 0.184 86.047)' : 'oklch(0.852 0.199 91.936)'} strokeWidth={1} strokeDasharray="5 5" strokeOpacity={0.4} />}
-              labelFormatter={(label, payload) => {
-                // Find a payload entry that has fullDate (prefer non-ext entries)
-                const entry = payload?.find(p => p.payload?.fullDate);
-                return entry?.payload?.fullDate || label;
-              }}
-              formatter={(value, name) => {
-                // Hide extended line entries and Area entries from tooltip
-                if (name.endsWith('_ext') || name.endsWith('_area')) return null;
-                return [`৳${value}`, name];
-              }}
-              filterNull={true}
-            />
+            {!isMobile && (
+              <Tooltip
+                wrapperStyle={{ zIndex: 100 }}
+                contentStyle={{
+                  borderRadius: '12px',
+                  border: 'none',
+                  backgroundColor: isDark ? 'oklch(0.205 0 0 / 0.95)' : 'oklch(0.97 0 0 / 0.95)',
+                  color: isDark ? 'oklch(0.985 0 0)' : 'oklch(0.145 0 0)',
+                  boxShadow: isDark ? '0 10px 15px -3px oklch(0 0 0 / 0.5)' : '0 10px 15px -3px oklch(0 0 0 / 0.1)',
+                  padding: '12px'
+                }}
+                cursor={<CustomCursor stroke={isDark ? 'oklch(0.795 0.184 86.047)' : 'oklch(0.852 0.199 91.936)'} strokeWidth={1} strokeDasharray="5 5" strokeOpacity={0.4} />}
+                labelFormatter={(label, payload) => {
+                  // Find a payload entry that has fullDate (prefer non-ext entries)
+                  const entry = payload?.find(p => p.payload?.fullDate);
+                  return entry?.payload?.fullDate || label;
+                }}
+                formatter={(value, name) => {
+                  // Hide extended line entries and Area entries from tooltip
+                  if (name.endsWith('_ext') || name.endsWith('_area')) return null;
+                  return [`৳${value}`, name];
+                }}
+                filterNull={true}
+              />
+            )}
 
             {itemsToRender.map((item) => {
               const { isNew, isRemoving } = getLineState(item.name);

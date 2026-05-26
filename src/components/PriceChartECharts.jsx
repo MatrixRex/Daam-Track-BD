@@ -943,6 +943,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 borderWidth: 0 // Hide border, just use splitLines
             },
             tooltip: {
+                show: !isMobile,
                 trigger: 'axis',
                 confine: true,
                 backgroundColor: isDark ? 'oklch(0.205 0 0 / 0.95)' : 'oklch(0.97 0 0 / 0.95)',
