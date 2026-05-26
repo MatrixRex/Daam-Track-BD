@@ -91,7 +91,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                                 </span>
                                 
                                 {isComparisonMode && (
-                                    <span className="text-[10px] font-bold text-muted-foreground/80">
+                                    <span className="text-[10px] font-bold text-muted-foreground/80 md:hidden">
                                         (Cur: ৳{currentPrice})
                                     </span>
                                 )}
@@ -101,7 +101,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                                 </span>
 
                                 {isComparisonMode && (
-                                    <div className="flex items-center gap-1 text-[10px] font-bold shrink-0 ml-1">
+                                    <div className="flex items-center gap-1 text-[10px] font-bold shrink-0 ml-1 md:hidden">
                                         {priceDiff > 0 ? (
                                             <span className="text-red-500 bg-red-500/10 dark:bg-red-500/20 px-1 rounded flex items-center gap-0.5">
                                                 ▲ ৳{priceDiff}
