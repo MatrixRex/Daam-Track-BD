@@ -6,11 +6,20 @@ import Tooltip from './Tooltip';
 function DraggableNumericInput({ id, value, onChange, unit }) {
     const [isEditing, setIsEditing] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
+    const [localValue, setLocalValue] = useState(value);
+    const [prevValue, setPrevValue] = useState(value);
     const inputRef = useRef(null);
     const startXRef = useRef(0);
     const startValueRef = useRef(0);
     const hasMovedRef = useRef(false);
     const isDraggingRef = useRef(false);
+    const latestValueRef = useRef(value);
+
+    // Sync state from props during render (React-recommended pattern to avoid cascading effect renders)
+    if (value !== prevValue && !isDragging && !isEditing) {
+        setPrevValue(value);
+        setLocalValue(value);
+    }
 
     useEffect(() => {
         if (isEditing && inputRef.current) {
@@ -22,6 +31,7 @@ function DraggableNumericInput({ id, value, onChange, unit }) {
     const handleMouseDown = (e) => {
         startXRef.current = e.clientX;
         startValueRef.current = value;
+        latestValueRef.current = value;
         hasMovedRef.current = false;
         isDraggingRef.current = true;
         setIsDragging(true);
@@ -42,7 +52,8 @@ function DraggableNumericInput({ id, value, onChange, unit }) {
                     const change = parseFloat((deltaX / 80).toFixed(1));
                     newValue = parseFloat(Math.max(0.1, startValueRef.current + change).toFixed(1));
                 }
-                onChange(newValue);
+                latestValueRef.current = newValue;
+                setLocalValue(newValue);
             }
         };
 
@@ -52,7 +63,9 @@ function DraggableNumericInput({ id, value, onChange, unit }) {
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
 
-            if (!hasMovedRef.current) {
+            if (hasMovedRef.current) {
+                onChange(latestValueRef.current);
+            } else {
                 setIsEditing(true);
             }
         };
@@ -65,6 +78,7 @@ function DraggableNumericInput({ id, value, onChange, unit }) {
         const touch = e.touches[0];
         startXRef.current = touch.clientX;
         startValueRef.current = value;
+        latestValueRef.current = value;
         hasMovedRef.current = false;
         isDraggingRef.current = true;
         setIsDragging(true);
@@ -89,14 +103,17 @@ function DraggableNumericInput({ id, value, onChange, unit }) {
                 const change = parseFloat((deltaX / 80).toFixed(1));
                 newValue = parseFloat(Math.max(0.1, startValueRef.current + change).toFixed(1));
             }
-            onChange(newValue);
+            latestValueRef.current = newValue;
+            setLocalValue(newValue);
         }
     };
 
     const handleTouchEnd = () => {
         isDraggingRef.current = false;
         setIsDragging(false);
-        if (!hasMovedRef.current) {
+        if (hasMovedRef.current) {
+            onChange(latestValueRef.current);
+        } else {
             setIsEditing(true);
         }
     };
@@ -107,12 +124,20 @@ function DraggableNumericInput({ id, value, onChange, unit }) {
                 <input
                     ref={inputRef}
                     type="number"
-                    value={value}
-                    onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-                    onBlur={() => setIsEditing(false)}
+                    value={localValue}
+                    onChange={(e) => {
+                        const val = parseFloat(e.target.value) || 0;
+                        setLocalValue(val);
+                        latestValueRef.current = val;
+                    }}
+                    onBlur={() => {
+                        setIsEditing(false);
+                        onChange(latestValueRef.current);
+                    }}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                             setIsEditing(false);
+                            onChange(latestValueRef.current);
                         }
                     }}
                     className="w-10 md:w-12 bg-transparent text-sm font-bold text-foreground outline-none text-center"
@@ -140,7 +165,7 @@ function DraggableNumericInput({ id, value, onChange, unit }) {
             title="Drag horizontally to adjust, tap to type"
         >
             <span className="w-10 md:w-12 text-sm font-bold text-foreground text-center">
-                {value}
+                {localValue}
             </span>
             <span className="text-[10px] font-bold text-muted-foreground ml-1">
                 {unit}
