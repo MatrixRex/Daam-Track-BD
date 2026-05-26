@@ -58,8 +58,8 @@ export default function SearchBar({
             return [];
         }
 
-        // Perform the search
-        const [, info, order] = uf.search(haystack, query);
+        // Perform the search with outOfOrder = 5 to support jumbled words
+        const [, info, order] = uf.search(haystack, query, 5);
 
         if (order && order.length > 0) {
             // Retrieve matched items using the sorted order double-indirection indices
