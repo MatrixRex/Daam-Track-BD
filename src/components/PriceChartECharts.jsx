@@ -87,7 +87,7 @@ const DateInput = ({ value, onChange, label, min, max }) => {
     );
 };
 
-const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, onStatsUpdate, normTargets, selectedDate, onDateSelect, onSelectedDateDataChange }, ref) => {
+const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate, normTargets, selectedDate, onDateSelect, onSelectedDateDataChange }, ref) => {
     const { runQuery, loading: engineLoading } = useDuckDB();
     const echartsRef = useRef(null);
     const dataCache = useRef(new Map());
@@ -114,6 +114,11 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     useEffect(() => {
         onSelectedDateDataChangeRef.current = onSelectedDateDataChange;
     }, [onSelectedDateDataChange]);
+
+    const hoveredItemRef = useRef(hoveredItem);
+    useEffect(() => {
+        hoveredItemRef.current = hoveredItem;
+    }, [hoveredItem]);
 
     // Sync selected date prices with parent
     useEffect(() => {
@@ -1365,13 +1370,23 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
                                     // Update Ref immediately - no React re-render needed for tooltip bolding
                                     localHoveredRef.current = closestName;
+
+                                    if (closestName !== hoveredItemRef.current) {
+                                        setHoveredItem?.(closestName);
+                                    }
                                 }
                             } else {
                                 localHoveredRef.current = null;
+                                if (hoveredItemRef.current !== null) {
+                                    setHoveredItem?.(null);
+                                }
                             }
                         },
                         'globalout': () => {
                             localHoveredRef.current = null;
+                            if (hoveredItemRef.current !== null) {
+                                setHoveredItem?.(null);
+                            }
                         }
                     }}
                 />
