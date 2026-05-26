@@ -225,7 +225,7 @@ function App() {
 
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground transition-colors duration-300">
+    <div className="min-h-dvh bg-background font-sans text-foreground transition-colors duration-300">
 
       {/* --- HEADER SECTION --- */}
       <div className="bg-muted border-b border-border shadow-sm sticky top-0 z-50 transition-colors duration-300 motion-preset-fade motion-duration-300">
@@ -475,7 +475,7 @@ function App() {
       )}
 
       {/* --- MAIN CONTENT AREA --- */}
-      <div className="w-full max-w-[1920px] mx-auto px-1 sm:px-2 lg:px-4 py-6 flex flex-col overflow-hidden h-[calc(100vh-80px)]">
+      <div className="w-full max-w-[1920px] mx-auto px-1 sm:px-2 lg:px-4 py-6 flex flex-col overflow-hidden h-[calc(100dvh-80px)]">
 
         {selectedItems.length > 0 ? (
           <div className="flex flex-col lg:grid lg:grid-cols-[6fr_2fr_2fr] gap-4 flex-1 min-h-0 overflow-hidden motion-preset-fade motion-duration-300">
@@ -642,7 +642,7 @@ function App() {
           "lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border rounded-t-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.25)] flex flex-col transition-transform duration-300 ease-out transform",
           selectedDetailItemName ? "translate-y-0" : "translate-y-full"
         )}
-        style={{ maxHeight: '80vh' }}
+        style={{ maxHeight: '80dvh' }}
       >
         {/* Drag handle */}
         <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full mx-auto my-3 flex-shrink-0" />

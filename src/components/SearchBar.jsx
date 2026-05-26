@@ -372,7 +372,7 @@ export default function SearchBar({
                         style={{ height: dropdownHeight ? `${dropdownHeight}px` : '0px' }}
                     >
                         <div ref={innerRef}>
-                            <ul className="max-h-[60vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 px-2 py-3 sm:p-3">
+                            <ul className="max-h-[60dvh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 px-2 py-3 sm:p-3">
                             {results.map((item, index) => {
                                 const isSelected = selectedItems.some(i => i.name === item.name);
                                 const itemColor = itemStats[item.name]?.color?.stroke || itemStats[item.name]?.color;
