@@ -7,6 +7,7 @@ import Tooltip from './Tooltip';
 import ExcelJS from 'exceljs';
 import { toast } from 'sonner';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Hook to detect dark mode
 const useDarkMode = () => {
@@ -89,6 +90,7 @@ const DateInput = ({ value, onChange, label, min, max }) => {
 
 const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredItem, setHoveredItem, onStatsUpdate, normTargets, selectedDate, onDateSelect, onSelectedDateDataChange, onDateRangeChange }, ref) => {
     const { runQuery, loading: engineLoading } = useDuckDB();
+    const { language, t, tProduct, tUnit, formatPrice, translateDate } = useLanguage();
     const echartsRef = useRef(null);
     const dataCache = useRef(new Map());
     const isDark = useDarkMode();
@@ -330,7 +332,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
     React.useImperativeHandle(ref, () => ({
         exportImage: async (mode = 'download') => { // mode: 'download' | 'copy'
             if (!items.length || !finalChartData.length) {
-                toast.error('No data available to export');
+                toast.error(t('noDataExport'));
                 return;
             }
 
@@ -372,7 +374,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     data: items.map(i => i.name),
                     formatter: (name) => {
                         const item = items.find(i => i.name === name);
-                        return item ? `${name} (${item.unit})` : name;
+                        return item ? `${tProduct(name)} (${tUnit(item.unit)})` : name;
                     },
                     textStyle: { color: isDark ? '#cacecc' : '#313533' }
                 }
@@ -494,21 +496,21 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         ctx.textAlign = 'left';
                         ctx.textBaseline = 'middle';
                         
-                        const brandText1 = 'দাম ';
-                        const brandText2 = 'কত';
+                        const brandText1 = language === 'bn' ? 'দাম ' : 'Daam';
+                        const brandText2 = language === 'bn' ? 'কত' : 'Koto';
                         
-                        // Draw "দাম "
+                        // Draw "দাম " / "Daam"
                         ctx.font = `bold ${Math.round(baseSize * 1.15)}px system-ui, -apple-system, sans-serif`;
                         ctx.fillStyle = textColor;
                         ctx.fillText(brandText1, textX, titleY);
                         
                         const width1 = ctx.measureText(brandText1).width;
                         
-                        // Draw "কত" in brand orange/theme primary
+                        // Draw "কত" / "Koto" in brand orange/theme primary
                         ctx.fillStyle = themePrimaryColor;
                         ctx.fillText(brandText2, textX + width1, titleY);
                         
-                        // 4. Draw Subtitle "Bangladeshi commodity price tracker" (Row 2 - below logo and title)
+                        // 4. Draw Subtitle (Row 2 - below logo and title)
                         // Left-aligned with the logoX edge
                         const subtitleY = logoY + logoSize + Math.round(baseSize * 0.48);
                         
@@ -516,7 +518,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         ctx.textBaseline = 'middle';
                         ctx.fillStyle = subColor;
                         ctx.font = `500 ${Math.round(baseSize * 0.65)}px system-ui, -apple-system, sans-serif`;
-                        ctx.fillText('Bangladeshi commodity price tracker', logoX, subtitleY);
+                        ctx.fillText(language === 'bn' ? 'বাংলাদেশ নিত্যপ্রয়োজনীয় পণ্যের মূল্য ট্র্যাকার' : 'Bangladeshi commodity price tracker', logoX, subtitleY);
                         
                         // 5. Draw Domain Name "daam.pro.bd" on the right side of the header (aligned with Row 1)
                         ctx.textAlign = 'right';
@@ -553,7 +555,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     await navigator.clipboard.write([
                         new ClipboardItem({ 'image/png': blob })
                     ]);
-                    toast.success('Image copied to clipboard');
+                    toast.success(t('imageCopied'));
                 } else {
                     // Trigger download
                     const newUrl = URL.createObjectURL(blob);
@@ -562,28 +564,28 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     link.href = newUrl;
                     link.click();
                     URL.revokeObjectURL(newUrl);
-                    toast.success('Image download started');
+                    toast.success(t('imageDownload'));
                 }
             } catch (err) {
                 console.error("Failed to export image:", err);
-                toast.error('Failed to export image');
+                toast.error(t('imageExportFailed'));
             }
         },
         exportData: async (format, mode = 'download') => { // format: 'json' | 'csv' | 'xlsx', mode: 'download' | 'copy'
             if (!items.length || !processedData.length) {
-                toast.error('No data available to export');
+                toast.error(t('noDataExport'));
                 return;
             }
 
             // Prepare clean data for export
             const dataToExport = processedData.map(row => {
                 const rowData = {
-                    Date: row.fullDate,
-                    'Date (Short)': row.dateShort,
+                    Date: translateDate(row.fullDate),
+                    'Date (Short)': translateDate(row.dateShort),
                     'ISO Date': row.date,
                 };
                 items.forEach(item => {
-                    const header = `${item.name} (${item.unit})`;
+                    const header = `${tProduct(item.name)} (${tUnit(item.unit)})`;
                     const val = row[item.name];
                     rowData[header] = (val !== undefined && val !== null)
                         ? (normTargets ? Math.round(getNormalizedPrice(val, item.unit, normTargets)) : val)
@@ -593,13 +595,13 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             });
 
             const filename = `price-data-${new Date().toISOString().split('T')[0]}`;
-            const itemHeaders = items.map(i => `${i.name} (${i.unit})`);
+            const itemHeaders = items.map(i => `${tProduct(i.name)} (${tUnit(i.unit)})`);
 
             if (format === 'json') {
                 const jsonString = JSON.stringify(dataToExport, null, 2);
                 if (mode === 'copy') {
                     await navigator.clipboard.writeText(jsonString);
-                    toast.success('JSON data copied to clipboard');
+                    toast.success(t('jsonCopied'));
                 } else {
                     const blob = new Blob([jsonString], { type: 'application/json' });
                     const url = URL.createObjectURL(blob);
@@ -607,7 +609,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     link.href = url;
                     link.download = `${filename}.json`;
                     link.click();
-                    toast.success('JSON download started');
+                    toast.success(t('jsonDownload'));
                 }
             } else if (format === 'csv') {
                 const headers = ['Date', 'Date (Short)', 'ISO Date', ...itemHeaders];
@@ -617,7 +619,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     'ISO Date': 'ISO Date',
                 };
                 items.forEach(i => {
-                    keyMap[`${i.name} (${i.unit})`] = `${i.name} (${i.unit})`;
+                    keyMap[`${tProduct(i.name)} (${tUnit(i.unit)})`] = `${tProduct(i.name)} (${tUnit(i.unit)})`;
                 });
 
                 const csvContent = [
@@ -630,7 +632,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
 
                 if (mode === 'copy') {
                     await navigator.clipboard.writeText(csvContent);
-                    toast.success('CSV data copied to clipboard');
+                    toast.success(t('csvCopied'));
                 } else {
                     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                     const url = URL.createObjectURL(blob);
@@ -638,7 +640,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     link.href = url;
                     link.download = `${filename}.csv`;
                     link.click();
-                    toast.success('CSV download started');
+                    toast.success(t('csvDownload'));
                 }
             } else if (format === 'xlsx') {
                 if (mode === 'copy') {
@@ -652,7 +654,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         }).join('\t'))
                     ].join('\n');
                     await navigator.clipboard.writeText(tsvContent);
-                    toast.success('Excel-compatible data copied to clipboard');
+                    toast.success(t('excelCopied'));
                 } else {
                     const wb = new ExcelJS.Workbook();
                     const ws = wb.addWorksheet('Price Data');
@@ -914,7 +916,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     label: {
                         show: true,
                         position: 'end',
-                        formatter: 'Selected',
+                        formatter: t('selected'),
                         fontSize: 10,
                         color: isDark ? '#cacecc' : '#313533',
                         backgroundColor: isDark ? 'oklch(0.205 0 0)' : 'oklch(0.97 0 0)',
@@ -980,7 +982,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                     const dateItem = finalChartData[dateIndex];
                     if (!dateItem) return '';
 
-                    let html = `<div class="font-medium text-muted-foreground mb-2">${dateItem.fullDate}</div>`;
+                    let html = `<div class="font-medium text-muted-foreground mb-2">${translateDate(dateItem.fullDate)}</div>`;
 
                     // Filter and sort items by price (highest first)
                     const sortedParams = params
@@ -1007,11 +1009,11 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         <div class="flex items-center justify-between gap-4 text-sm ${isHighlighted ? 'scale-105 origin-left' : ''} transition-all duration-200">
                             <div class="flex items-center gap-2 min-w-0">
                                 <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${color}; box-shadow: ${isHighlighted ? `0 0 8px ${color}` : 'none'}"></span>
-                                <span class="truncate ${isHighlighted ? 'font-bold text-foreground' : 'font-medium text-muted-foreground'}">${name}:</span>
+                                <span class="truncate ${isHighlighted ? 'font-bold text-foreground' : 'font-medium text-muted-foreground'}">${tProduct(name)}:</span>
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
-                                <span class="font-bold ${isHighlighted ? 'text-foreground' : 'text-foreground'}">৳${value}</span>
-                                <span class="text-[10px] opacity-70 ${isHighlighted ? 'font-bold' : ''}">/${unitLabel}</span>
+                                <span class="font-bold ${isHighlighted ? 'text-foreground' : 'text-foreground'}">৳${formatPrice(value)}</span>
+                                <span class="text-[10px] opacity-70 ${isHighlighted ? 'font-bold' : ''}">/${tUnit(unitLabel)}</span>
                             </div>
                         </div>
                     `;
@@ -1021,7 +1023,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             },
             xAxis: {
                 type: 'category',
-                data: finalChartData.map(d => d.dateShort), // Use pre-formatted short dates
+                data: finalChartData.map(d => translateDate(d.dateShort)), // Translate short dates
                 boundaryGap: false,
                 axisLine: { show: false },
                 axisTick: { show: false },
@@ -1042,7 +1044,9 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                 axisTick: { show: false },
                 splitLine: { show: true, lineStyle: { color: isDark ? '#145252' : '#adebeb' } },
                 axisLabel: {
-                    formatter: '৳{value}',
+                    formatter: (value) => {
+                        return `৳${formatPrice(value)}`;
+                    },
                     color: '#7a8580',
                     fontSize: 12
                 }
@@ -1053,7 +1057,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
             animationEasing: 'cubicOut',
             animationEasingUpdate: 'cubicOut', // Smooth updates
         };
-    }, [items, finalChartData, getItemColor, hoveredItem, getEffectiveResolution, isDark, normTargets, selectedDate]);
+    }, [items, finalChartData, getItemColor, hoveredItem, getEffectiveResolution, isDark, normTargets, selectedDate, formatPrice, t, tProduct, tUnit, translateDate]);
 
 
     // Manual Option Management for 'replaceMerge'

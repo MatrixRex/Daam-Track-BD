@@ -2,8 +2,11 @@ import React from 'react';
 import { getTargetUnitLabel, parseUnit, getNormalizedPrice } from '../utils/quantityUtils';
 import clsx from 'clsx';
 import { ArrowUp, ArrowDown } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function SelectedDatePanel({ items, stats = [], dateData, colors, normTargets, onSelect, onHover, deletingItems = [] }) {
+  const { t, tUnit, formatPrice } = useLanguage();
+
   if (!dateData || items.length === 0) return null;
 
   return (
@@ -57,14 +60,14 @@ export default function SelectedDatePanel({ items, stats = [], dateData, colors,
             {/* Price on Date (Left aligned) */}
             <div className="flex flex-col justify-center min-w-0">
               <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1.5 select-none">
-                Price on Date
+                {t('priceOnDateLabel')}
               </span>
               <div className="flex items-baseline gap-1">
                 <span className="text-base font-black text-foreground leading-none">
-                  {hasPrice ? `৳${Math.round(datePrice)}` : 'N/A'}
+                  {hasPrice ? `৳${formatPrice(Math.round(datePrice))}` : 'N/A'}
                 </span>
                 <span className="text-[9px] font-bold text-muted-foreground leading-none">
-                  / {unitLabel}
+                  / {tUnit(unitLabel)}
                 </span>
               </div>
             </div>
@@ -81,22 +84,22 @@ export default function SelectedDatePanel({ items, stats = [], dateData, colors,
                   {diff > 0 ? (
                     <>
                       <ArrowUp size={11} className="stroke-[3]" />
-                      <span>৳{Math.abs(diff)} Up</span>
+                      <span>৳{formatPrice(Math.abs(diff))} {t('up')}</span>
                     </>
                   ) : (
                     <>
                       <ArrowDown size={11} className="stroke-[3]" />
-                      <span>৳{Math.abs(diff)} Down</span>
+                      <span>৳{formatPrice(Math.abs(diff))} {t('down')}</span>
                     </>
                   )}
                 </div>
               ) : hasPrice ? (
                 <div className="px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider text-muted-foreground bg-accent/50 border border-border/30 shadow-sm select-none">
-                  No change
+                  {t('noChange')}
                 </div>
               ) : (
                 <div className="text-[10px] font-bold text-muted-foreground select-none">
-                  No price data
+                  {t('noPriceData')}
                 </div>
               )}
             </div>

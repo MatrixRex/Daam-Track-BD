@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { RotateCcw, Scale, Droplet, Hash } from 'lucide-react';
 import clsx from 'clsx';
 import Tooltip from './Tooltip';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function DraggableNumericInput({ id, value, onChange, unit }) {
+    const { t, formatPrice, tUnit } = useLanguage();
     const [isEditing, setIsEditing] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [localValue, setLocalValue] = useState(value);
@@ -144,7 +146,7 @@ function DraggableNumericInput({ id, value, onChange, unit }) {
                     step="any"
                     min="0"
                 />
-                <span className="text-[10px] font-bold text-muted-foreground ml-1">{unit}</span>
+                <span className="text-[10px] font-bold text-muted-foreground ml-1">{tUnit(unit)}</span>
             </div>
         );
     }
@@ -162,23 +164,24 @@ function DraggableNumericInput({ id, value, onChange, unit }) {
                     ? "border-primary/50 bg-primary/5 shadow-[0_0_8px_rgba(253,143,0,0.2)] scale-[1.04]" 
                     : "border-border hover:border-ring hover:bg-accent/40 active:scale-[0.98]"
             )}
-            title="Drag horizontally to adjust, tap to type"
+            title={t('dragAdjust')}
         >
             <span className="w-10 md:w-12 text-sm font-bold text-foreground text-center">
-                {localValue}
+                {formatPrice(localValue)}
             </span>
             <span className="text-[10px] font-bold text-muted-foreground ml-1">
-                {unit}
+                {tUnit(unit)}
             </span>
         </div>
     );
 }
 
 export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) {
+    const { t } = useLanguage();
     const categories = [
-        { id: 'mass', label: 'Weight', icon: Scale, unit: 'kg' },
-        { id: 'volume', label: 'Volume', icon: Droplet, unit: 'L' },
-        { id: 'count', label: 'Count', icon: Hash, unit: 'pcs' },
+        { id: 'mass', label: t('weight'), icon: Scale, unit: 'kg' },
+        { id: 'volume', label: t('volume'), icon: Droplet, unit: 'L' },
+        { id: 'count', label: t('count'), icon: Hash, unit: 'pcs' },
     ];
 
     return (
@@ -206,7 +209,7 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
                     "text-sm font-bold text-muted-foreground whitespace-nowrap animate-in fade-in duration-200",
                     normTargets.enabled ? "hidden md:inline" : "inline"
                 )}>
-                    Normalize Units
+                    {t('normalizeUnits')}
                 </span>
             </div>
 
@@ -232,7 +235,7 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
 
             {normTargets.enabled && (
                 <div className="animate-in fade-in zoom-in duration-200 flex items-center justify-center">
-                    <Tooltip content="Reset Units" align="right">
+                    <Tooltip content={t('resetUnits')} align="right">
                         <button
                             onClick={onResetUnits}
                             className="p-1 rounded-lg transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"

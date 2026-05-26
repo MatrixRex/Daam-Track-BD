@@ -1,7 +1,9 @@
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const EmptyStateSkeleton = () => {
+    const { t } = useLanguage();
     return (
         <div className="relative flex-1 min-h-0 w-full h-full flex flex-col justify-center">
             
@@ -43,14 +45,14 @@ const EmptyStateSkeleton = () => {
                     <div className="bg-muted p-4 rounded-full inline-flex mb-6 ring-4 ring-border/50">
                         <TrendingUp className="w-10 h-10 text-primary" />
                     </div>
-                    <h2 className="text-2xl font-bold text-foreground mb-3">Compare Prices &amp; Trends</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-3">{t('comparePricesTitle')}</h2>
                     <p className="text-muted-foreground mb-8 leading-relaxed">
-                        Select items from the search bar to visualize their price history, compare trends, and make smarter buying decisions.
+                        {t('comparePricesDesc')}
                     </p>
                     <div className="flex flex-wrap justify-center gap-2 text-sm text-muted-foreground">
-                        <span className="bg-background border border-border px-3 py-1 rounded-full">Try &quot;Rice&quot;</span>
-                        <span className="bg-background border border-border px-3 py-1 rounded-full">Try &quot;Egg&quot;</span>
-                        <span className="bg-background border border-border px-3 py-1 rounded-full">Try &quot;Onion&quot;</span>
+                        <span className="bg-background border border-border px-3 py-1 rounded-full">{t('tryRice')}</span>
+                        <span className="bg-background border border-border px-3 py-1 rounded-full">{t('tryEgg')}</span>
+                        <span className="bg-background border border-border px-3 py-1 rounded-full">{t('tryOnion')}</span>
                     </div>
                 </div>
             </div>

@@ -3,8 +3,10 @@ import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quan
 import clsx from 'clsx';
 import { TrendingUp, Trash2 } from 'lucide-react';
 import ProductImage from './ProductImage';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function StatsSidebar({ items, stats, colors, normTargets, onHover, selectedItemName, onSelect, onRemove, selectedDateData, deletingItems = [] }) {
+    const { t, tProduct, tUnit, formatPrice } = useLanguage();
 
     if (items.length === 0) {
         return (
@@ -12,9 +14,9 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                 <div className="w-16 h-16 mb-4 rounded-2xl bg-background flex items-center justify-center text-muted-foreground">
                     <TrendingUp className="w-8 h-8 opacity-20" />
                 </div>
-                <h3 className="text-lg font-bold text-foreground mb-2">Compare Products</h3>
+                <h3 className="text-lg font-bold text-foreground mb-2">{t('compareProducts')}</h3>
                 <p className="text-sm text-muted-foreground max-w-[200px]">
-                    Search and select items to see their live stats and comparison.
+                    {t('sidebarDesc')}
                 </p>
             </div>
         );
@@ -83,38 +85,38 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                         {/* Info Section */}
                         <div className="flex-1 min-w-0">
                             <h4 className="text-xs font-bold text-foreground truncate">
-                                {item.name}
+                                {tProduct(item.name)}
                             </h4>
                             <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                 {/* Always show current price on desktop (lg and up) */}
                                 <span className="text-sm font-black text-foreground hidden lg:inline">
-                                    ৳{currentPrice}
+                                    ৳{formatPrice(currentPrice)}
                                 </span>
                                 
                                 {/* On mobile, show selectedPrice if in comparison mode, else currentPrice */}
                                 <span className="text-sm font-black text-foreground lg:hidden">
-                                    ৳{isComparisonMode ? selectedPrice : currentPrice}
+                                    ৳{formatPrice(isComparisonMode ? selectedPrice : currentPrice)}
                                 </span>
                                 
                                 {isComparisonMode && (
                                     <span className="text-[10px] font-bold text-muted-foreground/80 lg:hidden">
-                                        (Cur: ৳{currentPrice})
+                                        ({t('currentAbbr')}: ৳{formatPrice(currentPrice)})
                                     </span>
                                 )}
                                 
                                 <span className="text-[10px] font-bold text-muted-foreground">
-                                    / {unitLabel}
+                                    / {tUnit(unitLabel)}
                                 </span>
-
+ 
                                 {isComparisonMode && (
                                     <div className="flex items-center gap-1 text-[10px] font-bold shrink-0 ml-1 lg:hidden">
                                         {priceDiff > 0 ? (
                                             <span className="text-red-500 bg-red-500/10 dark:bg-red-500/20 px-1 rounded flex items-center gap-0.5">
-                                                ▲ ৳{priceDiff}
+                                                ▲ ৳{formatPrice(priceDiff)}
                                             </span>
                                         ) : priceDiff < 0 ? (
                                             <span className="text-green-500 bg-green-500/10 dark:bg-green-500/20 px-1 rounded flex items-center gap-0.5">
-                                                ▼ ৳{Math.abs(priceDiff)}
+                                                ▼ ৳{formatPrice(Math.abs(priceDiff))}
                                             </span>
                                         ) : (
                                             <span className="text-muted-foreground bg-muted dark:bg-zinc-800 px-1 rounded">
@@ -138,7 +140,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                               )} 
                             />
                         </div>
-
+ 
                         {/* Delete button */}
                         <button
                           onClick={(e) => { e.stopPropagation(); onRemove(item); }}
@@ -146,8 +148,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                         >
                           <Trash2 size={16} />
                         </button>
-
-
+ 
                     </div>
                 );
             })}

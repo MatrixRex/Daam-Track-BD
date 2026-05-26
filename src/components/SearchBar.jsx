@@ -3,6 +3,7 @@ import uFuzzy from '@leeoniya/ufuzzy';
 import { Search, X, ChevronRight, Check } from 'lucide-react';
 import clsx from 'clsx';
 import ItemHoverCard from './ItemHoverCard';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import ItemDetailModal from './ItemDetailModal';
 import ProductImage from './ProductImage';
 
@@ -70,6 +71,7 @@ export default function SearchBar({
     onMobileExpandChange,
     onSuggestionsListOpenChange
 }) {
+    const { t, tProduct, tCategory, tUnit, formatPrice } = useLanguage();
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredItem, setHoveredItem] = useState(null);
@@ -335,7 +337,7 @@ export default function SearchBar({
                             ? "pl-11 pr-12 py-3 bg-muted border border-border rounded-2xl h-12 opacity-100 pointer-events-auto transition-all duration-500 ease-out"
                             : "w-0 h-0 p-0 border-0 opacity-0 pointer-events-none md:block md:w-full md:pl-11 md:pr-12 md:py-4 md:bg-muted md:border md:border-border md:rounded-2xl md:h-auto md:opacity-100 md:pointer-events-auto"
                     )}
-                    placeholder={loading ? "Loading products..." : "Search for eggs, rice, beef..."}
+                    placeholder={loading ? t('loadingProducts') : t('searchPlaceholder')}
                     value={query}
                     onChange={(e) => {
                         setQuery(e.target.value);
@@ -422,22 +424,22 @@ export default function SearchBar({
                                         {/* Text Info */}
                                         <div className="flex-1 min-w-0">
                                             <h4 className="text-xs sm:text-sm font-semibold text-foreground truncate group-hover:text-primary">
-                                                {item.name}
+                                                {tProduct(item.name)}
                                             </h4>
                                             <div className="flex items-center gap-1.5 mt-0.5">
                                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-background text-muted-foreground">
-                                                    {item.category}
+                                                    {tCategory(item.category)}
                                                 </span>
                                                 <span className="text-[10px] text-muted-foreground">•</span>
-                                                <span className="text-[10px] text-muted-foreground">{item.unit}</span>
+                                                <span className="text-[10px] text-muted-foreground">{tUnit(item.unit)}</span>
                                             </div>
                                         </div>
 
                                         {/* Price & Arrow/Check */}
                                         <div className="text-right flex items-center gap-2">
                                             <div className="flex flex-col items-end">
-                                                <span className="text-xs sm:text-sm font-bold text-foreground">৳{item.price}</span>
-                                                <span className="text-[9px] sm:text-[10px] text-muted-foreground">{isSelected ? 'Selected' : 'Latest'}</span>
+                                                <span className="text-xs sm:text-sm font-bold text-foreground">৳{formatPrice(item.price)}</span>
+                                                <span className="text-[9px] sm:text-[10px] text-muted-foreground">{isSelected ? t('selected') : t('latest')}</span>
                                             </div>
                                             {isSelected
                                                 ? <Check className="w-3.5 h-3.5 text-primary" />
@@ -448,7 +450,7 @@ export default function SearchBar({
                                                             setDetailItem(item);
                                                         }}
                                                         className="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-primary transition-all"
-                                                        title="View Details"
+                                                        title={t('viewDetails')}
                                                     >
                                                         <ChevronRight className="w-4 h-4" />
                                                     </button>
@@ -467,7 +469,7 @@ export default function SearchBar({
             {/* "No Results" State */}
             {isOpen && query && results.length === 0 && (
                 <div className="fixed top-20 left-4 w-[calc(100vw-32px)] md:absolute md:top-full md:right-auto md:left-0 md:w-full mt-2 bg-muted rounded-2xl shadow-lg border border-border p-8 text-center motion-preset-blur-down motion-duration-300 z-50">
-                    <p className="text-muted-foreground">No items found for "{query}"</p>
+                    <p className="text-muted-foreground">{t('noItemsFound', { query })}</p>
                 </div>
             )}
             {/* Hover Details Card */}

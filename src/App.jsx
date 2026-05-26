@@ -4,6 +4,8 @@ import PriceChart from './components/PriceChartECharts';
 import DevControls from './components/DevControls';
 import EmptyStateSkeleton from './components/EmptyStateSkeleton';
 import ThemeToggle from './components/ThemeToggle';
+import LanguageToggle from './components/LanguageToggle';
+import { useLanguage } from './context/LanguageContext';
 import BuildInfo from './components/BuildInfo';
 import { useDuckDB } from './hooks/useDuckDB';
 import { TrendingUp, X, Trash2, ArrowDownWideNarrow, ArrowUp, ArrowDown, Download, FileJson, FileSpreadsheet, Image as ImageIcon, FileText, Copy, Menu, Search } from 'lucide-react';
@@ -37,6 +39,7 @@ const COLORS = [
 
 const EditableDateHeader = ({ selectedDate, selectedDateData, minDate, maxDate, onChange }) => {
   const inputRef = useRef(null);
+  const { t, translateDate } = useLanguage();
 
   if (!selectedDateData) return null;
 
@@ -51,9 +54,9 @@ const EditableDateHeader = ({ selectedDate, selectedDateData, minDate, maxDate, 
     <div 
       onClick={handleHeaderClick}
       className="inline-flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors duration-150 group relative"
-      title="Click to change date"
+      title={t('clickToChangeDate')}
     >
-      <span>Prices ({selectedDateData.dateShort})</span>
+      <span>{t('pricesOnDate')} ({translateDate(selectedDateData.dateShort)})</span>
       <span className="text-[10px] text-muted-foreground/60 group-hover:text-primary transition-colors">✎</span>
       <input
         ref={inputRef}
@@ -75,6 +78,8 @@ const EditableDateHeader = ({ selectedDate, selectedDateData, minDate, maxDate, 
 function App() {
   // 1. Start DuckDB in background
   useDuckDB();
+
+  const { t, formatPrice, language } = useLanguage();
 
   // Array for multi-item comparison (no limit)
   const [selectedItems, setSelectedItems] = useState([]);
@@ -302,7 +307,11 @@ function App() {
                   ? "w-0 opacity-0 md:w-auto md:opacity-100 text-xl sm:text-2xl" 
                   : "max-w-[200px] opacity-100 text-xl sm:text-2xl"
               )}>
-                দাম <span className="text-primary">কত</span>
+                {language === 'bn' ? (
+                  <>দাম <span className="text-primary">কত</span></>
+                ) : (
+                  <>Daam<span className="text-primary">Koto</span></>
+                )}
               </h1>
             </div>
 
@@ -346,7 +355,7 @@ function App() {
               >
                 <button
                   className="p-2 rounded-lg bg-muted border border-border text-foreground hover:bg-accent transition-colors"
-                  title="Export Chart & Data"
+                  title={t('exportComparison')}
                 >
                   <Download size={20} />
                 </button>
@@ -357,12 +366,12 @@ function App() {
                   <div className="pt-7 pointer-events-auto">
                    <div className="w-56 bg-muted rounded-xl shadow-xl border border-border py-1 motion-preset-blur-down motion-duration-200 pointer-events-auto">
                   <div className="px-3 py-2 border-b border-border/50">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Export As</span>
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('exportAs')}</span>
                   </div>
 
                   {selectedItems.length === 0 ? (
                     <div className="px-4 py-6 text-center">
-                      <p className="text-sm text-muted-foreground">Add items to the comparison list to enable export.</p>
+                      <p className="text-sm text-muted-foreground">{t('addItemsToExport')}</p>
                     </div>
                   ) : (<>
 
@@ -373,12 +382,12 @@ function App() {
                       className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-foreground flex items-center gap-2"
                     >
                       <ImageIcon size={14} className="text-blue-500" />
-                      <span>Image (PNG)</span>
+                      <span>{t('imagePng')}</span>
                     </button>
                     <button
                       onClick={() => chartRef.current?.exportImage('copy')}
                       className="p-2 mr-2 text-muted-foreground hover:text-foreground opacity-0 group-hover/item:opacity-100 transition-opacity"
-                      title="Copy Image to Clipboard"
+                      title={t('copyImage')}
                     >
                       <Copy size={14} />
                     </button>
@@ -391,12 +400,12 @@ function App() {
                       className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-foreground flex items-center gap-2"
                     >
                       <FileSpreadsheet size={14} className="text-emerald-500" />
-                      <span>Excel (XLSX)</span>
+                      <span>{t('excelXlsx')}</span>
                     </button>
                     <button
                       onClick={() => chartRef.current?.exportData('xlsx', 'copy')}
                       className="p-2 mr-2 text-muted-foreground hover:text-foreground opacity-0 group-hover/item:opacity-100 transition-opacity"
-                      title="Copy Data (TSV) to Clipboard"
+                      title={t('copyDataTsv')}
                     >
                       <Copy size={14} />
                     </button>
@@ -409,12 +418,12 @@ function App() {
                       className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-foreground flex items-center gap-2"
                     >
                       <FileText size={14} className="text-amber-500" />
-                      <span>CSV File</span>
+                      <span>{t('csvFile')}</span>
                     </button>
                     <button
                       onClick={() => chartRef.current?.exportData('csv', 'copy')}
                       className="p-2 mr-2 text-muted-foreground hover:text-foreground opacity-0 group-hover/item:opacity-100 transition-opacity"
-                      title="Copy CSV to Clipboard"
+                      title={t('copyCsv')}
                     >
                       <Copy size={14} />
                     </button>
@@ -427,12 +436,12 @@ function App() {
                       className="flex-1 text-left px-4 py-2.5 text-sm md:text-xs text-foreground flex items-center gap-2"
                     >
                       <FileJson size={14} className="text-purple-500" />
-                      <span>JSON Data</span>
+                      <span>{t('jsonData')}</span>
                     </button>
                     <button
                       onClick={() => chartRef.current?.exportData('json', 'copy')}
                       className="p-2 mr-2 text-muted-foreground hover:text-foreground opacity-0 group-hover/item:opacity-100 transition-opacity"
-                      title="Copy JSON to Clipboard"
+                      title={t('copyJson')}
                     >
                       <Copy size={14} />
                     </button>
@@ -446,6 +455,7 @@ function App() {
                 )}
               </div>
 
+              <LanguageToggle />
               <ThemeToggle />
             </div>
 
@@ -465,13 +475,16 @@ function App() {
         {isMobileMenuOpen && (
           <div className="absolute top-20 left-0 right-0 z-40 md:hidden border-b border-border bg-muted/95 backdrop-blur-md px-4 py-4 flex flex-col gap-4 shadow-xl animate-in slide-in-from-top duration-300">
             <div className="flex items-center justify-between border-b border-border/50 pb-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Quick Actions</span>
-              <ThemeToggle />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('quickActions')}</span>
+              <div className="flex items-center gap-2">
+                <LanguageToggle />
+                <ThemeToggle />
+              </div>
             </div>
 
             {/* DevControls mobile integration */}
             <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Dev Tools & Controls</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('devTools')}</span>
               <div className="bg-background border border-border rounded-xl p-2">
                 <DevControls 
                   allItems={allItems} 
@@ -483,9 +496,9 @@ function App() {
 
             {/* Export Options inside hamburger */}
             <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Export Comparison</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('exportComparison')}</span>
               {selectedItems.length === 0 ? (
-                <p className="text-xs text-muted-foreground">Add items to enable export options.</p>
+                <p className="text-xs text-muted-foreground">{t('addItemsToEnableExport')}</p>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -493,28 +506,28 @@ function App() {
                     className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
                   >
                     <ImageIcon size={14} className="text-blue-500" />
-                    <span>Image (PNG)</span>
+                    <span>{t('imagePng')}</span>
                   </button>
                   <button
                     onClick={() => { chartRef.current?.exportData('xlsx', 'download'); setIsMobileMenuOpen(false); }}
                     className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
                   >
                     <FileSpreadsheet size={14} className="text-emerald-500" />
-                    <span>Excel (XLSX)</span>
+                    <span>{t('excelXlsx')}</span>
                   </button>
                   <button
                     onClick={() => { chartRef.current?.exportData('csv', 'download'); setIsMobileMenuOpen(false); }}
                     className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
                   >
                     <FileText size={14} className="text-amber-500" />
-                    <span>CSV File</span>
+                    <span>{t('csvFile')}</span>
                   </button>
                   <button
                     onClick={() => { chartRef.current?.exportData('json', 'download'); setIsMobileMenuOpen(false); }}
                     className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
                   >
                     <FileJson size={14} className="text-purple-500" />
-                    <span>JSON Data</span>
+                    <span>{t('jsonData')}</span>
                   </button>
                 </div>
               )}
@@ -569,7 +582,7 @@ function App() {
               <div className="flex items-center justify-between px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">
                   <span className="hidden lg:inline">
-                    ITEMS TRACKED ({selectedItems.length})
+                    {t('itemsTracked')} ({formatPrice(selectedItems.length)})
                   </span>
                   <span className="lg:hidden">
                     {selectedDateData ? (
@@ -581,14 +594,14 @@ function App() {
                         onChange={setSelectedDate}
                       />
                     ) : (
-                      `ITEMS TRACKED (${selectedItems.length})`
+                      `${t('itemsTracked')} (${formatPrice(selectedItems.length)})`
                     )}
                   </span>
                 </h3>
                 <div className="flex items-center gap-1.5">
                   {selectedDateData && (
                     <span className="lg:hidden">
-                      <Tooltip content="Clear Selected Date">
+                      <Tooltip content={t('clearSelectedDate')}>
                         <button
                           onClick={() => {
                             setSelectedDate(null);
@@ -602,7 +615,7 @@ function App() {
                     </span>
                   )}
 
-                  <Tooltip content="Clear All">
+                  <Tooltip content={t('clearAll')}>
                     <button
                       onClick={handleClearAll}
                       className="p-1 rounded-lg transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
@@ -612,7 +625,7 @@ function App() {
                   </Tooltip>
 
                   <div className="flex items-center bg-background rounded-lg p-0.5 border border-border">
-                    <Tooltip content={isSorted ? "Turn sort off" : "Sort by price"} align="right">
+                    <Tooltip content={isSorted ? t('turnSortOff') : t('sortByPrice')} align="right">
                       <button
                         onClick={() => setIsSorted(!isSorted)}
                         className={clsx(
@@ -626,7 +639,7 @@ function App() {
                       </button>
                     </Tooltip>
                     
-                    <Tooltip content={sortDirection === 'asc' ? "Lowest first" : "Highest first"} align="right">
+                    <Tooltip content={sortDirection === 'asc' ? t('lowestFirst') : t('highestFirst')} align="right">
                       <button
                         onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
                         className={clsx(
@@ -676,7 +689,7 @@ function App() {
               <div className="flex items-center justify-between px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">
                   {selectedDetailItemName 
-                    ? "Details" 
+                    ? t('details') 
                     : selectedDateData ? (
                       <EditableDateHeader
                         selectedDate={selectedDate}
@@ -686,11 +699,11 @@ function App() {
                         onChange={setSelectedDate}
                       />
                     ) : (
-                      "Details"
+                      t('details')
                     )}
                 </h3>
                 {(selectedDetailItemName || selectedDateData) && (
-                  <Tooltip content={selectedDetailItemName ? "Clear details" : "Clear selected date"} align="right">
+                  <Tooltip content={selectedDetailItemName ? t('clearDetails') : t('clearSelectedDate')} align="right">
                     <button
                       onClick={() => {
                         if (selectedDetailItemName) {
@@ -770,7 +783,7 @@ function App() {
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 pb-2 border-b border-border/20 flex-shrink-0">
-          <span className="text-xs font-bold uppercase tracking-wider text-primary">Details</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-primary">{t('details')}</span>
           <button 
             onClick={() => setSelectedDetailItemName(null)}
             className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted active:scale-95 transition-all"
