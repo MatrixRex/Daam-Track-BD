@@ -54,12 +54,12 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                         onMouseEnter={() => !isDeleting && onHover(item.name)}
                         onMouseLeave={() => !isDeleting && onHover(null)}
                         className={clsx(
-                            "flex items-center gap-3 p-3 bg-muted rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out group cursor-pointer relative overflow-hidden h-[68px]",
+                            "flex items-center gap-3 p-3 pr-20 lg:pr-3 bg-muted rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ease-out group cursor-pointer relative overflow-hidden h-[68px]",
                             "ring-2 border",
                             isSelected 
                                 ? "ring-ring border-transparent bg-accent translate-x-1.5 shadow-md" 
                                 : isComparisonMode
-                                    ? "ring-purple-500/10 border-purple-500/25 dark:border-purple-400/25 hover:border-purple-500/40 hover:ring-purple-500/20"
+                                    ? "ring-purple-500/10 border-purple-500/25 dark:border-purple-400/25 hover:border-purple-500/40 hover:ring-purple-500/20 lg:ring-transparent lg:border-border lg:hover:border-transparent lg:hover:ring-ring/35 lg:hover:translate-x-0.5"
                                     : "ring-transparent hover:ring-ring/35 border-border hover:border-transparent hover:translate-x-0.5",
                             isDeleting 
                                 ? "opacity-0 -translate-x-full !max-h-0 !h-0 !p-0 !m-0 !border-0 !shadow-none pointer-events-none scale-y-0 duration-200 ease-in-out"
@@ -86,12 +86,18 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                                 {item.name}
                             </h4>
                             <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                                <span className="text-sm font-black text-foreground">
+                                {/* Always show current price on desktop (lg and up) */}
+                                <span className="text-sm font-black text-foreground hidden lg:inline">
+                                    ৳{currentPrice}
+                                </span>
+                                
+                                {/* On mobile, show selectedPrice if in comparison mode, else currentPrice */}
+                                <span className="text-sm font-black text-foreground lg:hidden">
                                     ৳{isComparisonMode ? selectedPrice : currentPrice}
                                 </span>
                                 
                                 {isComparisonMode && (
-                                    <span className="text-[10px] font-bold text-muted-foreground/80 md:hidden">
+                                    <span className="text-[10px] font-bold text-muted-foreground/80 lg:hidden">
                                         (Cur: ৳{currentPrice})
                                     </span>
                                 )}
@@ -101,7 +107,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                                 </span>
 
                                 {isComparisonMode && (
-                                    <div className="flex items-center gap-1 text-[10px] font-bold shrink-0 ml-1 md:hidden">
+                                    <div className="flex items-center gap-1 text-[10px] font-bold shrink-0 ml-1 lg:hidden">
                                         {priceDiff > 0 ? (
                                             <span className="text-red-500 bg-red-500/10 dark:bg-red-500/20 px-1 rounded flex items-center gap-0.5">
                                                 ▲ ৳{priceDiff}
@@ -118,16 +124,17 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                                     </div>
                                 )}
                             </div>
+                            
+                            {/* Standard change line (always on desktop, on mobile only when not in comparison mode) */}
                             <div 
                               className={clsx(
                                 "w-full h-0.5 rounded-full mt-1.5 transition-colors duration-300",
-                                isComparisonMode
-                                  ? "bg-purple-400/40"
-                                  : (itemStat?.change ?? 0) > 0 
-                                    ? "bg-red-400/60" 
-                                    : (itemStat?.change ?? 0) < 0 
-                                      ? "bg-green-400/60" 
-                                      : "bg-transparent"
+                                isComparisonMode ? "hidden lg:block" : "block",
+                                (itemStat?.change ?? 0) > 0 
+                                  ? "bg-red-400/60" 
+                                  : (itemStat?.change ?? 0) < 0 
+                                    ? "bg-green-400/60" 
+                                    : "bg-transparent"
                               )} 
                             />
                         </div>
@@ -135,7 +142,7 @@ export default function StatsSidebar({ items, stats, colors, normTargets, onHove
                         {/* Delete button */}
                         <button
                           onClick={(e) => { e.stopPropagation(); onRemove(item); }}
-                          className="absolute right-0 top-0 h-full aspect-square translate-x-full group-hover:translate-x-0 transition-transform duration-200 bg-red-400 hover:bg-red-500 flex items-center justify-center text-white shadow-sm"
+                          className="absolute right-0 top-0 h-full aspect-square translate-x-0 lg:translate-x-full lg:group-hover:translate-x-0 transition-transform duration-200 bg-red-400 hover:bg-red-500 flex items-center justify-center text-white shadow-sm"
                         >
                           <Trash2 size={16} />
                         </button>

@@ -63,6 +63,24 @@ function App() {
 
 
   const chartRef = useRef(null);
+  const leftScrollRef = useRef(null);
+  const rightScrollRef = useRef(null);
+
+  const handleLeftScroll = () => {
+    if (leftScrollRef.current && rightScrollRef.current) {
+      if (rightScrollRef.current.scrollTop !== leftScrollRef.current.scrollTop) {
+        rightScrollRef.current.scrollTop = leftScrollRef.current.scrollTop;
+      }
+    }
+  };
+
+  const handleRightScroll = () => {
+    if (leftScrollRef.current && rightScrollRef.current) {
+      if (leftScrollRef.current.scrollTop !== rightScrollRef.current.scrollTop) {
+        leftScrollRef.current.scrollTop = rightScrollRef.current.scrollTop;
+      }
+    }
+  };
 
   // 1a. Fetch Product Catalog (Meta Index)
   const [allItems, setAllItems] = useState([]);
@@ -508,23 +526,30 @@ function App() {
             <div className="flex flex-col gap-4 flex-1 min-h-0 lg:col-span-1 overflow-hidden z-10">
               <div className="flex items-center justify-between px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">
-                  {selectedDateData 
-                    ? `Prices (${selectedDateData.dateShort})` 
-                    : `ITEMS TRACKED (${selectedItems.length})`}
+                  <span className="hidden lg:inline">
+                    ITEMS TRACKED ({selectedItems.length})
+                  </span>
+                  <span className="lg:hidden">
+                    {selectedDateData 
+                      ? `Prices (${selectedDateData.dateShort})` 
+                      : `ITEMS TRACKED (${selectedItems.length})`}
+                  </span>
                 </h3>
                 <div className="flex items-center gap-1.5">
                   {selectedDateData && (
-                    <Tooltip content="Clear Selected Date">
-                      <button
-                        onClick={() => {
-                          setSelectedDate(null);
-                          setSelectedDateData(null);
-                        }}
-                        className="p-1 rounded-lg transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-purple-500/10 border border-purple-500/30 text-purple-600 hover:text-purple-700 hover:bg-purple-500/20 active:scale-95 animate-pulse"
-                      >
-                        <X size={13} />
-                      </button>
-                    </Tooltip>
+                    <span className="lg:hidden">
+                      <Tooltip content="Clear Selected Date">
+                        <button
+                          onClick={() => {
+                            setSelectedDate(null);
+                            setSelectedDateData(null);
+                          }}
+                          className="p-1 rounded-lg transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
+                        >
+                          <X size={13} />
+                        </button>
+                      </Tooltip>
+                    </span>
                   )}
 
                   <Tooltip content="Clear All">
@@ -575,6 +600,8 @@ function App() {
               </div>
               
               <div 
+                ref={leftScrollRef}
+                onScroll={handleLeftScroll}
                 className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2 pt-1.5"
               >
                 <StatsSidebar
@@ -598,26 +625,62 @@ function App() {
             <div className="hidden lg:flex lg:flex-col gap-4 min-h-0 overflow-visible">
               <div className="flex items-center justify-between px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm flex-shrink-0">
                 <h3 className="text-sm font-bold text-foreground">
-                  Details
+                  {selectedDetailItemName 
+                    ? "Details" 
+                    : selectedDateData 
+                      ? `Prices (${selectedDateData.dateShort})` 
+                      : "Details"}
                 </h3>
-                {selectedDetailItemName && (
-                  <Tooltip content="Clear" align="right">
+                {(selectedDetailItemName || selectedDateData) && (
+                  <Tooltip content={selectedDetailItemName ? "Clear details" : "Clear selected date"} align="right">
                     <button
                       onClick={() => {
-                        setSelectedDetailItemName(null);
+                        if (selectedDetailItemName) {
+                          setSelectedDetailItemName(null);
+                        } else {
+                          setSelectedDate(null);
+                          setSelectedDateData(null);
+                        }
                       }}
                       className="p-1 rounded-lg transition-all duration-300 flex items-center justify-center h-[26px] w-[26px] bg-background border border-border text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
                     >
-                      <Trash2 size={13} />
+                      <X size={13} />
                     </button>
                   </Tooltip>
                 )}
               </div>
-              <ItemDetailsPanel
-                item={selectedItems.find(i => i.name === selectedDetailItemName)}
-                stats={itemStats[selectedDetailItemName]}
-                normTargets={normTargets.enabled ? normTargets : null}
-              />
+              {selectedDetailItemName ? (
+                <ItemDetailsPanel
+                  item={selectedItems.find(i => i.name === selectedDetailItemName)}
+                  stats={itemStats[selectedDetailItemName]}
+                  normTargets={normTargets.enabled ? normTargets : null}
+                />
+              ) : selectedDateData ? (
+                <div 
+                  ref={rightScrollRef}
+                  onScroll={handleRightScroll}
+                  className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2 pt-1.5"
+                >
+                  <SelectedDatePanel
+                    items={sortedItems}
+                    stats={Object.values(itemStats)}
+                    dateData={selectedDateData}
+                    colors={COLORS}
+                    normTargets={normTargets.enabled ? normTargets : null}
+                    onSelect={(name) => {
+                      setSelectedDetailItemName(name);
+                    }}
+                    onHover={setHoveredItem}
+                    deletingItems={deletingItems}
+                  />
+                </div>
+              ) : (
+                <ItemDetailsPanel
+                  item={null}
+                  stats={null}
+                  normTargets={normTargets.enabled ? normTargets : null}
+                />
+              )}
             </div>
 
           </div>

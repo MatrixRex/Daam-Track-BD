@@ -202,11 +202,12 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
                         )}
                     />
                 </button>
-                {!normTargets.enabled && (
-                    <span className="text-sm font-bold text-muted-foreground whitespace-nowrap animate-in fade-in duration-200">
-                        Normalize Units
-                    </span>
-                )}
+                <span className={clsx(
+                    "text-sm font-bold text-muted-foreground whitespace-nowrap animate-in fade-in duration-200",
+                    normTargets.enabled ? "hidden md:inline" : "inline"
+                )}>
+                    Normalize Units
+                </span>
             </div>
 
             {/* Numeric Inputs */}
