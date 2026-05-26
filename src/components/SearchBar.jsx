@@ -138,31 +138,61 @@ export default function SearchBar({
             
             const queryWords = cleanQuery.toLowerCase().split(/\s+/).filter(Boolean);
             
+            // Singular/plural normalization helper
+            const normalizeWord = (w) => {
+                if (w.length > 3 && w.endsWith('s')) {
+                    if (w.endsWith('ies')) {
+                        return w.slice(0, -3) + 'y';
+                    }
+                    if (w.endsWith('es')) {
+                        return w.slice(0, -2);
+                    }
+                    return w.slice(0, -1);
+                }
+                return w;
+            };
+
+            const queryWordsNorm = queryWords.map(normalizeWord);
+            
+            // Common unit identifiers to ignore for semantic coverage length calculation
+            const COMMON_UNITS = new Set([
+                'pcs', 'pc', 'gm', 'kg', 'ltr', 'ml', 'pack', 'bundle', 'each', 
+                'set', 'bag', 'box', 'roll', 'rim', 'can', 'bottle'
+            ]);
+
             const scoredItems = matchedItems.map(item => {
                 const nameLower = item.name.toLowerCase();
                 const nameWords = nameLower.split(/[^a-z0-9]+/i).filter(Boolean);
+                const nameWordsNorm = nameWords.map(normalizeWord);
+                
+                // Exclude quantity numbers and common packaging/unit names for true semantic name coverage
+                const semanticWords = nameWords.filter(w => !COMMON_UNITS.has(w) && !/^\d+$/.test(w));
                 
                 let matchedLength = 0;
                 let exactMatches = 0;
                 const nameWordsMatched = new Array(nameWords.length).fill(false);
                 
-                for (const qw of queryWords) {
+                for (let qIdx = 0; qIdx < queryWords.length; qIdx++) {
+                    const qw = queryWords[qIdx];
+                    const qwNorm = queryWordsNorm[qIdx];
+                    
                     let bestScore = 0;
                     let bestIdx = -1;
                     
                     for (let i = 0; i < nameWords.length; i++) {
                         if (nameWordsMatched[i]) continue;
                         const nw = nameWords[i];
+                        const nwNorm = nameWordsNorm[i];
                         
                         let score = 0;
-                        if (nw === qw) {
+                        if (nw === qw || nwNorm === qwNorm) {
                             score = 1.0;
-                        } else if (nw.startsWith(qw)) {
-                            score = 0.9 * (qw.length / nw.length);
-                        } else if (qw.startsWith(nw)) {
-                            score = 0.8 * (nw.length / qw.length);
-                        } else if (nw.includes(qw)) {
-                            score = 0.5 * (qw.length / nw.length);
+                        } else if (nw.startsWith(qw) || nwNorm.startsWith(qwNorm)) {
+                            score = 0.9 * (Math.min(qw.length, nw.length) / Math.max(qw.length, nw.length));
+                        } else if (qw.startsWith(nw) || qwNorm.startsWith(nwNorm)) {
+                            score = 0.8 * (Math.min(qw.length, nw.length) / Math.max(qw.length, nw.length));
+                        } else if (nw.includes(qw) || nwNorm.includes(qwNorm)) {
+                            score = 0.5 * (Math.min(qw.length, nw.length) / Math.max(qw.length, nw.length));
                         }
                         
                         if (score > bestScore) {
@@ -178,8 +208,11 @@ export default function SearchBar({
                     }
                 }
                 
+                const totalSemanticLength = semanticWords.reduce((sum, w) => sum + w.length, 0);
                 const totalNameLength = nameWords.reduce((sum, w) => sum + w.length, 0);
-                const nameCoverage = totalNameLength > 0 ? (matchedLength / totalNameLength) : 0;
+                
+                // Use semantic words length for coverage if available, otherwise fallback to total name length
+                const nameCoverage = totalSemanticLength > 0 ? (matchedLength / totalSemanticLength) : (totalNameLength > 0 ? (matchedLength / totalNameLength) : 0);
                 
                 const totalQueryLength = queryWords.reduce((sum, w) => sum + w.length, 0);
                 const queryCoverage = totalQueryLength > 0 ? (matchedLength / totalQueryLength) : 0;
@@ -187,9 +220,11 @@ export default function SearchBar({
                 // Combined match score (60% weight on name coverage, 40% on query coverage)
                 let score = nameCoverage * 0.6 + queryCoverage * 0.4;
                 
-                // Boost for matching words in name exactly (even out of order)
-                if (exactMatches === queryWords.length && nameWords.length === queryWords.length) {
-                    score += 2.0;
+                // Boost for matching words exactly (even out of order)
+                if (exactMatches === queryWords.length && semanticWords.length === queryWords.length) {
+                    score += 2.0; // Perfect semantic match
+                } else if (exactMatches === queryWords.length && nameWords.length === queryWords.length) {
+                    score += 1.8; // Full exact match (with packaging)
                 } else if (exactMatches === queryWords.length) {
                     score += 1.0;
                 }
