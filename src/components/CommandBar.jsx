@@ -11,9 +11,9 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
     ];
 
     return (
-        <div className="flex flex-wrap items-center gap-4 px-4 h-16 bg-muted border border-border rounded-2xl shadow-sm transition-all duration-300 motion-preset-fade motion-duration-300">
+        <div className="flex flex-wrap items-center gap-3 md:gap-4 px-3 md:px-4 min-h-16 py-2.5 md:py-0 bg-muted border border-border rounded-2xl shadow-sm transition-all duration-300 motion-preset-fade motion-duration-300">
             {/* Normalization Toggle */}
-            <div className="flex items-center gap-3 pr-4 border-r border-border">
+            <div className="flex items-center gap-2 md:gap-3 pr-3 md:pr-4 border-r border-border">
                 <button
                     onClick={() => onUpdateNorm({ ...normTargets, enabled: !normTargets.enabled })}
                     className={clsx(
@@ -29,7 +29,7 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
                     />
                 </button>
                 <span className={clsx(
-                    "text-sm font-bold transition-colors duration-300",
+                    "text-sm font-bold transition-colors duration-300 whitespace-nowrap",
                     normTargets.enabled ? "text-foreground" : "text-muted-foreground"
                 )}>
                     Normalize Units
@@ -38,13 +38,13 @@ export default function CommandBar({ normTargets, onUpdateNorm, onResetUnits }) 
 
             {/* Numeric Inputs */}
             <div className={clsx(
-                "flex flex-wrap items-center gap-6 transition-all duration-300",
+                "flex flex-wrap items-center gap-3 md:gap-6 transition-all duration-300",
                 normTargets.enabled ? "opacity-100" : "opacity-0 pointer-events-none"
             )}>
                 {categories.map((cat) => (
-                    <div key={cat.id} className="flex items-center gap-2 group">
-                        <cat.icon className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{cat.label}</span>
+                    <div key={cat.id} className="flex items-center gap-1.5 md:gap-2 group">
+                        <cat.icon className="hidden md:block w-4 h-4 text-muted-foreground" />
+                        <span className="hidden md:inline text-xs font-bold text-muted-foreground uppercase tracking-wider">{cat.label}</span>
                         <div className="flex items-center bg-background border border-border rounded-lg px-2 py-1 focus-within:border-ring transition-all">
                             <input
                                 type="number"

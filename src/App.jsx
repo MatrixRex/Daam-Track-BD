@@ -481,7 +481,7 @@ function App() {
           <div className="flex flex-col lg:grid lg:grid-cols-[6fr_2fr_2fr] gap-4 flex-1 min-h-0 overflow-hidden motion-preset-fade motion-duration-300">
 
             {/* Column 1: Chart (60%) */}
-            <div className="flex flex-col gap-4 flex-none h-[300px] sm:h-[330px] lg:h-auto lg:flex-1 lg:col-span-1 min-h-0">
+            <div className="flex flex-col gap-4 flex-none min-h-[300px] sm:min-h-[330px] lg:h-auto lg:flex-1 lg:col-span-1 min-h-0">
               <CommandBar
                 normTargets={normTargets}
                 onUpdateNorm={setNormTargets}
