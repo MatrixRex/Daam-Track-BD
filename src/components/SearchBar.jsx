@@ -257,7 +257,7 @@ export default function SearchBar({
     }, [query, uf, haystack, items]);
 
     // Lift suggestion dropdown state up to notify if suggestions list is open (including "no results" state)
-    const showSuggestions = isOpen && query.trim().length >= 2 && (results.length > 0 || results.length === 0);
+    const showSuggestions = isOpen && (results.length > 0 || (query.trim() !== '' && results.length === 0));
     useEffect(() => {
         if (onSuggestionsListOpenChange) {
             onSuggestionsListOpenChange(showSuggestions);
@@ -465,7 +465,7 @@ export default function SearchBar({
             )}
 
             {/* "No Results" State */}
-            {isOpen && query.trim().length >= 2 && results.length === 0 && (
+            {isOpen && query && results.length === 0 && (
                 <div className="fixed top-20 left-4 w-[calc(100vw-32px)] md:absolute md:top-full md:right-auto md:left-0 md:w-full mt-2 bg-muted rounded-2xl shadow-lg border border-border p-8 text-center motion-preset-blur-down motion-duration-300 z-50">
                     <p className="text-muted-foreground">No items found for "{query}"</p>
                 </div>
