@@ -152,9 +152,9 @@ const UI_TRANSLATIONS = {
     // Empty State
     comparePricesTitle: "মূল্য ও ট্রেন্ড তুলনা করুন",
     comparePricesDesc: "পণ্যসমূহের দামের ইতিহাস দেখতে, মূল্য বৃদ্ধির গতিবিধি ট্র্যাক করতে এবং সঠিক কেনাকাটার সিদ্ধান্ত নিতে সার্চবার থেকে পণ্য নির্বাচন করুন।",
-    tryRice: 'চেষ্টা করুন "Rice"',
-    tryEgg: 'চেষ্টা করুন "Egg"',
-    tryOnion: 'চেষ্টা করুন "Onion"',
+    tryRice: 'খুঁজুন "Rice"',
+    tryEgg: 'খুঁজুন "Egg"',
+    tryOnion: 'খুঁজুন "Onion"',
     
     // Insights
     productInsights: "পণ্য বিশ্লেষণ",
