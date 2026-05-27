@@ -7,8 +7,8 @@
 /* Custom theme colors */
 @theme {
   /* Font Families */
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-heading: "Alan Sans", var(--font-sans);
+  --font-sans: "Inter", "Noto Sans Bengali", system-ui, -apple-system, sans-serif;
+  --font-heading: "Alan Sans", "Noto Sans Bengali", var(--font-sans);
 
   --radius-3xl: 0.75rem;
   --radius-2xl: 0.5rem;
