@@ -302,7 +302,8 @@ function App() {
                 <TrendingUp size={24} />
               </div>
               <h1 className={clsx(
-                "font-black tracking-tight text-foreground transition-all duration-500 overflow-hidden whitespace-nowrap",
+                language === 'bn' ? 'font-black' : 'font-bold',
+                "tracking-tight text-foreground transition-all duration-500 overflow-hidden whitespace-nowrap",
                 isSearchExpanded 
                   ? "w-0 opacity-0 md:w-auto md:opacity-100 text-xl sm:text-2xl" 
                   : "max-w-[200px] opacity-100 text-xl sm:text-2xl"

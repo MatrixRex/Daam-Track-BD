@@ -356,8 +356,8 @@ export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(() => {
     const saved = localStorage.getItem('language');
     if (saved) return saved;
-    // Default to 'en'
-    return 'en';
+    // Default to 'bn'
+    return 'bn';
   });
 
   useEffect(() => {
