@@ -277,6 +277,24 @@ export default function SearchBar({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Track failed searches (no results found) after debouncing to prevent partial logging
+    useEffect(() => {
+        const trimmedQuery = query.trim();
+        if (!trimmedQuery || trimmedQuery.length < 2) return;
+
+        if (isOpen && results.length === 0) {
+            const debouncedLog = setTimeout(() => {
+                window.goatcounter?.count({
+                    path: 'search-failed/' + trimmedQuery.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                    title: 'Search Failed: ' + trimmedQuery,
+                    event: true
+                });
+            }, 1500); // 1.5s debounce
+
+            return () => clearTimeout(debouncedLog);
+        }
+    }, [query, results, isOpen]);
+
     // 5. Observe dropdown content height changes to animate container size
     useEffect(() => {
         if (!isOpen || results.length === 0) {
@@ -399,6 +417,13 @@ export default function SearchBar({
                                         }}
                                         onClick={() => {
                                             if (!isSelected) {
+                                                // Track successful search selection in GoatCounter
+                                                window.goatcounter?.count({
+                                                    path: 'search-success/' + item.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                                                    title: 'Search Success: ' + item.name,
+                                                    event: true
+                                                });
+
                                                 onSelect(item);
                                                 setQuery(''); // Clear input to allow adding more
                                                 setIsOpen(false);
