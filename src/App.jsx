@@ -51,43 +51,50 @@ const EditableDateHeader = ({ selectedDate, selectedDateData, minDate, maxDate, 
   };
 
   return (
-    <div 
-      onClick={handleHeaderClick}
-      className="inline-flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors duration-150 group relative"
-      title={t('clickToChangeDate')}
-    >
-      <span>
-        {t('pricesOnDate')} ({translateDate(selectedDateData.dateShort)})
-        {totalPrice !== undefined && totalPrice > 0 && (
-          currentTotalPrice !== undefined && currentTotalPrice > 0 ? (
-            <>
-              <span className="mx-1.5">•</span>
-              <span className="lg:hidden">
-                ৳{formatPrice(totalPrice)} <span className="text-[10px] font-bold text-muted-foreground/80">({t('currentAbbr')}: ৳{formatPrice(currentTotalPrice)})</span>
-              </span>
-              <span className="hidden lg:inline">
-                {t('total')}: ৳{formatPrice(totalPrice)}
-              </span>
-            </>
-          ) : (
-            ` • ${t('total')}: ৳${formatPrice(totalPrice)}`
-          )
-        )}
-      </span>
-      <span className="text-[10px] text-muted-foreground/60 group-hover:text-primary transition-colors">✎</span>
-      <input
-        ref={inputRef}
-        type="date"
-        value={selectedDate || ''}
-        onChange={(e) => {
-          if (e.target.value) {
-            onChange(e.target.value);
-          }
-        }}
-        min={minDate}
-        max={maxDate}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer pointer-events-auto"
-      />
+    <div className="inline-flex items-center flex-wrap gap-1.5 text-sm font-bold text-foreground select-none">
+      <span>{t('pricesOnDate')}</span>
+      
+      {/* Date Selector Box (only this is clickable and hoverable) */}
+      <div 
+        onClick={handleHeaderClick}
+        className="relative inline-flex items-center gap-1.5 bg-background border border-border rounded-lg px-2 py-0.5 hover:border-primary hover:bg-accent transition-all cursor-pointer font-semibold text-xs text-foreground shadow-sm hover:shadow-md"
+        title={t('clickToChangeDate')}
+      >
+        <span>{translateDate(selectedDateData.dateShort)}</span>
+        <span className="text-[10px] text-muted-foreground/60">✎</span>
+        <input
+          ref={inputRef}
+          type="date"
+          value={selectedDate || ''}
+          onChange={(e) => {
+            if (e.target.value) {
+              onChange(e.target.value);
+            }
+          }}
+          min={minDate}
+          max={maxDate}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer pointer-events-auto"
+        />
+      </div>
+
+      {totalPrice !== undefined && totalPrice > 0 && (
+        currentTotalPrice !== undefined && currentTotalPrice > 0 ? (
+          <>
+            <span className="mx-0.5 text-muted-foreground/50">•</span>
+            <span className="lg:hidden">
+              ৳{formatPrice(totalPrice)} <span className="text-[10px] font-bold text-muted-foreground/80">({t('currentAbbr')}: ৳{formatPrice(currentTotalPrice)})</span>
+            </span>
+            <span className="hidden lg:inline">
+              {t('total')}: ৳{formatPrice(totalPrice)}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="mx-0.5 text-muted-foreground/50">•</span>
+            <span>{t('total')}: ৳{formatPrice(totalPrice)}</span>
+          </>
+        )
+      )}
     </div>
   );
 };
