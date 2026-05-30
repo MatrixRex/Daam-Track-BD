@@ -69,10 +69,15 @@ export default function SearchBar({
     emptyState = false,
     isMobileExpanded = false,
     onMobileExpandChange,
-    onSuggestionsListOpenChange
+    onSuggestionsListOpenChange,
+    query: propQuery,
+    setQuery: propSetQuery
 }) {
     const { t, tProduct, tCategory, tUnit, formatPrice } = useLanguage();
-    const [query, setQuery] = useState('');
+    const [localQuery, setLocalQuery] = useState('');
+    const query = propQuery !== undefined ? propQuery : localQuery;
+    const setQuery = propSetQuery !== undefined ? propSetQuery : setLocalQuery;
+
     const [isOpen, setIsOpen] = useState(false);
     const [hoveredItem, setHoveredItem] = useState(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -89,6 +94,13 @@ export default function SearchBar({
             return () => clearTimeout(timer);
         }
     }, [autoFocus]);
+
+    // Focus input when query changes from outside (the input's onFocus event will naturally open suggestions)
+    useEffect(() => {
+        if (query.trim() && document.activeElement !== inputRef.current) {
+            inputRef.current?.focus();
+        }
+    }, [query]);
 
     // Detect touch device to disable hover
     const isTouchDevice = useMemo(() => {

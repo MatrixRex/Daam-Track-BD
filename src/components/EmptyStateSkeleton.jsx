@@ -2,7 +2,7 @@ import React from 'react';
 import { TrendingUp } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
-const EmptyStateSkeleton = () => {
+const EmptyStateSkeleton = ({ onSelectSuggestion }) => {
     const { t } = useLanguage();
     return (
         <div className="relative flex-1 min-h-0 w-full h-full flex flex-col justify-center">
@@ -50,9 +50,24 @@ const EmptyStateSkeleton = () => {
                         {t('comparePricesDesc')}
                     </p>
                     <div className="flex flex-wrap justify-center gap-2 text-sm text-muted-foreground">
-                        <span className="bg-background border border-border px-3 py-1 rounded-full">{t('tryRice')}</span>
-                        <span className="bg-background border border-border px-3 py-1 rounded-full">{t('tryEgg')}</span>
-                        <span className="bg-background border border-border px-3 py-1 rounded-full">{t('tryOnion')}</span>
+                        <button
+                            onClick={() => onSelectSuggestion?.('rice')}
+                            className="bg-background hover:bg-accent border border-border px-3 py-1 rounded-full cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md hover:border-primary/50 text-foreground"
+                        >
+                            {t('tryRice')}
+                        </button>
+                        <button
+                            onClick={() => onSelectSuggestion?.('egg')}
+                            className="bg-background hover:bg-accent border border-border px-3 py-1 rounded-full cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md hover:border-primary/50 text-foreground"
+                        >
+                            {t('tryEgg')}
+                        </button>
+                        <button
+                            onClick={() => onSelectSuggestion?.('onion')}
+                            className="bg-background hover:bg-accent border border-border px-3 py-1 rounded-full cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md hover:border-primary/50 text-foreground"
+                        >
+                            {t('tryOnion')}
+                        </button>
                     </div>
                 </div>
             </div>

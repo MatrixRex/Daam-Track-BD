@@ -105,6 +105,7 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isSearchSuggestionsOpen, setIsSearchSuggestionsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
 
 
@@ -208,6 +209,12 @@ function App() {
       return [...prev, ...filteredNewItems];
     });
   }, [getItemColor]);
+
+  // Handle suggestion select
+  const handleSelectSuggestion = useCallback((query) => {
+    setSearchQuery(query);
+    setIsSearchExpanded(true);
+  }, []);
 
   const sortedItems = useMemo(() => {
     if (!isSorted) return selectedItems;
@@ -340,6 +347,8 @@ function App() {
               isMobileExpanded={isSearchExpanded}
               onMobileExpandChange={setIsSearchExpanded}
               onSuggestionsListOpenChange={setIsSearchSuggestionsOpen}
+              query={searchQuery}
+              setQuery={setSearchQuery}
             />
           </div>
 
@@ -758,7 +767,7 @@ function App() {
           </div>
         ) : (
           /* Empty State */
-          <EmptyStateSkeleton />
+          <EmptyStateSkeleton onSelectSuggestion={handleSelectSuggestion} />
         )}
 
       </div>
