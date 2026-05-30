@@ -1,11 +1,14 @@
 import { useLanguage } from '../context/LanguageContext';
 
-const LanguageToggle = () => {
+const LanguageToggle = ({ onClick }) => {
     const { language, setLanguage } = useLanguage();
 
     return (
         <button
-            onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
+            onClick={() => {
+                setLanguage(language === 'en' ? 'bn' : 'en');
+                onClick?.();
+            }}
             className="relative w-10 h-10 rounded-lg bg-muted hover:bg-primary/10 transition-all duration-300 group overflow-hidden border border-border motion-preset-fade motion-duration-300 flex items-center justify-center font-bold text-xs select-none text-primary"
             title={language === 'en' ? 'বাংলায় দেখুন' : 'Switch to English'}
             aria-label={language === 'en' ? 'Switch to Bangla' : 'Switch to English'}

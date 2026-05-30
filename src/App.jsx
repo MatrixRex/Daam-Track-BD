@@ -536,8 +536,8 @@ function App() {
             <div className="flex items-center justify-between border-b border-border/50 pb-2">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('quickActions')}</span>
               <div className="flex items-center gap-2">
-                <LanguageToggle />
-                <ThemeToggle />
+                <LanguageToggle onClick={() => setIsMobileMenuOpen(false)} />
+                <ThemeToggle onClick={() => setIsMobileMenuOpen(false)} />
               </div>
             </div>
 
@@ -548,7 +548,10 @@ function App() {
                 <DevControls 
                   allItems={allItems} 
                   selectedItems={selectedItems} 
-                  onAddItems={handleBulkAdd} 
+                  onAddItems={(items) => {
+                    handleBulkAdd(items);
+                    setIsMobileMenuOpen(false);
+                  }} 
                 />
               </div>
             </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
-const ThemeToggle = () => {
+const ThemeToggle = ({ onClick }) => {
     const [isDark, setIsDark] = useState(() => {
         // Check localStorage first
         const saved = localStorage.getItem('theme');
@@ -36,7 +36,10 @@ const ThemeToggle = () => {
 
     return (
         <button
-            onClick={() => setIsDark(!isDark)}
+            onClick={() => {
+                setIsDark(!isDark);
+                onClick?.();
+            }}
             className="relative p-2.5 rounded-lg bg-muted hover:bg-primary/10 transition-all duration-300 group overflow-hidden border border-border motion-preset-fade motion-duration-300"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
