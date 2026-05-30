@@ -919,7 +919,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         formatter: t('selected'),
                         fontSize: 10,
                         color: isDark ? '#cacecc' : '#313533',
-                        backgroundColor: isDark ? 'oklch(0.205 0 0)' : 'oklch(0.97 0 0)',
+                        backgroundColor: isDark ? '#2a2442' : '#f1f5f9',
                         padding: [2, 4],
                         borderRadius: 4
                     },
@@ -929,7 +929,7 @@ const PriceChartECharts = React.forwardRef(({ items = [], colors = [], hoveredIt
                         type: 'dashed'
                     },
                     data: [
-                        { xAxis: selectedDateShort }
+                        { xAxis: translateDate(selectedDateShort) }
                     ]
                 };
             } else {
