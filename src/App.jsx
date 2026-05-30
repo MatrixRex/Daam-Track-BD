@@ -37,9 +37,9 @@ const COLORS = [
   { stroke: '#A855F7', fill: '#A855F7' }, // Violet
 ];
 
-const EditableDateHeader = ({ selectedDate, selectedDateData, minDate, maxDate, onChange }) => {
+const EditableDateHeader = ({ selectedDate, selectedDateData, minDate, maxDate, onChange, totalPrice, currentTotalPrice }) => {
   const inputRef = useRef(null);
-  const { t, translateDate } = useLanguage();
+  const { t, translateDate, formatPrice } = useLanguage();
 
   if (!selectedDateData) return null;
 
@@ -56,7 +56,24 @@ const EditableDateHeader = ({ selectedDate, selectedDateData, minDate, maxDate, 
       className="inline-flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors duration-150 group relative"
       title={t('clickToChangeDate')}
     >
-      <span>{t('pricesOnDate')} ({translateDate(selectedDateData.dateShort)})</span>
+      <span>
+        {t('pricesOnDate')} ({translateDate(selectedDateData.dateShort)})
+        {totalPrice !== undefined && totalPrice > 0 && (
+          currentTotalPrice !== undefined && currentTotalPrice > 0 ? (
+            <>
+              <span className="mx-1.5">•</span>
+              <span className="lg:hidden">
+                ৳{formatPrice(totalPrice)} <span className="text-[10px] font-bold text-muted-foreground/80">({t('currentAbbr')}: ৳{formatPrice(currentTotalPrice)})</span>
+              </span>
+              <span className="hidden lg:inline">
+                {t('total')}: ৳{formatPrice(totalPrice)}
+              </span>
+            </>
+          ) : (
+            ` • ${t('total')}: ৳${formatPrice(totalPrice)}`
+          )
+        )}
+      </span>
       <span className="text-[10px] text-muted-foreground/60 group-hover:text-primary transition-colors">✎</span>
       <input
         ref={inputRef}
@@ -232,6 +249,31 @@ function App() {
       return sortDirection === 'asc' ? priceA - priceB : priceB - priceA;
     });
   }, [selectedItems, isSorted, sortDirection, itemStats, normTargets]);
+
+  const currentTotalPrice = useMemo(() => {
+    if (selectedItems.length === 0) return 0;
+    return selectedItems.reduce((sum, item) => {
+      const itemStat = itemStats[item.name];
+      const currentRawPrice = itemStat?.current ?? item.price;
+      const price = normTargets.enabled
+        ? Math.round(getNormalizedPrice(currentRawPrice, item.unit, normTargets))
+        : currentRawPrice;
+      return sum + (price || 0);
+    }, 0);
+  }, [selectedItems, itemStats, normTargets]);
+
+  const selectedTotalPrice = useMemo(() => {
+    if (!selectedDateData || selectedItems.length === 0) return 0;
+    return selectedItems.reduce((sum, item) => {
+      const currentRawPrice = itemStats[item.name]?.current ?? item.price;
+      const hasSelectedPrice = selectedDateData.prices && selectedDateData.prices[item.name] !== undefined;
+      const rawPrice = hasSelectedPrice ? selectedDateData.prices[item.name] : currentRawPrice;
+      const price = normTargets.enabled
+        ? Math.round(getNormalizedPrice(rawPrice, item.unit, normTargets))
+        : rawPrice;
+      return sum + (price || 0);
+    }, 0);
+  }, [selectedItems, itemStats, selectedDateData, normTargets]);
 
   // Remove item from comparison
   const handleRemoveItem = useCallback((itemName) => {
@@ -593,6 +635,7 @@ function App() {
                 <h3 className="text-sm font-bold text-foreground">
                   <span className="hidden lg:inline">
                     {t('itemsTracked')} ({formatPrice(selectedItems.length)})
+                    {selectedItems.length > 0 && ` • ${t('total')}: ৳${formatPrice(currentTotalPrice)}`}
                   </span>
                   <span className="lg:hidden">
                     {selectedDateData ? (
@@ -602,9 +645,11 @@ function App() {
                         minDate={chartDateRange.start}
                         maxDate={chartDateRange.end}
                         onChange={setSelectedDate}
+                        totalPrice={selectedTotalPrice}
+                        currentTotalPrice={currentTotalPrice}
                       />
                     ) : (
-                      `${t('itemsTracked')} (${formatPrice(selectedItems.length)})`
+                      `${t('itemsTracked')} (${formatPrice(selectedItems.length)})` + (selectedItems.length > 0 ? ` • ৳${formatPrice(currentTotalPrice)}` : '')
                     )}
                   </span>
                 </h3>
@@ -707,6 +752,8 @@ function App() {
                         minDate={chartDateRange.start}
                         maxDate={chartDateRange.end}
                         onChange={setSelectedDate}
+                        totalPrice={selectedTotalPrice}
+                        currentTotalPrice={currentTotalPrice}
                       />
                     ) : (
                       t('details')
