@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { getNormalizedPrice, getTargetUnitLabel, parseUnit } from '../utils/quantityUtils';
 import ProductImage from './ProductImage';
 
-export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right', normTargets, stats }) {
+export default function ItemHoverCard({ item, mousePos, sideRect, normTargets, stats }) {
     const [activeData, setActiveData] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
 
@@ -40,47 +40,37 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
     const cardWidth = 288;
     const cardHeight = 380;
     const gap = 15;
-    const hoverItemOffset = 40; // Space to keep the hovered item visible
 
     let left = mousePos.x + 20;
     let top = mousePos.y;
 
-    // 1. Vertical Positioning Logic: Anchor based on screen half
-    if (mousePos.y < window.innerHeight / 2) {
-        // Cursor in top half: card goes BELOW
-        top = mousePos.y + hoverItemOffset;
-    } else {
-        // Cursor in bottom half: card goes ABOVE
-        top = mousePos.y - cardHeight - hoverItemOffset;
-    }
-
-    // 2. Horizontal Positioning Logic
     if (currentSideRect) {
+        // Vertical positioning: Center vertically relative to the hovered item
+        top = currentSideRect.top + (currentSideRect.height / 2) - (cardHeight / 2);
+
+        // Horizontal positioning: Position next to the item (right side first, fallback to left)
         const spaceOnRight = window.innerWidth - currentSideRect.right;
         const spaceOnLeft = currentSideRect.left;
 
-        if (side === 'right') {
-            // Priority 1: Right of the list
-            if (spaceOnRight > cardWidth + gap) {
-                left = currentSideRect.right + gap;
-            } else {
-                // Priority 2: Overlap the list, but NEVER overlap the chart (don't go left of sideRect.left)
-                left = Math.max(currentSideRect.left, currentSideRect.right - cardWidth);
-            }
+        if (spaceOnRight > cardWidth + gap) {
+            // Place on the right of the item
+            left = currentSideRect.right + gap;
+        } else if (spaceOnLeft > cardWidth + gap) {
+            // Place on the left of the item
+            left = currentSideRect.left - cardWidth - gap;
         } else {
-            // side === 'left' (e.g. Search Bar)
-            // Priority 1: Left of the anchor
-            if (spaceOnLeft > cardWidth + gap) {
-                left = currentSideRect.left - cardWidth - gap;
-            }
-            // Priority 2: Right of the anchor
-            else if (spaceOnRight > cardWidth + gap) {
-                left = currentSideRect.right + gap;
-            }
-            // Priority 3: Overlap but stay within sideRect bounds if possible
-            else {
-                left = Math.max(10, currentSideRect.left);
-            }
+            // Fallback: Place on whichever side has more space (never hide the item completely)
+            left = spaceOnRight >= spaceOnLeft 
+                ? window.innerWidth - cardWidth - 10 
+                : 10;
+        }
+    } else {
+        // Fallback to cursor position if no sideRect is available
+        const hoverItemOffset = 40;
+        if (mousePos.y < window.innerHeight / 2) {
+            top = mousePos.y + hoverItemOffset;
+        } else {
+            top = mousePos.y - cardHeight - hoverItemOffset;
         }
     }
 

@@ -411,12 +411,10 @@ export default function SearchBar({
                                 return (
                                     <li
                                         key={index}
-                                        onMouseEnter={() => {
+                                        onMouseEnter={(e) => {
                                             if (isTouchDevice) return;
                                             setHoveredItem(item);
-                                            if (searchRef.current) {
-                                                setSideRect(searchRef.current.getBoundingClientRect());
-                                            }
+                                            setSideRect(e.currentTarget.getBoundingClientRect());
                                         }}
                                         onMouseLeave={() => {
                                             if (isTouchDevice) return;
