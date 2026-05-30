@@ -521,92 +521,111 @@ function App() {
             {/* Hamburger Menu Button (visible only on mobile) */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg bg-muted border border-border text-foreground hover:bg-accent transition-all flex items-center justify-center active:scale-95 flex-shrink-0 w-10 h-10 opacity-100 scale-100"
+              className="md:hidden p-2 rounded-lg bg-muted border border-border text-foreground hover:bg-accent transition-all flex items-center justify-center active:scale-95 flex-shrink-0 w-10 h-10 opacity-100 scale-100 relative"
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              <div className="relative w-5 h-5 flex items-center justify-center">
+                <div className={clsx(
+                  "absolute inset-0 transition-all duration-300 ease-in-out flex items-center justify-center",
+                  isMobileMenuOpen ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"
+                )}>
+                  <Menu size={20} />
+                </div>
+                <div className={clsx(
+                  "absolute inset-0 transition-all duration-300 ease-in-out flex items-center justify-center",
+                  isMobileMenuOpen ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0"
+                )}>
+                  <X size={20} />
+                </div>
+              </div>
             </button>
           </div>
 
         </div>
 
         {/* --- MOBILE HAMBURGER MENU DROPDOWN --- */}
-        {isMobileMenuOpen && (
-          <div className="absolute top-20 left-0 right-0 z-40 md:hidden border-b border-border bg-muted/95 backdrop-blur-md px-4 py-4 flex flex-col gap-4 shadow-xl animate-in slide-in-from-top duration-300">
-            <div className="flex items-center justify-between border-b border-border/50 pb-2">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('quickActions')}</span>
-              <div className="flex items-center gap-2">
-                <LanguageToggle onClick={() => setIsMobileMenuOpen(false)} />
-                <ThemeToggle onClick={() => setIsMobileMenuOpen(false)} />
-              </div>
-            </div>
-
-            {/* DevControls mobile integration */}
-            <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('devTools')}</span>
-              <div className="bg-background border border-border rounded-xl p-2">
-                <DevControls 
-                  allItems={allItems} 
-                  selectedItems={selectedItems} 
-                  onAddItems={(items) => {
-                    handleBulkAdd(items);
-                    setIsMobileMenuOpen(false);
-                  }} 
-                />
-              </div>
-            </div>
-
-            {/* Export Options inside hamburger */}
-            <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('exportComparison')}</span>
-              {selectedItems.length === 0 ? (
-                <p className="text-xs text-muted-foreground">{t('addItemsToEnableExport')}</p>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => { chartRef.current?.exportImage('download'); setIsMobileMenuOpen(false); }}
-                    className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
-                  >
-                    <ImageIcon size={14} className="text-blue-500" />
-                    <span>{t('imagePng')}</span>
-                  </button>
-                  <button
-                    onClick={() => { chartRef.current?.exportData('xlsx', 'download'); setIsMobileMenuOpen(false); }}
-                    className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
-                  >
-                    <FileSpreadsheet size={14} className="text-emerald-500" />
-                    <span>{t('excelXlsx')}</span>
-                  </button>
-                  <button
-                    onClick={() => { chartRef.current?.exportData('csv', 'download'); setIsMobileMenuOpen(false); }}
-                    className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
-                  >
-                    <FileText size={14} className="text-amber-500" />
-                    <span>{t('csvFile')}</span>
-                  </button>
-                  <button
-                    onClick={() => { chartRef.current?.exportData('json', 'download'); setIsMobileMenuOpen(false); }}
-                    className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
-                  >
-                    <FileJson size={14} className="text-purple-500" />
-                    <span>{t('jsonData')}</span>
-                  </button>
-                </div>
-              )}
+        <div className={clsx(
+          "absolute left-0 right-0 z-40 md:hidden border-b border-border bg-muted/95 backdrop-blur-md px-4 py-4 flex flex-col gap-4 shadow-xl transition-all duration-300 ease-in-out",
+          isMobileMenuOpen 
+            ? "top-20 opacity-100 translate-y-0 pointer-events-auto" 
+            : "top-20 opacity-0 -translate-y-4 pointer-events-none"
+        )}>
+          <div className="flex items-center justify-between border-b border-border/50 pb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('quickActions')}</span>
+            <div className="flex items-center gap-2">
+              <LanguageToggle onClick={() => setIsMobileMenuOpen(false)} />
+              <ThemeToggle onClick={() => setIsMobileMenuOpen(false)} />
             </div>
           </div>
-        )}
+
+          {/* DevControls mobile integration */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('devTools')}</span>
+            <div className="bg-background border border-border rounded-xl p-2">
+              <DevControls 
+                allItems={allItems} 
+                selectedItems={selectedItems} 
+                onAddItems={(items) => {
+                  handleBulkAdd(items);
+                  setIsMobileMenuOpen(false);
+                }} 
+              />
+            </div>
+          </div>
+
+          {/* Export Options inside hamburger */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('exportComparison')}</span>
+            {selectedItems.length === 0 ? (
+              <p className="text-xs text-muted-foreground">{t('addItemsToEnableExport')}</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => { chartRef.current?.exportImage('download'); setIsMobileMenuOpen(false); }}
+                  className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
+                >
+                  <ImageIcon size={14} className="text-blue-500" />
+                  <span>{t('imagePng')}</span>
+                </button>
+                <button
+                  onClick={() => { chartRef.current?.exportData('xlsx', 'download'); setIsMobileMenuOpen(false); }}
+                  className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
+                >
+                  <FileSpreadsheet size={14} className="text-emerald-500" />
+                  <span>{t('excelXlsx')}</span>
+                </button>
+                <button
+                  onClick={() => { chartRef.current?.exportData('csv', 'download'); setIsMobileMenuOpen(false); }}
+                  className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
+                >
+                  <FileText size={14} className="text-amber-500" />
+                  <span>{t('csvFile')}</span>
+                </button>
+                <button
+                  onClick={() => { chartRef.current?.exportData('json', 'download'); setIsMobileMenuOpen(false); }}
+                  className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:bg-accent text-xs font-semibold text-foreground"
+                >
+                  <FileJson size={14} className="text-purple-500" />
+                  <span>{t('jsonData')}</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Backdrop Dim Overlay for Mobile Hamburger Menu or Search Suggestions */}
-      {(isMobileMenuOpen || isSearchSuggestionsOpen) && (
-        <div 
-          onClick={() => {
-            setIsMobileMenuOpen(false);
-          }}
-          className="fixed inset-0 top-20 bg-black/50 backdrop-blur-[2px] z-20 animate-in fade-in duration-300 cursor-pointer"
-        />
-      )}
+      <div 
+        onClick={() => {
+          setIsMobileMenuOpen(false);
+        }}
+        className={clsx(
+          "fixed inset-0 top-20 bg-black/50 backdrop-blur-[2px] z-20 transition-all duration-300 cursor-pointer",
+          (isMobileMenuOpen || isSearchSuggestionsOpen) 
+            ? "opacity-100 pointer-events-auto" 
+            : "opacity-0 pointer-events-none"
+        )}
+      />
 
       {/* --- MAIN CONTENT AREA --- */}
       <div className="w-full max-w-[1920px] mx-auto px-1 sm:px-2 lg:px-4 py-6 flex flex-col overflow-hidden h-[calc(100dvh-80px)]">

@@ -486,7 +486,7 @@ export default function SearchBar({
                                                             e.stopPropagation();
                                                             setDetailItem(item);
                                                         }}
-                                                        className="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-primary transition-all"
+                                                        className="p-1.5 rounded-lg bg-background border border-border text-muted-foreground hover:bg-accent hover:text-primary active:scale-90 transition-all shadow-sm flex items-center justify-center w-8 h-8 shrink-0"
                                                         title={t('viewDetails')}
                                                     >
                                                         <ChevronRight className="w-4 h-4" />
