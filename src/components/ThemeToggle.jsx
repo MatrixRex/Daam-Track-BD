@@ -37,7 +37,19 @@ const ThemeToggle = ({ onClick }) => {
     return (
         <button
             onClick={() => {
-                setIsDark(!isDark);
+                const nextDark = !isDark;
+                
+                // Synchronously update DOM to prevent race conditions with component unmounting
+                const root = document.documentElement;
+                if (nextDark) {
+                    root.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    root.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+                
+                setIsDark(nextDark);
                 onClick?.();
             }}
             className="relative p-2.5 rounded-lg bg-muted hover:bg-primary/10 transition-all duration-300 group overflow-hidden border border-border motion-preset-fade motion-duration-300"
