@@ -5,9 +5,20 @@ import ProductImage from './ProductImage';
 
 export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right', normTargets, stats }) {
     const [activeData, setActiveData] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768 || window.matchMedia('(hover: none)').matches);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Delay popup visibility but hide instantly on mouse leave (item === null)
     useEffect(() => {
+        if (isMobile) return;
         if (!item) {
             const clearTimer = setTimeout(() => {
                 setActiveData(null);
@@ -20,9 +31,9 @@ export default function ItemHoverCard({ item, mousePos, sideRect, side = 'right'
         }, 300); // 300ms hover delay
 
         return () => clearTimeout(timer);
-    }, [item, stats, sideRect]);
+    }, [item, stats, sideRect, isMobile]);
 
-    if (!activeData) return null;
+    if (isMobile || !activeData) return null;
 
     const { item: currentItem, stats: currentStats, sideRect: currentSideRect } = activeData;
 
