@@ -57,6 +57,39 @@ const CATEGORY_ALIASES = {
     ]
 };
 
+// Damerau-Levenshtein distance for typo matching
+function getDamerauLevenshteinDistance(a, b) {
+    const al = a.length;
+    const bl = b.length;
+    const d = [];
+
+    for (let i = 0; i <= al; i++) {
+        d[i] = [i];
+    }
+    for (let j = 0; j <= bl; j++) {
+        d[0][j] = j;
+    }
+
+    for (let i = 1; i <= al; i++) {
+        for (let j = 1; j <= bl; j++) {
+            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+            d[i][j] = Math.min(
+                d[i - 1][j] + 1,      // deletion
+                d[i][j - 1] + 1,      // insertion
+                d[i - 1][j - 1] + cost // substitution
+            );
+
+            if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+                d[i][j] = Math.min(
+                    d[i][j],
+                    d[i - 2][j - 2] + cost // transposition
+                );
+            }
+        }
+    }
+    return d[al][bl];
+}
+
 
 export default function SearchBar({ 
     onSelect, 
@@ -115,7 +148,7 @@ export default function SearchBar({
     const innerRef = useRef(null);
 
     // Initialize uFuzzy & Memoize Haystack
-    const uf = useMemo(() => new uFuzzy(), []);
+    const uf = useMemo(() => new uFuzzy({ intraMode: 1 }), []);
     const haystack = useMemo(() => {
         return items.map(item => {
             const categoryLower = (item.category || '').toLowerCase();
@@ -210,6 +243,13 @@ export default function SearchBar({
                             score = 0.8 * (Math.min(qw.length, nw.length) / Math.max(qw.length, nw.length));
                         } else if (nw.includes(qw) || nwNorm.includes(qwNorm)) {
                             score = 0.5 * (Math.min(qw.length, nw.length) / Math.max(qw.length, nw.length));
+                        } else {
+                            const dist = getDamerauLevenshteinDistance(nw, qw);
+                            const distNorm = getDamerauLevenshteinDistance(nwNorm, qwNorm);
+                            const minDist = Math.min(dist, distNorm);
+                            if (minDist === 1 && qw.length >= 3) {
+                                score = 0.7 * (Math.min(qw.length, nw.length) / Math.max(qw.length, nw.length));
+                            }
                         }
                         
                         if (score > bestScore) {
