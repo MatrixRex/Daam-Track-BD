@@ -8,8 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "scrape": "python scraper/main.py",
-    "scrape:push": "python scraper/main.py --push"
+    "scrape": "node scraper/run.js",
+    "scrape:push": "node scraper/run.js --push"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.30.0",
