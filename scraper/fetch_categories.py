@@ -1,143 +1,121 @@
 import json
 import os
+import re
 import sys
-import time
-from playwright.sync_api import sync_playwright
+import requests
 
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "categories.json")
 
-# Level 1 Roots (The starting points)
-ROOTS = [
-    "Flash Sales", "Popular", "Food", "Cleaning Supplies", "Personal Care", 
-    "Health & Wellness", "Baby Care", "Home & Kitchen", "Stationery & Office", 
+# Target top-level roots for price tracking
+TARGET_ROOT_NAMES = [
+    "Popular", "Flash Sales", "Food", "Cleaning Supplies", "Personal Care",
+    "Health & Wellness", "Baby Care", "Home & Kitchen", "Stationery & Office",
     "Pet Care", "Toys & Sports", "Beauty & MakeUp"
 ]
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9,bn;q=0.8",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1"
+}
+
 def fetch_categories():
-    final_links = []
-    seen_urls = set()
+    print("Fetching live category tree from Chaldal...")
+    url = "https://chaldal.com"
+    
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=20)
+        if response.status_code != 200:
+            print(f"[!] Error fetching {url}: Status code {response.status_code}")
+            sys.exit(1)
+        html = response.text
+    except Exception as e:
+        print(f"[!] Network error fetching Chaldal homepage: {e}")
+        sys.exit(1)
 
-    with sync_playwright() as p:
-        print("Launching browser...")
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(
-            viewport={'width': 1920, 'height': 1080},
-            permissions=['geolocation'], 
-            geolocation={'latitude': 23.8103, 'longitude': 90.4125}
-        )
-        page = context.new_page()
-        page.goto("https://chaldal.com", timeout=60000)
-        time.sleep(3) # Let page settle
+    # Extract window.__serviceState JSON
+    match = re.search(r'<script>window\.__serviceState\s*=\s*([\s\S]*?)</script>', html)
+    if not match:
+        print("[!] Fatal: window.__serviceState not found in Chaldal HTML.")
+        sys.exit(1)
 
-        # Helper to get all visible text in sidebar
-        def get_sidebar_items():
-            # Get all elements that look like menu items
-            # We grab text to compare "Before" vs "After"
-            elements = page.locator(".menu-item, li div, .category-name").all()
-            items = {}
-            for el in elements:
-                try:
-                    if not el.is_visible(): continue
-                    box = el.bounding_box()
-                    if not box or box['x'] > 350: continue # Strict Sidebar check
-                    
-                    text = el.inner_text().strip()
-                    if text and text not in ["Offers", "Help", "More"]:
-                        items[text] = el # Save the element so we can click it later
-                except:
-                    pass
-            return items
+    try:
+        service_state = json.loads(match.group(1))
+    except Exception as e:
+        print(f"[!] Failed to parse service state JSON: {e}")
+        sys.exit(1)
 
-        # --- THE RECURSIVE WALKER ---
-        for root in ROOTS:
-            print(f"\n--- Root: {root} ---")
-            
-            # 1. Get Baseline (What is visible BEFORE clicking?)
-            before_items = get_sidebar_items()
-            
-            if root not in before_items:
-                print(f"Skipping {root} (Not found)")
-                continue
+    category_service = service_state.get("CategoryService", {})
+    categories_by_store = category_service.get("categories", {})
+    all_categories = categories_by_store.get("1") or next(iter(categories_by_store.values()), [])
 
-            # 2. Click Root
-            try:
-                before_items[root].click()
-                time.sleep(1) # Wait for expansion
-            except:
-                continue
+    router_service = service_state.get("RouterService", {})
+    routes = router_service.get("categoryRoutes", {})
 
-            # 3. Get New State (What is visible AFTER clicking?)
-            after_items = get_sidebar_items()
-            
-            # 4. Calculate Difference (These are the Level 2 items!)
-            new_level_2 = [key for key in after_items if key not in before_items]
-            print(f"  > Revealed {len(new_level_2)} sub-categories: {new_level_2}")
+    print(f"Found {len(all_categories)} total categories and {len(routes)} routes in service state.")
 
-            # 5. Process Level 2
-            for l2_text in new_level_2:
-                # Refetch items to get fresh handles and current state (Dynamic Baseline)
-                state_before_l2 = get_sidebar_items()
+    # Build parent -> children map
+    children_map = {}
+    for cat in all_categories:
+        p_id = cat.get("ParentCategoryId", 0)
+        children_map.setdefault(p_id, []).append(cat)
+
+    # Collect leaf/target categories
+    leaf_categories = []
+    seen_ids = set()
+
+    def collect_leaves(cat, parent_chain=None):
+        if parent_chain is None:
+            parent_chain = []
+        
+        cat_id = cat.get("Id")
+        cat_name = cat.get("Name", "").strip()
+        children = children_map.get(cat_id, [])
+        current_chain = parent_chain + [cat_name]
+
+        # A category is a scraping target if it has no subcategories (leaf) OR is explicitly marked ContainsProducts
+        if not children or cat.get("ContainsProducts", False):
+            if cat_id not in seen_ids and cat_name:
+                seen_ids.add(cat_id)
+                slug = routes.get(str(cat_id)) or routes.get(cat_id) or ""
+                url = f"https://chaldal.com/{slug}" if slug else f"https://chaldal.com/{cat_id}"
                 
-                if l2_text not in state_before_l2:
-                    print(f"    Skipping {l2_text} (Not visible)")
-                    continue
+                leaf_categories.append({
+                    "id": cat_id,
+                    "category": cat_name,
+                    "categoryBn": cat.get("NameBn", ""),
+                    "parentCategoryId": cat.get("ParentCategoryId", 0),
+                    "hierarchy": " > ".join(current_chain),
+                    "topCategory": parent_chain[0] if parent_chain else cat_name,
+                    "slug": slug,
+                    "url": url
+                })
 
-                # Click Level 2 to see if Level 3 exists
-                try:
-                    state_before_l2[l2_text].click()
-                    time.sleep(1)
-                    
-                    # Check for Level 3 (Did new items appear?)
-                    state_after_l2 = get_sidebar_items()
-                    new_level_3 = [key for key in state_after_l2 if key not in state_before_l2]
-                    
-                    if new_level_3:
-                        print(f"    > Found Leaves (L3): {new_level_3}")
-                        # These are likely the final categories.
-                        
-                        for l3_text in new_level_3:
-                            # Re-fetch sidebar to ensure we have a fresh handle
-                            # content updates or navigation can make handles stale
-                            current_sidebar_l3 = get_sidebar_items()
-                            
-                            if l3_text in current_sidebar_l3:
-                                try:
-                                    current_sidebar_l3[l3_text].click()
-                                    time.sleep(2) # Wait for URL update
-                                    
-                                    curr_url = page.url
-                                    # Removed strictly requiring '-' as some categories are single words like 'rice'
-                                    if "chaldal.com/" in curr_url:
-                                        if curr_url not in seen_urls:
-                                            final_links.append({"category": l3_text, "url": curr_url})
-                                            seen_urls.add(curr_url)
-                                            print(f"      + Saved: {curr_url}")
-                                except Exception as e:
-                                    print(f"      Error iterating L3 {l3_text}: {e}")
+        for child in children:
+            collect_leaves(child, current_chain)
 
-                    else:
-                        # No new items appeared? Then L2 was the leaf!
-                        # We are already on the page (since we clicked it)
-                        curr_url = page.url
-                        if "chaldal.com/" in curr_url:
-                             if curr_url not in seen_urls:
-                                final_links.append({"category": l2_text, "url": curr_url})
-                                seen_urls.add(curr_url)
-                                print(f"    + Saved (L2): {curr_url}")
+    roots = children_map.get(0, [])
+    for root in roots:
+        root_name = root.get("Name", "").strip()
+        # Filter for relevant roots if TARGET_ROOT_NAMES is defined
+        if not TARGET_ROOT_NAMES or any(t.lower() in root_name.lower() for t in TARGET_ROOT_NAMES):
+            collect_leaves(root)
 
-                except Exception as e:
-                    print(f"    Error clicking {l2_text}: {e}")
+    print(f"Extracted {len(leaf_categories)} leaf categories for scraping.")
 
-        browser.close()
-
-    # Validation & Save
-    if not final_links:
-        print("\n[!] FATAL ERROR: No categories found. Site structure likely changed.")
+    if not leaf_categories:
+        print("[!] FATAL ERROR: No categories extracted.")
         sys.exit(1)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(final_links, f, indent=2)
-    print(f"\nSUCCESS! Scraped {len(final_links)} categories.")
+        json.dump(leaf_categories, f, indent=2, ensure_ascii=False)
+
+    print(f"SUCCESS: Saved {len(leaf_categories)} categories to {OUTPUT_FILE}")
 
 if __name__ == "__main__":
     fetch_categories()

@@ -1,746 +1,1674 @@
 [
   {
+    "id": 238,
+    "category": "Popular",
+    "categoryBn": "জনপ্রিয়",
+    "topCategory": "Popular",
+    "hierarchy": "Popular",
+    "url": "https://chaldal.com/238"
+  },
+  {
+    "id": 1471,
+    "category": "Flash Sales",
+    "categoryBn": "ফ্ল্যাশ সেলস",
+    "topCategory": "Flash Sales",
+    "hierarchy": "Flash Sales",
+    "url": "https://chaldal.com/1471"
+  },
+  {
+    "id": 12,
     "category": "Fresh Vegetables",
-    "url": "https://chaldal.com/fresh-vegetable"
+    "categoryBn": "তাজা সবজি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Fruits & Vegetables > Fresh Vegetables",
+    "url": "https://chaldal.com/12"
   },
   {
+    "id": 11,
     "category": "Fresh Fruits",
-    "url": "https://chaldal.com/fresh-fruit"
+    "categoryBn": "তাজা ফল",
+    "topCategory": "Food",
+    "hierarchy": "Food > Fruits & Vegetables > Fresh Fruits",
+    "url": "https://chaldal.com/11"
   },
   {
+    "id": 1593,
     "category": "Chicken & Poultry",
-    "url": "https://chaldal.com/chicken-poultry"
+    "categoryBn": "মুরগি এবং পোল্ট্রি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Meat & Fish > Chicken & Poultry",
+    "url": "https://chaldal.com/1593"
   },
   {
+    "id": 1725,
     "category": "Premium Perishables",
-    "url": "https://chaldal.com/premium-perishables"
+    "categoryBn": "প্রিমিয়াম মাছ - মাংস",
+    "topCategory": "Food",
+    "hierarchy": "Food > Meat & Fish > Premium Perishables",
+    "url": "https://chaldal.com/1725"
   },
   {
+    "id": 1235,
     "category": "Frozen Fish",
-    "url": "https://chaldal.com/frozen-fish"
+    "categoryBn": "হিমায়িত মাছ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Meat & Fish > Frozen Fish",
+    "url": "https://chaldal.com/1235"
   },
   {
+    "id": 1696,
     "category": "Meat",
-    "url": "https://chaldal.com/meat-new"
+    "categoryBn": "মাংস",
+    "topCategory": "Food",
+    "hierarchy": "Food > Meat & Fish > Meat",
+    "url": "https://chaldal.com/1696"
   },
   {
+    "id": 9,
     "category": "Tofu & Meat Alternatives",
-    "url": "https://chaldal.com/tofu-meat-alternatives"
+    "categoryBn": "টফু এবং মাংসের বিকল্প",
+    "topCategory": "Food",
+    "hierarchy": "Food > Meat & Fish > Tofu & Meat Alternatives",
+    "url": "https://chaldal.com/9"
   },
   {
+    "id": 1238,
     "category": "Dried Fish",
-    "url": "https://chaldal.com/dried-fish"
+    "categoryBn": "শুঁটকি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Meat & Fish > Dried Fish",
+    "url": "https://chaldal.com/1238"
   },
   {
+    "id": 107,
     "category": "Spices",
-    "url": "https://chaldal.com/spices"
+    "categoryBn": "মশলা",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Spices",
+    "url": "https://chaldal.com/107"
   },
   {
+    "id": 111,
     "category": "Salt & Sugar",
-    "url": "https://chaldal.com/salt-sugar"
+    "categoryBn": "লবন এবং চিনি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Salt & Sugar",
+    "url": "https://chaldal.com/111"
   },
   {
+    "id": 80,
     "category": "Rice",
-    "url": "https://chaldal.com/rices"
+    "categoryBn": "চাল",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Rice",
+    "url": "https://chaldal.com/80"
   },
   {
+    "id": 198,
     "category": "Dal or Lentil",
-    "url": "https://chaldal.com/dal-or-lentil"
+    "categoryBn": "ডাল",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Dal or Lentil",
+    "url": "https://chaldal.com/198"
   },
   {
+    "id": 110,
     "category": "Ready Mix",
-    "url": "https://chaldal.com/ready-mix"
+    "categoryBn": "রেডি মিক্স",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Ready Mix",
+    "url": "https://chaldal.com/110"
   },
   {
+    "id": 1352,
     "category": "Shemai & Suji",
-    "url": "https://chaldal.com/shemai-suji"
+    "categoryBn": "সেমাই ও সুজি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Shemai & Suji",
+    "url": "https://chaldal.com/1352"
   },
   {
+    "id": 200,
     "category": "Special Ingredients",
-    "url": "https://chaldal.com/miscellaneous"
+    "categoryBn": "রান্নার বিভিন্ন সামগ্রী",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Special Ingredients",
+    "url": "https://chaldal.com/200"
   },
   {
+    "id": 108,
     "category": "Oil",
-    "url": "https://chaldal.com/oil"
+    "categoryBn": "তেল",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Oil",
+    "url": "https://chaldal.com/108"
   },
   {
+    "id": 1372,
     "category": "Colors & Flavours",
-    "url": "https://chaldal.com/colors-flavours"
+    "categoryBn": "কালারস ও ফ্লেভারস",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Colors & Flavours",
+    "url": "https://chaldal.com/1372"
   },
   {
+    "id": 109,
     "category": "Ghee",
-    "url": "https://chaldal.com/ghee"
+    "categoryBn": "ঘি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Ghee",
+    "url": "https://chaldal.com/109"
   },
   {
+    "id": 1266,
     "category": "Premium Ingredients",
-    "url": "https://chaldal.com/premium-ingredients"
+    "categoryBn": "প্রিমিয়াম উপকরণ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Cooking > Premium Ingredients",
+    "url": "https://chaldal.com/1266"
   },
   {
+    "id": 1632,
     "category": "Tomato Sauces",
-    "url": "https://chaldal.com/tomato-sauces"
+    "categoryBn": "টমেটো সস",
+    "topCategory": "Food",
+    "hierarchy": "Food > Sauces & Pickles > Tomato Sauces",
+    "url": "https://chaldal.com/1632"
   },
   {
+    "id": 78,
     "category": "Pickles",
-    "url": "https://chaldal.com/pickles"
+    "categoryBn": "আচার",
+    "topCategory": "Food",
+    "hierarchy": "Food > Sauces & Pickles > Pickles",
+    "url": "https://chaldal.com/78"
   },
   {
+    "id": 1703,
     "category": "Cooking Sauces",
-    "url": "https://chaldal.com/cooking-sauces"
+    "categoryBn": "রান্নার সস",
+    "topCategory": "Food",
+    "hierarchy": "Food > Sauces & Pickles > Cooking Sauces",
+    "url": "https://chaldal.com/1703"
   },
   {
+    "id": 1633,
     "category": "Other Table Sauces",
-    "url": "https://chaldal.com/other-sauces"
+    "categoryBn": "অন্যান্য টেবিল সস",
+    "topCategory": "Food",
+    "hierarchy": "Food > Sauces & Pickles > Other Table Sauces",
+    "url": "https://chaldal.com/1633"
   },
   {
+    "id": 61,
     "category": "Eggs",
-    "url": "https://chaldal.com/eggs"
+    "categoryBn": "ডিম",
+    "topCategory": "Food",
+    "hierarchy": "Food > Dairy & Eggs > Eggs",
+    "url": "https://chaldal.com/61"
   },
   {
+    "id": 1580,
     "category": "Powder Milk",
-    "url": "https://chaldal.com/powder-milk"
+    "categoryBn": "গুঁড়া দুধ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Dairy & Eggs > Powder Milk",
+    "url": "https://chaldal.com/1580"
   },
   {
+    "id": 1380,
     "category": "Liquid & UHT Milk",
-    "url": "https://chaldal.com/liquid-uht-milk"
+    "categoryBn": "তরল এবং ইউএইচটি দুধ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Dairy & Eggs > Liquid & UHT Milk",
+    "url": "https://chaldal.com/1380"
   },
   {
+    "id": 64,
     "category": "Yogurt & Sweets",
-    "url": "https://chaldal.com/yogurt"
+    "categoryBn": "দই ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Dairy & Eggs > Yogurt & Sweets",
+    "url": "https://chaldal.com/64"
   },
   {
+    "id": 60,
     "category": "Cheese",
-    "url": "https://chaldal.com/cheeses"
+    "categoryBn": "পনির",
+    "topCategory": "Food",
+    "hierarchy": "Food > Dairy & Eggs > Cheese",
+    "url": "https://chaldal.com/60"
   },
   {
+    "id": 1583,
     "category": "Condensed Milk & Cream",
-    "url": "https://chaldal.com/condensed-milk-cream"
+    "categoryBn": "কনডেন্সড দুধ এবং ক্রিম",
+    "topCategory": "Food",
+    "hierarchy": "Food > Dairy & Eggs > Condensed Milk & Cream",
+    "url": "https://chaldal.com/1583"
   },
   {
+    "id": 59,
     "category": "Butter & Sour Cream",
-    "url": "https://chaldal.com/butter-sour-cream"
+    "categoryBn": "মাখন এবং সাওয়ার ক্রিম",
+    "topCategory": "Food",
+    "hierarchy": "Food > Dairy & Eggs > Butter & Sour Cream",
+    "url": "https://chaldal.com/59"
   },
   {
+    "id": 1702,
+    "category": "Eggs",
+    "categoryBn": "ডিম",
+    "topCategory": "Food",
+    "hierarchy": "Food > Breakfast > Eggs",
+    "url": "https://chaldal.com/1702"
+  },
+  {
+    "id": 74,
     "category": "Breads",
-    "url": "https://chaldal.com/breads"
+    "categoryBn": "ব্রেড ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Breakfast > Breads",
+    "url": "https://chaldal.com/74"
   },
   {
+    "id": 1597,
     "category": "Tea & Coffee",
-    "url": "https://chaldal.com/tea-coffee-2"
+    "categoryBn": "চা এবং কফি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Breakfast > Tea & Coffee",
+    "url": "https://chaldal.com/1597"
   },
   {
+    "id": 228,
     "category": "Local Breakfast",
-    "url": "https://chaldal.com/local-breakfast"
+    "categoryBn": "স্থানীয় নাশতা",
+    "topCategory": "Food",
+    "hierarchy": "Food > Breakfast > Local Breakfast",
+    "url": "https://chaldal.com/228"
   },
   {
+    "id": 16,
     "category": "Cereals",
-    "url": "https://chaldal.com/cereals"
+    "categoryBn": "সিরিয়াল",
+    "topCategory": "Food",
+    "hierarchy": "Food > Breakfast > Cereals",
+    "url": "https://chaldal.com/16"
   },
   {
+    "id": 77,
     "category": "Honey",
-    "url": "https://chaldal.com/honey"
+    "categoryBn": "মধু",
+    "topCategory": "Food",
+    "hierarchy": "Food > Breakfast > Honey",
+    "url": "https://chaldal.com/77"
   },
   {
+    "id": 1596,
     "category": "Dips, Spreads & Syrups",
-    "url": "https://chaldal.com/spreads-syrups"
+    "categoryBn": "ডিপ্স , স্প্রেড এবং সিরাপ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Breakfast > Dips, Spreads & Syrups",
+    "url": "https://chaldal.com/1596"
   },
   {
+    "id": 235,
     "category": "Energy Boosters",
-    "url": "https://chaldal.com/energy-boosters"
+    "categoryBn": "শক্তি বৃদ্ধিকারী ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Breakfast > Energy Boosters",
+    "url": "https://chaldal.com/235"
   },
   {
+    "id": 1594,
     "category": "Jams & Jellies",
-    "url": "https://chaldal.com/jams-jellies"
+    "categoryBn": "জ্যাম এবং জেলি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Breakfast > Jams & Jellies",
+    "url": "https://chaldal.com/1594"
   },
   {
+    "id": 51,
+    "category": "Candy & Chocolate",
+    "categoryBn": "ক্যান্ডি এন্ড চকলেট",
+    "topCategory": "Food",
+    "hierarchy": "Food > Candy & Chocolate",
+    "url": "https://chaldal.com/51"
+  },
+  {
+    "id": 1600,
     "category": "Chocolates",
-    "url": "https://chaldal.com/chocolates"
+    "categoryBn": "চকলেট",
+    "topCategory": "Food",
+    "hierarchy": "Food > Candy & Chocolate > Chocolates",
+    "url": "https://chaldal.com/1600"
   },
   {
+    "id": 1602,
     "category": "Wafers",
-    "url": "https://chaldal.com/wafers"
+    "categoryBn": "ওয়েফার",
+    "topCategory": "Food",
+    "hierarchy": "Food > Candy & Chocolate > Wafers",
+    "url": "https://chaldal.com/1602"
   },
   {
+    "id": 1599,
     "category": "Candies",
-    "url": "https://chaldal.com/candies"
+    "categoryBn": "ক্যান্ডি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Candy & Chocolate > Candies",
+    "url": "https://chaldal.com/1599"
   },
   {
+    "id": 1605,
     "category": "Gums, Mints & Mouth Fresheners",
-    "url": "https://chaldal.com/mints-mouth-fresheners"
+    "categoryBn": "চুইংগাম, মিন্টস এবং মাউথ ফ্রেশনার",
+    "topCategory": "Food",
+    "hierarchy": "Food > Candy & Chocolate > Gums, Mints & Mouth Fresheners",
+    "url": "https://chaldal.com/1605"
   },
   {
+    "id": 1607,
     "category": "Jellies & Marshmallows",
-    "url": "https://chaldal.com/halal-marshmallows"
+    "categoryBn": "জেলি এবং মার্শম্যালো",
+    "topCategory": "Food",
+    "hierarchy": "Food > Candy & Chocolate > Jellies & Marshmallows",
+    "url": "https://chaldal.com/1607"
   },
   {
+    "id": 93,
     "category": "Noodles",
-    "url": "https://chaldal.com/noodles"
+    "categoryBn": "নুডুলস",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Noodles",
+    "url": "https://chaldal.com/93"
   },
   {
+    "id": 1629,
     "category": "Cookies",
-    "url": "https://chaldal.com/cookies-2"
+    "categoryBn": "কুকিজ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Cookies",
+    "url": "https://chaldal.com/1629"
   },
   {
+    "id": 52,
     "category": "Local Snacks",
-    "url": "https://chaldal.com/local-snacks"
+    "categoryBn": "স্থানীয় জলখাবার",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Local Snacks",
+    "url": "https://chaldal.com/52"
   },
   {
+    "id": 53,
     "category": "Chips & Pretzels",
-    "url": "https://chaldal.com/chips-pretzels"
+    "categoryBn": "চিপস এবং প্রেটযিলস",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Chips & Pretzels",
+    "url": "https://chaldal.com/53"
   },
   {
+    "id": 1619,
     "category": "Plain Biscuits",
-    "url": "https://chaldal.com/plain-biscuits"
+    "categoryBn": "প্লেইন বিস্কুট",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Plain Biscuits",
+    "url": "https://chaldal.com/1619"
   },
   {
+    "id": 1625,
     "category": "Toast & Bakery Biscuits",
-    "url": "https://chaldal.com/toast-biscuits"
+    "categoryBn": "টোস্ট এবং বেকারি বিস্কুট",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Toast & Bakery Biscuits",
+    "url": "https://chaldal.com/1625"
   },
   {
+    "id": 1621,
     "category": "Cream Biscuits",
-    "url": "https://chaldal.com/cream-biscuits"
+    "categoryBn": "ক্রিম বিস্কুট",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Cream Biscuits",
+    "url": "https://chaldal.com/1621"
   },
   {
+    "id": 1381,
     "category": "Pasta & Macaroni",
-    "url": "https://chaldal.com/pasta-macaroni"
+    "categoryBn": "পাস্তা এবং ম্যাকারনি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Pasta & Macaroni",
+    "url": "https://chaldal.com/1381"
   },
   {
+    "id": 194,
     "category": "Soups",
-    "url": "https://chaldal.com/soups"
+    "categoryBn": "স্যুপ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Soups",
+    "url": "https://chaldal.com/194"
   },
   {
+    "id": 56,
     "category": "Popcorn & Nuts",
-    "url": "https://chaldal.com/popcorn-nuts"
+    "categoryBn": "পপ কর্ণ এবং বাদাম",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Popcorn & Nuts",
+    "url": "https://chaldal.com/56"
   },
   {
+    "id": 1623,
     "category": "Salted Biscuits",
-    "url": "https://chaldal.com/salted-biscuits"
+    "categoryBn": "লবণাক্ত বিস্কুট",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Salted Biscuits",
+    "url": "https://chaldal.com/1623"
   },
   {
+    "id": 196,
     "category": "Cakes",
-    "url": "https://chaldal.com/cakes"
+    "categoryBn": "কেক ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Cakes",
+    "url": "https://chaldal.com/196"
   },
   {
+    "id": 79,
     "category": "Salad Dressing",
-    "url": "https://chaldal.com/salad-dressing"
+    "categoryBn": "সালাদ ড্রেসিং",
+    "topCategory": "Food",
+    "hierarchy": "Food > Snacks > Salad Dressing",
+    "url": "https://chaldal.com/79"
   },
   {
+    "id": 18,
     "category": "Tea",
-    "url": "https://chaldal.com/beverages-tea"
+    "categoryBn": "চা",
+    "topCategory": "Food",
+    "hierarchy": "Food > Beverages > Tea",
+    "url": "https://chaldal.com/18"
   },
   {
+    "id": 20,
     "category": "Soft Drinks",
-    "url": "https://chaldal.com/soft-drinks"
+    "categoryBn": "কোমল পানীয়",
+    "topCategory": "Food",
+    "hierarchy": "Food > Beverages > Soft Drinks",
+    "url": "https://chaldal.com/20"
   },
   {
+    "id": 1377,
     "category": "Coffee",
-    "url": "https://chaldal.com/coffees"
+    "categoryBn": "কফি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Beverages > Coffee",
+    "url": "https://chaldal.com/1377"
   },
   {
+    "id": 189,
     "category": "Syrups & Powder Drinks",
-    "url": "https://chaldal.com/powder-mixes"
+    "categoryBn": "সিরাপ এবং পাউডার ড্রিংক",
+    "topCategory": "Food",
+    "hierarchy": "Food > Beverages > Syrups & Powder Drinks",
+    "url": "https://chaldal.com/189"
   },
   {
+    "id": 19,
     "category": "Juice",
-    "url": "https://chaldal.com/juice"
+    "categoryBn": "জুস",
+    "topCategory": "Food",
+    "hierarchy": "Food > Beverages > Juice",
+    "url": "https://chaldal.com/19"
   },
   {
+    "id": 22,
     "category": "Water",
-    "url": "https://chaldal.com/water"
+    "categoryBn": "পানি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Beverages > Water",
+    "url": "https://chaldal.com/22"
   },
   {
+    "id": 103,
     "category": "Flour",
-    "url": "https://chaldal.com/flour"
+    "categoryBn": "ময়দা",
+    "topCategory": "Food",
+    "hierarchy": "Food > Baking > Flour",
+    "url": "https://chaldal.com/103"
   },
   {
+    "id": 8,
     "category": "Nuts & Dried Fruits",
-    "url": "https://chaldal.com/nuts-dried-fruits"
+    "categoryBn": "বাদাম এবং শুকনো ফল ",
+    "topCategory": "Food",
+    "hierarchy": "Food > Baking > Nuts & Dried Fruits",
+    "url": "https://chaldal.com/8"
   },
   {
+    "id": 102,
     "category": "Baking Ingredients",
-    "url": "https://chaldal.com/baking-ingredients"
+    "categoryBn": "বেকিং সামগ্রী",
+    "topCategory": "Food",
+    "hierarchy": "Food > Baking > Baking Ingredients",
+    "url": "https://chaldal.com/102"
   },
   {
+    "id": 1493,
     "category": "Baking Tools",
-    "url": "https://chaldal.com/baking-tools"
+    "categoryBn": "বেকিং সরঞ্জাম",
+    "topCategory": "Food",
+    "hierarchy": "Food > Baking > Baking Tools",
+    "url": "https://chaldal.com/1493"
   },
   {
+    "id": 101,
     "category": "Baking & Dessert Mixes",
-    "url": "https://chaldal.com/baking-mixes"
+    "categoryBn": "বেকিং এবং ডেজারট মিক্স",
+    "topCategory": "Food",
+    "hierarchy": "Food > Baking > Baking & Dessert Mixes",
+    "url": "https://chaldal.com/101"
   },
   {
+    "id": 1595,
     "category": "Chicken Snacks",
-    "url": "https://chaldal.com/chicken-snacks"
+    "categoryBn": "মুরগির স্ন্যাক্স",
+    "topCategory": "Food",
+    "hierarchy": "Food > Frozen & Canned > Chicken Snacks",
+    "url": "https://chaldal.com/1595"
   },
   {
+    "id": 1609,
     "category": "Frozen Parathas & Roti",
-    "url": "https://chaldal.com/frozen-parathas-roti"
+    "categoryBn": "হিমায়িত পরাঠা এবং রুটি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Frozen & Canned > Frozen Parathas & Roti",
+    "url": "https://chaldal.com/1609"
   },
   {
+    "id": 1606,
     "category": "Vegetable Snacks",
-    "url": "https://chaldal.com/vegetable-snacks"
+    "categoryBn": "সবজির স্ন্যাক্স",
+    "topCategory": "Food",
+    "hierarchy": "Food > Frozen & Canned > Vegetable Snacks",
+    "url": "https://chaldal.com/1606"
   },
   {
+    "id": 1612,
     "category": "Mushroom Cans",
-    "url": "https://chaldal.com/mushroom-cans"
+    "categoryBn": "মাশরুম ক্যান",
+    "topCategory": "Food",
+    "hierarchy": "Food > Frozen & Canned > Mushroom Cans",
+    "url": "https://chaldal.com/1612"
   },
   {
+    "id": 1598,
     "category": "Beef Snacks",
-    "url": "https://chaldal.com/beef-snacks"
+    "categoryBn": "",
+    "topCategory": "Food",
+    "hierarchy": "Food > Frozen & Canned > Beef Snacks",
+    "url": "https://chaldal.com/1598"
   },
   {
+    "id": 1615,
     "category": "Vegetable Cans",
-    "url": "https://chaldal.com/vegetable-cans"
+    "categoryBn": "সবজির ক্যান",
+    "topCategory": "Food",
+    "hierarchy": "Food > Frozen & Canned > Vegetable Cans",
+    "url": "https://chaldal.com/1615"
   },
   {
+    "id": 1618,
     "category": "Fish Cans",
-    "url": "https://chaldal.com/fish-cans"
+    "categoryBn": "মাছের ক্যান",
+    "topCategory": "Food",
+    "hierarchy": "Food > Frozen & Canned > Fish Cans",
+    "url": "https://chaldal.com/1618"
   },
   {
+    "id": 1617,
     "category": "Canned Fruits & Sweets",
-    "url": "https://chaldal.com/canned-fruits"
+    "categoryBn": "টিনজাত ফল এবং মিষ্টি",
+    "topCategory": "Food",
+    "hierarchy": "Food > Frozen & Canned > Canned Fruits & Sweets",
+    "url": "https://chaldal.com/1617"
   },
   {
+    "id": 1604,
     "category": "Fish Snacks",
-    "url": "https://chaldal.com/fish-snacks"
+    "categoryBn": "মাছের স্ন্যাক্স",
+    "topCategory": "Food",
+    "hierarchy": "Food > Frozen & Canned > Fish Snacks",
+    "url": "https://chaldal.com/1604"
   },
   {
+    "id": 191,
     "category": "Diabetic Food",
-    "url": "https://chaldal.com/diabetic-food"
+    "categoryBn": "ডায়বেটিক খাবার",
+    "topCategory": "Food",
+    "hierarchy": "Food > Diabetic Food",
+    "url": "https://chaldal.com/191"
   },
   {
+    "id": 71,
     "category": "Ice Cream",
-    "url": "https://chaldal.com/ice-cream"
+    "categoryBn": "আইসক্রিম",
+    "topCategory": "Food",
+    "hierarchy": "Food > Ice Cream",
+    "url": "https://chaldal.com/71"
   },
   {
+    "id": 1420,
+    "category": "Marks Milk",
+    "categoryBn": "মার্কস দুধ",
+    "topCategory": "Marks Milk",
+    "hierarchy": "Marks Milk",
+    "url": "https://chaldal.com/1420"
+  },
+  {
+    "id": 1738,
+    "category": "Nutri Plus",
+    "categoryBn": "নিউট্রিপ্লাস",
+    "topCategory": "Nutri Plus",
+    "hierarchy": "Nutri Plus",
+    "url": "https://chaldal.com/1738"
+  },
+  {
+    "id": 1746,
+    "category": "Fitra Package",
+    "categoryBn": "ফিতরা প্যাকেজ",
+    "topCategory": "Fitra Package",
+    "hierarchy": "Fitra Package",
+    "url": "https://chaldal.com/1746"
+  },
+  {
+    "id": 83,
     "category": "Dishwashing Supplies",
-    "url": "https://chaldal.com/dish-wash"
+    "categoryBn": "থালা বাসন পরিষ্কারক",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Dishwashing Supplies",
+    "url": "https://chaldal.com/83"
   },
   {
+    "id": 86,
     "category": "Laundry",
-    "url": "https://chaldal.com/laundry"
+    "categoryBn": "লন্ড্রি",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Laundry",
+    "url": "https://chaldal.com/86"
   },
   {
+    "id": 84,
     "category": "Toilet Cleaners",
-    "url": "https://chaldal.com/toilet-cleaning"
+    "categoryBn": "টয়লেট পরিষ্কারক",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Toilet Cleaners",
+    "url": "https://chaldal.com/84"
   },
   {
+    "id": 87,
     "category": "Napkins & Paper Products",
-    "url": "https://chaldal.com/paper-products"
+    "categoryBn": "ন্যাপকিন এবং কাগজ এর দ্রব্য",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Napkins & Paper Products",
+    "url": "https://chaldal.com/87"
   },
   {
+    "id": 88,
     "category": "Pest Control",
-    "url": "https://chaldal.com/pest-control"
+    "categoryBn": "পোকা নিধনকারী সামগ্রী",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Pest Control",
+    "url": "https://chaldal.com/88"
   },
   {
+    "id": 1542,
     "category": "Floor & Glass Cleaners",
-    "url": "https://chaldal.com/floor-glass-cleaners"
+    "categoryBn": "মেঝে এবং গ্লাস পরিষ্কারক",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Floor & Glass Cleaners",
+    "url": "https://chaldal.com/1542"
   },
   {
+    "id": 1276,
     "category": "Cleaning Accessories",
-    "url": "https://chaldal.com/cleaning-accessories"
+    "categoryBn": "পরিষ্কারের সামগ্রী",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Cleaning Accessories",
+    "url": "https://chaldal.com/1276"
   },
   {
+    "id": 82,
     "category": "Air Fresheners",
-    "url": "https://chaldal.com/air-freshners"
+    "categoryBn": "এয়ার ফ্রেশনার",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Air Fresheners",
+    "url": "https://chaldal.com/82"
   },
   {
+    "id": 90,
     "category": "Disposables & Trash Bags",
-    "url": "https://chaldal.com/trash-bags"
+    "categoryBn": "ডিসপোজেবল এবং ময়লার ব্যাগ",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Disposables & Trash Bags",
+    "url": "https://chaldal.com/90"
   },
   {
+    "id": 89,
     "category": "Shoe Care",
-    "url": "https://chaldal.com/shoe-care"
+    "categoryBn": "জুতোর সামগ্রী",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Shoe Care",
+    "url": "https://chaldal.com/89"
   },
   {
+    "id": 1545,
     "category": "Trash Bin & Basket",
-    "url": "https://chaldal.com/trash-bin-basket"
+    "categoryBn": "ডাস্টবিন এবং ঝুড়ি",
+    "topCategory": "Cleaning Supplies",
+    "hierarchy": "Cleaning Supplies > Trash Bin & Basket",
+    "url": "https://chaldal.com/1545"
   },
   {
-    "category": "Women's Soaps",
-    "url": "https://chaldal.com/womens-soaps"
-  },
-  {
-    "category": "Hair Care",
-    "url": "https://chaldal.com/hair-care"
-  },
-  {
-    "category": "Women's Shampoos & Conditioners",
-    "url": "https://chaldal.com/female-shampoo"
-  },
-  {
-    "category": "Feminine Care",
-    "url": "https://chaldal.com/feminine-care"
-  },
-  {
-    "category": "Female Moisturizer",
-    "url": "https://chaldal.com/female-moisturizer"
-  },
-  {
-    "category": "Face Wash & Scrub",
-    "url": "https://chaldal.com/face-wash-scrub"
-  },
-  {
-    "category": "Female Deo",
-    "url": "https://chaldal.com/female-deo"
-  },
-  {
-    "category": "Women's Perfume",
-    "url": "https://chaldal.com/womens-perfume"
-  },
-  {
-    "category": "Women's Shower Gel",
-    "url": "https://chaldal.com/womens-shower-gel"
-  },
-  {
-    "category": "Masks & Cleansers",
-    "url": "https://chaldal.com/masks-cleansers"
-  },
-  {
-    "category": "Serum, Oil & Toners",
-    "url": "https://chaldal.com/serum-oil-toners"
-  },
-  {
-    "category": "Men's Soaps",
-    "url": "https://chaldal.com/mens-soaps"
-  },
-  {
-    "category": "Men's Perfume",
-    "url": "https://chaldal.com/mens-perfume"
-  },
-  {
-    "category": "Men's Shampoos & Conditioners",
-    "url": "https://chaldal.com/shampoo"
-  },
-  {
-    "category": "Shaving Needs",
-    "url": "https://chaldal.com/shaving-needs"
-  },
-  {
-    "category": "Beard Grooming",
-    "url": "https://chaldal.com/beard-grooming"
-  },
-  {
-    "category": "Men's Deodorants",
-    "url": "https://chaldal.com/deodorants"
-  },
-  {
-    "category": "Razors & Blades",
-    "url": "https://chaldal.com/razors-blades"
-  },
-  {
-    "category": "Men's Hair Care",
-    "url": "https://chaldal.com/mens-hair-care"
-  },
-  {
-    "category": "Cream & Lotion",
-    "url": "https://chaldal.com/lotion-cream"
-  },
-  {
-    "category": "Men's Facewash",
-    "url": "https://chaldal.com/mens-facewash"
-  },
-  {
-    "category": "Men's Shower Gels",
-    "url": "https://chaldal.com/mens-shower-gels"
-  },
-  {
-    "category": "Liquid Handwash",
-    "url": "https://chaldal.com/liquid-handwash"
-  },
-  {
-    "category": "Hand Sanitizer",
-    "url": "https://chaldal.com/hand-sanitizer"
-  },
-  {
-    "category": "Tissue & Wipes",
-    "url": "https://chaldal.com/tissue-wipes"
-  },
-  {
-    "category": "Toothpastes",
-    "url": "https://chaldal.com/toothpastes"
-  },
-  {
-    "category": "Toothbrushes",
-    "url": "https://chaldal.com/toothbrushes"
-  },
-  {
-    "category": "Mouthwash & Others",
-    "url": "https://chaldal.com/mouthwash-others"
-  },
-  {
-    "category": "Soaps",
-    "url": "https://chaldal.com/soaps"
-  },
-  {
-    "category": "Lotions",
-    "url": "https://chaldal.com/lotions"
-  },
-  {
-    "category": "Petroleum Jelly",
-    "url": "https://chaldal.com/petroleum-jelly"
-  },
-  {
-    "category": "Creams",
-    "url": "https://chaldal.com/creams"
-  },
-  {
-    "category": "Face Wash & Mask",
-    "url": "https://chaldal.com/face-wash-mask"
-  },
-  {
-    "category": "Body & Hair Oil",
-    "url": "https://chaldal.com/body-hair-oil"
-  },
-  {
-    "category": "Lipsticks & Lip Balm",
-    "url": "https://chaldal.com/lipsticks-lip-balm"
-  },
-  {
-    "category": "Talcom Powder",
-    "url": "https://chaldal.com/talcom-powder"
-  },
-  {
-    "category": "Hair Color",
-    "url": "https://chaldal.com/hair-color"
-  },
-  {
-    "category": "Keto Food",
-    "url": "https://chaldal.com/keto-food"
-  },
-  {
-    "category": "Antiseptics",
-    "url": "https://chaldal.com/antiseptics"
-  },
-  {
-    "category": "Handwash & Handrub",
-    "url": "https://chaldal.com/handwash-handrub"
-  },
-  {
-    "category": "Herbal & Digestive Aids",
-    "url": "https://chaldal.com/herbal-products"
-  },
-  {
-    "category": "Food Supplements",
-    "url": "https://chaldal.com/food-supplements"
-  },
-  {
-    "category": "Face Masks & Safety",
-    "url": "https://chaldal.com/face-masks-safety"
-  },
-  {
-    "category": "Family Planning",
-    "url": "https://chaldal.com/family-planning"
-  },
-  {
-    "category": "Mouthwashes, Inhaler & Balm",
-    "url": "https://chaldal.com/mouthwashes"
-  },
-  {
-    "category": "Adult Diapers",
-    "url": "https://chaldal.com/adult-diapers"
-  },
-  {
-    "category": "Medical Devices",
-    "url": "https://chaldal.com/medical-devices"
-  },
-  {
-    "category": "Medium (5-13 kg) Diapers",
-    "url": "https://chaldal.com/medium-2"
-  },
-  {
-    "category": "Large (10-16 kg) Diapers",
-    "url": "https://chaldal.com/large-2"
-  },
-  {
-    "category": "Extra Large (15+ kg) Diapers",
-    "url": "https://chaldal.com/extra-large-15-kg-diapers"
-  },
-  {
-    "category": "Small (3-7 kg) Diapers",
-    "url": "https://chaldal.com/small-2"
-  },
-  {
-    "category": "Newborn (2-5 kg) Diapers",
-    "url": "https://chaldal.com/newborn-2"
-  },
-  {
-    "category": "Milk, Juice & Drinks",
-    "url": "https://chaldal.com/milk-juice-drinks"
-  },
-  {
-    "category": "Baby & Toddler Food",
-    "url": "https://chaldal.com/toddler-food"
-  },
-  {
-    "category": "Formula",
-    "url": "https://chaldal.com/formula"
-  },
-  {
-    "category": "Baby Skincare",
-    "url": "https://chaldal.com/bath-skincare"
-  },
-  {
-    "category": "Wipes",
-    "url": "https://chaldal.com/wipes"
-  },
-  {
-    "category": "Baby Oral Care",
-    "url": "https://chaldal.com/baby-oral-care"
-  },
-  {
-    "category": "Newborn Essentials",
-    "url": "https://chaldal.com/newborn-essentials"
-  },
-  {
-    "category": "Baby Accessories",
-    "url": "https://chaldal.com/baby-accessories"
-  },
-  {
-    "category": "Feeders",
-    "url": "https://chaldal.com/feeders"
-  },
-  {
+    "id": 85,
     "category": "Kitchen Accessories",
-    "url": "https://chaldal.com/kitchen-accessories"
+    "categoryBn": "রান্নাঘরের সামগ্রী ",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Kitchen Accessories",
+    "url": "https://chaldal.com/85"
   },
   {
+    "id": 1269,
     "category": "Kitchen Appliances",
-    "url": "https://chaldal.com/kitchen-appliances"
+    "categoryBn": "রান্নাঘর যন্ত্রপাতি",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Kitchen Appliances",
+    "url": "https://chaldal.com/1269"
   },
   {
+    "id": 1267,
+    "category": "Lights & Electrical",
+    "categoryBn": "লাইট ও বৈদ্যুতিক",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Lights & Electrical",
+    "url": "https://chaldal.com/1267"
+  },
+  {
+    "id": 1713,
     "category": "Lights",
-    "url": "https://chaldal.com/lights"
+    "categoryBn": "লাইট্স",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Lights & Electrical > Lights",
+    "url": "https://chaldal.com/1713"
   },
   {
+    "id": 1714,
     "category": "Mosquito Swatter",
-    "url": "https://chaldal.com/mosquito-swatter"
+    "categoryBn": "মশা সোয়াটার",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Lights & Electrical > Mosquito Swatter",
+    "url": "https://chaldal.com/1714"
   },
   {
+    "id": 1715,
     "category": "Electric & Multiplug",
-    "url": "https://chaldal.com/electric-multiplug"
+    "categoryBn": "বৈদ্যুতিক এবং মাল্টিপ্লাগ",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Lights & Electrical > Electric & Multiplug",
+    "url": "https://chaldal.com/1715"
   },
   {
+    "id": 1716,
     "category": "Electronics",
-    "url": "https://chaldal.com/electronics"
+    "categoryBn": "ইলেকট্রনিক্স",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Lights & Electrical > Electronics",
+    "url": "https://chaldal.com/1716"
   },
   {
+    "id": 1268,
     "category": "Tools & Hardware",
-    "url": "https://chaldal.com/tools-hardware"
+    "categoryBn": "টুলস ও হার্ডওয়্যার",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Tools & Hardware",
+    "url": "https://chaldal.com/1268"
   },
   {
+    "id": 1543,
     "category": "Basket & Bucket",
-    "url": "https://chaldal.com/baskets-buckets"
+    "categoryBn": "বালতি গামলা ঝুড়ি",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Basket & Bucket",
+    "url": "https://chaldal.com/1543"
   },
   {
+    "id": 1544,
     "category": "Box & Container",
-    "url": "https://chaldal.com/box-container"
+    "categoryBn": "বক্স এবং কনটেইনার",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Box & Container",
+    "url": "https://chaldal.com/1544"
   },
   {
+    "id": 1527,
     "category": "Gardening",
-    "url": "https://chaldal.com/gardening"
+    "categoryBn": "বাগান সামগ্রী",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Gardening",
+    "url": "https://chaldal.com/1527"
   },
   {
+    "id": 1541,
     "category": "Rack & Organizer",
-    "url": "https://chaldal.com/rack-organizer"
+    "categoryBn": "তাক এবং র‍্যাক",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Rack & Organizer",
+    "url": "https://chaldal.com/1541"
   },
   {
+    "id": 1540,
     "category": "Disposables",
-    "url": "https://chaldal.com/disposables"
+    "categoryBn": "ডিসপোজেবল",
+    "topCategory": "Home & Kitchen",
+    "hierarchy": "Home & Kitchen > Disposables",
+    "url": "https://chaldal.com/1540"
   },
   {
+    "id": 1553,
+    "category": "Fashion & Lifestyle",
+    "categoryBn": "ফ্যাশন এবং লাইফস্টাইল",
+    "topCategory": "Fashion & Lifestyle",
+    "hierarchy": "Fashion & Lifestyle",
+    "url": "https://chaldal.com/1553"
+  },
+  {
+    "id": 209,
+    "category": "Baby Care",
+    "categoryBn": "শিশুদের ব্যবহার্য",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care",
+    "url": "https://chaldal.com/209"
+  },
+  {
+    "id": 211,
+    "category": "Diapers",
+    "categoryBn": "ডায়পার",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Diapers",
+    "url": "https://chaldal.com/211"
+  },
+  {
+    "id": 1673,
+    "category": "Medium (5-13 kg) Diapers",
+    "categoryBn": "মাঝারি (5-13 কেজি) ডায়াপার",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Diapers > Medium (5-13 kg) Diapers",
+    "url": "https://chaldal.com/1673"
+  },
+  {
+    "id": 1676,
+    "category": "Large (10-16 kg) Diapers",
+    "categoryBn": "বড় (10-16 কেজি) ডায়াপার",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Diapers > Large (10-16 kg) Diapers",
+    "url": "https://chaldal.com/1676"
+  },
+  {
+    "id": 1677,
+    "category": "Extra Large (15+ kg) Diapers",
+    "categoryBn": "অতিরিক্ত বড় (15+ কেজি) ডায়াপার",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Diapers > Extra Large (15+ kg) Diapers",
+    "url": "https://chaldal.com/1677"
+  },
+  {
+    "id": 1672,
+    "category": "Small (3-7 kg) Diapers",
+    "categoryBn": "ছোট (3-7 কেজি) ডায়াপার",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Diapers > Small (3-7 kg) Diapers",
+    "url": "https://chaldal.com/1672"
+  },
+  {
+    "id": 1671,
+    "category": "Newborn (2-5 kg) Diapers",
+    "categoryBn": "নবজাতক (2-5 কেজি) ডায়াপার",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Diapers > Newborn (2-5 kg) Diapers",
+    "url": "https://chaldal.com/1671"
+  },
+  {
+    "id": 216,
+    "category": "Baby Food",
+    "categoryBn": "শিশু খাদ্য",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Baby Food",
+    "url": "https://chaldal.com/216"
+  },
+  {
+    "id": 221,
+    "category": "Milk, Juice & Drinks",
+    "categoryBn": "দুধ, জুস এবং পানীয়",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Baby Food > Milk, Juice & Drinks",
+    "url": "https://chaldal.com/221"
+  },
+  {
+    "id": 219,
+    "category": "Baby & Toddler Food",
+    "categoryBn": "শিশু খাদ্য",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Baby Food > Baby & Toddler Food",
+    "url": "https://chaldal.com/219"
+  },
+  {
+    "id": 217,
+    "category": "Formula",
+    "categoryBn": "ফর্মুলা ",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Baby Food > Formula",
+    "url": "https://chaldal.com/217"
+  },
+  {
+    "id": 223,
+    "category": "Baby Skincare",
+    "categoryBn": "শিশুর স্নান এবং ত্বকের যত্ন",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Baby Skincare",
+    "url": "https://chaldal.com/223"
+  },
+  {
+    "id": 212,
+    "category": "Wipes",
+    "categoryBn": "ওয়াইপ্স",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Wipes",
+    "url": "https://chaldal.com/212"
+  },
+  {
+    "id": 1379,
+    "category": "Baby Oral Care",
+    "categoryBn": "শিশুর মুখের ব্যবহার্য",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Baby Oral Care",
+    "url": "https://chaldal.com/1379"
+  },
+  {
+    "id": 1483,
+    "category": "Newborn Essentials",
+    "categoryBn": "নবজাতকের প্রয়োজনীয়তা",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Newborn Essentials",
+    "url": "https://chaldal.com/1483"
+  },
+  {
+    "id": 1378,
+    "category": "Baby Accessories",
+    "categoryBn": "শিশুর আনুষাঙ্গিক",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Baby Accessories",
+    "url": "https://chaldal.com/1378"
+  },
+  {
+    "id": 234,
+    "category": "Feeders",
+    "categoryBn": "ফিডার",
+    "topCategory": "Baby Care",
+    "hierarchy": "Baby Care > Feeders",
+    "url": "https://chaldal.com/234"
+  },
+  {
+    "id": 1494,
+    "category": "Women's Care",
+    "categoryBn": "মহিলাদের ব্যবহার্য",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care",
+    "url": "https://chaldal.com/1494"
+  },
+  {
+    "id": 1608,
+    "category": "Women's Soaps",
+    "categoryBn": "মহিলাদের সাবান",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Women's Soaps",
+    "url": "https://chaldal.com/1608"
+  },
+  {
+    "id": 33,
+    "category": "Hair Care",
+    "categoryBn": "চুলের ব্যবহার্য",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Hair Care",
+    "url": "https://chaldal.com/[object Object]"
+  },
+  {
+    "id": 1501,
+    "category": "Women's Shampoos & Conditioners",
+    "categoryBn": "মহিলাদের শ্যাম্পু এবং কন্ডিশনার",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Women's Shampoos & Conditioners",
+    "url": "https://chaldal.com/1501"
+  },
+  {
+    "id": 35,
+    "category": "Feminine Care",
+    "categoryBn": "মহিলাদের ব্যবহার্য",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Feminine Care",
+    "url": "https://chaldal.com/35"
+  },
+  {
+    "id": 1497,
+    "category": "Female Moisturizer",
+    "categoryBn": "মহিলাদের ময়েশ্চারাইজার",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Female Moisturizer",
+    "url": "https://chaldal.com/1497"
+  },
+  {
+    "id": 1642,
+    "category": "Face Wash & Scrub",
+    "categoryBn": "ফেস ওয়াশ এবং স্ক্রাব",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Face Wash & Scrub",
+    "url": "https://chaldal.com/1642"
+  },
+  {
+    "id": 1499,
+    "category": "Female Deo",
+    "categoryBn": "",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Female Deo",
+    "url": "https://chaldal.com/1499"
+  },
+  {
+    "id": 1611,
+    "category": "Women's Perfume",
+    "categoryBn": "মহিলাদের সুগন্ধি",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Women's Perfume",
+    "url": "https://chaldal.com/1611"
+  },
+  {
+    "id": 1610,
+    "category": "Women's Shower Gel",
+    "categoryBn": "মহিলাদের গোসলের জেল",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Women's Shower Gel",
+    "url": "https://chaldal.com/1610"
+  },
+  {
+    "id": 1643,
+    "category": "Masks & Cleansers",
+    "categoryBn": "মাস্ক এবং ক্লিনজার",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Masks & Cleansers",
+    "url": "https://chaldal.com/1643"
+  },
+  {
+    "id": 1644,
+    "category": "Serum, Oil & Toners",
+    "categoryBn": "সিরাম, তেল এবং টোনার",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Women's Care > Serum, Oil & Toners",
+    "url": "https://chaldal.com/1644"
+  },
+  {
+    "id": 1636,
+    "category": "Men's Soaps",
+    "categoryBn": "পুরুষদের সাবান",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Men's Soaps",
+    "url": "https://chaldal.com/1636"
+  },
+  {
+    "id": 1641,
+    "category": "Men's Perfume",
+    "categoryBn": "পুরুষদের সুগন্ধি",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Men's Perfume",
+    "url": "https://chaldal.com/1641"
+  },
+  {
+    "id": 39,
+    "category": "Men's Shampoos & Conditioners",
+    "categoryBn": "পুরুষদের শ্যাম্পু এবং কন্ডিশনার",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Men's Shampoos & Conditioners",
+    "url": "https://chaldal.com/39"
+  },
+  {
+    "id": 32,
+    "category": "Shaving Needs",
+    "categoryBn": "শেভিং এর ব্যবহার্য ",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Shaving Needs",
+    "url": "https://chaldal.com/32"
+  },
+  {
+    "id": 1468,
+    "category": "Beard Grooming",
+    "categoryBn": "দাড়ির সাজগোজের",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Beard Grooming",
+    "url": "https://chaldal.com/1468"
+  },
+  {
+    "id": 31,
+    "category": "Men's Deodorants",
+    "categoryBn": "পুরুষদের ডিওডোরেন্টস",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Men's Deodorants",
+    "url": "https://chaldal.com/31"
+  },
+  {
+    "id": 1640,
+    "category": "Razors & Blades",
+    "categoryBn": "রেজার এবং ব্লেড",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Razors & Blades",
+    "url": "https://chaldal.com/1640"
+  },
+  {
+    "id": 1500,
+    "category": "Men's Hair Care",
+    "categoryBn": "পুরুষদের হেয়ার কেয়ার",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Men's Hair Care",
+    "url": "https://chaldal.com/1500"
+  },
+  {
+    "id": 1354,
+    "category": "Cream & Lotion",
+    "categoryBn": "ক্রিম ও লোশান",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Cream & Lotion",
+    "url": "https://chaldal.com/1354"
+  },
+  {
+    "id": 1498,
+    "category": "Men's Facewash",
+    "categoryBn": "পুরুষদের ফেসওয়াশ",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Men's Facewash",
+    "url": "https://chaldal.com/1498"
+  },
+  {
+    "id": 1639,
+    "category": "Men's Shower Gels",
+    "categoryBn": "পুরুষদের গোসলের জেল",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Men's Care > Men's Shower Gels",
+    "url": "https://chaldal.com/1639"
+  },
+  {
+    "id": 40,
+    "category": "Handwash",
+    "categoryBn": "হ্যান্ড ওয়াশ",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Handwash",
+    "url": "https://chaldal.com/40"
+  },
+  {
+    "id": 1638,
+    "category": "Liquid Handwash",
+    "categoryBn": "তরল হ্যান্ডওয়াশ",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Handwash > Liquid Handwash",
+    "url": "https://chaldal.com/1638"
+  },
+  {
+    "id": 1645,
+    "category": "Hand Sanitizer",
+    "categoryBn": "হ্যান্ড স্যানিটাইজার",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Handwash > Hand Sanitizer",
+    "url": "https://chaldal.com/1645"
+  },
+  {
+    "id": 41,
+    "category": "Tissue & Wipes",
+    "categoryBn": "টিস্যু এবং ওয়াইপ্স",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Tissue & Wipes",
+    "url": "https://chaldal.com/41"
+  },
+  {
+    "id": 1697,
+    "category": "Oral Care",
+    "categoryBn": "মুখের ব্যবহার্য",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Oral Care",
+    "url": "https://chaldal.com/1697"
+  },
+  {
+    "id": 1613,
+    "category": "Toothpastes",
+    "categoryBn": "টুথপেস্ট",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Oral Care > Toothpastes",
+    "url": "https://chaldal.com/1613"
+  },
+  {
+    "id": 1614,
+    "category": "Toothbrushes",
+    "categoryBn": "টুথব্রাশ",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Oral Care > Toothbrushes",
+    "url": "https://chaldal.com/1614"
+  },
+  {
+    "id": 1616,
+    "category": "Mouthwash & Others",
+    "categoryBn": "মাউথওয়াশ এবং অন্যান্য",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Oral Care > Mouthwash & Others",
+    "url": "https://chaldal.com/1616"
+  },
+  {
+    "id": 1698,
+    "category": "Skin Care",
+    "categoryBn": "ত্বক এর ব্যবহার্য",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Skin Care",
+    "url": "https://chaldal.com/1698"
+  },
+  {
+    "id": 1620,
+    "category": "Soaps",
+    "categoryBn": "সাবান",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Skin Care > Soaps",
+    "url": "https://chaldal.com/1620"
+  },
+  {
+    "id": 1628,
+    "category": "Lotions",
+    "categoryBn": "লোশন",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Skin Care > Lotions",
+    "url": "https://chaldal.com/1628"
+  },
+  {
+    "id": 1624,
+    "category": "Petroleum Jelly",
+    "categoryBn": "পেট্রোলিয়াম জেলি",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Skin Care > Petroleum Jelly",
+    "url": "https://chaldal.com/1624"
+  },
+  {
+    "id": 1630,
+    "category": "Creams",
+    "categoryBn": "ক্রিম",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Skin Care > Creams",
+    "url": "https://chaldal.com/1630"
+  },
+  {
+    "id": 1627,
+    "category": "Face Wash & Mask",
+    "categoryBn": "ফেস ওয়াশ এবং মাস্ক",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Skin Care > Face Wash & Mask",
+    "url": "https://chaldal.com/1627"
+  },
+  {
+    "id": 1622,
+    "category": "Body & Hair Oil",
+    "categoryBn": "শরীর এবং চুলের তেল",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Skin Care > Body & Hair Oil",
+    "url": "https://chaldal.com/1622"
+  },
+  {
+    "id": 1635,
+    "category": "Lipsticks & Lip Balm",
+    "categoryBn": "লিপস্টিক এবং লিপ বাম",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Skin Care > Lipsticks & Lip Balm",
+    "url": "https://chaldal.com/1635"
+  },
+  {
+    "id": 190,
+    "category": "Talcom Powder",
+    "categoryBn": "ট্যালকম পাউডার",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Talcom Powder",
+    "url": "https://chaldal.com/190"
+  },
+  {
+    "id": 1504,
+    "category": "Hair Color",
+    "categoryBn": "হেয়ার কালার ",
+    "topCategory": "Personal Care",
+    "hierarchy": "Personal Care > Hair Color",
+    "url": "https://chaldal.com/1504"
+  },
+  {
+    "id": 230,
     "category": "Batteries",
-    "url": "https://chaldal.com/batteries"
+    "categoryBn": "ব্যাটারি",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Office Electronics > Batteries",
+    "url": "https://chaldal.com/230"
   },
   {
+    "id": 1539,
     "category": "Calculators",
-    "url": "https://chaldal.com/calculators"
+    "categoryBn": "ক্যালকুলেটর",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Office Electronics > Calculators",
+    "url": "https://chaldal.com/1539"
   },
   {
+    "id": 201,
+    "category": "Organizers",
+    "categoryBn": "অর্গানাইজার্স",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Organizers",
+    "url": "https://chaldal.com/201"
+  },
+  {
+    "id": 226,
     "category": "Tapes, Glues & Adhesive",
-    "url": "https://chaldal.com/glue-tapes"
+    "categoryBn": "আঠা এবং টেপ",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Organizers > Tapes, Glues & Adhesive",
+    "url": "https://chaldal.com/226"
   },
   {
+    "id": 1533,
     "category": "Stapler & Punch",
-    "url": "https://chaldal.com/stapler-punch"
+    "categoryBn": "স্ট্যাপলার এবং পাঞ্চ",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Organizers > Stapler & Punch",
+    "url": "https://chaldal.com/1533"
   },
   {
+    "id": 202,
     "category": "Organizing Accessories",
-    "url": "https://chaldal.com/organizing-accessories"
+    "categoryBn": "অর্গানাইজিং আনুষাঙ্গিক",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Organizers > Organizing Accessories",
+    "url": "https://chaldal.com/202"
   },
   {
+    "id": 204,
     "category": "Cutting",
-    "url": "https://chaldal.com/cutting-2"
+    "categoryBn": "কাটিং",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Organizers > Cutting",
+    "url": "https://chaldal.com/204"
   },
   {
+    "id": 203,
     "category": "Files & Folders",
-    "url": "https://chaldal.com/file-folder"
+    "categoryBn": "ফাইলস এবং ফোল্ডার",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Organizers > Files & Folders",
+    "url": "https://chaldal.com/203"
   },
   {
+    "id": 1535,
     "category": "Measuring Tools",
-    "url": "https://chaldal.com/measuring"
+    "categoryBn": "পরিমাপক যন্ত্রপাতি",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Organizers > Measuring Tools",
+    "url": "https://chaldal.com/1535"
   },
   {
+    "id": 1532,
     "category": "Desk Organizers",
-    "url": "https://chaldal.com/desk-organizers"
+    "categoryBn": "ডেস্ক অর্গানাইজার্স",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Organizers > Desk Organizers",
+    "url": "https://chaldal.com/1532"
   },
   {
+    "id": 114,
     "category": "Pens",
-    "url": "https://chaldal.com/pens"
+    "categoryBn": "কলম ",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Writing & Printing > Pens",
+    "url": "https://chaldal.com/114"
   },
   {
+    "id": 116,
     "category": "Highlighters & Markers",
-    "url": "https://chaldal.com/highlighters"
+    "categoryBn": "হাইলাইটার ও মার্কারস",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Writing & Printing > Highlighters & Markers",
+    "url": "https://chaldal.com/116"
   },
   {
+    "id": 208,
     "category": "Toner & Ink",
-    "url": "https://chaldal.com/printer-ink"
+    "categoryBn": "টোনার এবং কালি",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Writing & Printing > Toner & Ink",
+    "url": "https://chaldal.com/208"
   },
   {
+    "id": 115,
     "category": "Pencils",
-    "url": "https://chaldal.com/pencils"
+    "categoryBn": "পেন্সিল",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Writing & Printing > Pencils",
+    "url": "https://chaldal.com/115"
   },
   {
+    "id": 117,
     "category": "Erasers & Correction Fluid",
-    "url": "https://chaldal.com/erasers-correction-fluid"
+    "categoryBn": "ইরেজার এবং কারেকসন ফ্লুইড",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Writing & Printing > Erasers & Correction Fluid",
+    "url": "https://chaldal.com/117"
   },
   {
+    "id": 207,
     "category": "Printing Paper",
-    "url": "https://chaldal.com/printing-paper"
+    "categoryBn": "প্রিন্টিং কাগজ",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Paper Supplies > Printing Paper",
+    "url": "https://chaldal.com/207"
   },
   {
+    "id": 119,
     "category": "Diaries & Notebooks",
-    "url": "https://chaldal.com/notebook-diary"
+    "categoryBn": "নোট, খাতা এবং ডায়েরি",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Paper Supplies > Diaries & Notebooks",
+    "url": "https://chaldal.com/119"
   },
   {
+    "id": 1531,
     "category": "School Supplies",
-    "url": "https://chaldal.com/school-supplies"
+    "categoryBn": "স্কুল সামগ্রী",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > School Supplies",
+    "url": "https://chaldal.com/1531"
   },
   {
+    "id": 225,
     "category": "Color Pencils",
-    "url": "https://chaldal.com/color-pencil"
+    "categoryBn": "রং পেন্সিল",
+    "topCategory": "Stationery & Office",
+    "hierarchy": "Stationery & Office > Arts & Crafts > Color Pencils",
+    "url": "https://chaldal.com/225"
   },
   {
+    "id": 1254,
     "category": "Cat Food",
-    "url": "https://chaldal.com/cat-food"
+    "categoryBn": "বিড়ালের খাদ্য",
+    "topCategory": "Pet Care",
+    "hierarchy": "Pet Care > Cat Food",
+    "url": "https://chaldal.com/1254"
   },
   {
+    "id": 1257,
     "category": "Cat Litters",
-    "url": "https://chaldal.com/cat-litters"
+    "categoryBn": "বিড়ালের লিটার",
+    "topCategory": "Pet Care",
+    "hierarchy": "Pet Care > Cat Litters",
+    "url": "https://chaldal.com/1257"
   },
   {
+    "id": 1383,
     "category": "Kitten Food",
-    "url": "https://chaldal.com/kitten-food"
+    "categoryBn": "বিড়ালছানার খাবার",
+    "topCategory": "Pet Care",
+    "hierarchy": "Pet Care > Kitten Food",
+    "url": "https://chaldal.com/1383"
   },
   {
+    "id": 1255,
     "category": "Dog Food",
-    "url": "https://chaldal.com/dog-food"
+    "categoryBn": "কুকুরের খাদ্য",
+    "topCategory": "Pet Care",
+    "hierarchy": "Pet Care > Dog Food",
+    "url": "https://chaldal.com/1255"
   },
   {
+    "id": 1547,
     "category": "Grooming & Cleaning",
-    "url": "https://chaldal.com/pet-grooming-cleaning"
+    "categoryBn": "গ্রুমিং ও ক্লিনিং",
+    "topCategory": "Pet Care",
+    "hierarchy": "Pet Care > Grooming & Cleaning",
+    "url": "https://chaldal.com/1547"
   },
   {
+    "id": 1679,
     "category": "Bird & Other Pet Food",
-    "url": "https://chaldal.com/bird-food"
+    "categoryBn": "পাখি এবং অন্যান্য পোষা খাদ্য",
+    "topCategory": "Pet Care",
+    "hierarchy": "Pet Care > Bird & Other Pet Food",
+    "url": "https://chaldal.com/1679"
+  },
+  {
+    "id": 1574,
+    "category": "Toys & Sports",
+    "categoryBn": "খেলনা এবং খেলাধুলা",
+    "topCategory": "Toys & Sports",
+    "hierarchy": "Toys & Sports",
+    "url": "https://chaldal.com/1574"
+  },
+  {
+    "id": 1648,
+    "category": "Beauty & MakeUp",
+    "categoryBn": "সৌন্দর্য এবং মেক আপ",
+    "topCategory": "Beauty & MakeUp",
+    "hierarchy": "Beauty & MakeUp",
+    "url": "https://chaldal.com/1648"
+  },
+  {
+    "id": 1484,
+    "category": "Health & Wellness",
+    "categoryBn": "স্বাস্থ্য এবং সুস্থতা",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness",
+    "url": "https://chaldal.com/1484"
+  },
+  {
+    "id": 1505,
+    "category": "Keto Food",
+    "categoryBn": "কিটোর খাবার",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Keto Food",
+    "url": "https://chaldal.com/1505"
+  },
+  {
+    "id": 192,
+    "category": "Antiseptics",
+    "categoryBn": "এন্টিসেপ্টিক্স ",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Antiseptics",
+    "url": "https://chaldal.com/192"
+  },
+  {
+    "id": 1660,
+    "category": "Handwash & Handrub",
+    "categoryBn": "হ্যান্ডওয়াশ এবং হ্যান্ডরাব",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Handwash & Handrub",
+    "url": "https://chaldal.com/1660"
+  },
+  {
+    "id": 232,
+    "category": "Herbal & Digestive Aids",
+    "categoryBn": "ঔষধি দ্রব্যাদি এবং হজম এর জন্য",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Herbal & Digestive Aids",
+    "url": "https://chaldal.com/232"
+  },
+  {
+    "id": 227,
+    "category": "Food Supplements",
+    "categoryBn": "ফুড সাপ্লিমেন্টস",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Food Supplements",
+    "url": "https://chaldal.com/227"
+  },
+  {
+    "id": 1658,
+    "category": "Face Masks & Safety",
+    "categoryBn": "ফেস মাস্ক এবং নিরাপত্তা",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Face Masks & Safety",
+    "url": "https://chaldal.com/1658"
+  },
+  {
+    "id": 47,
+    "category": "Family Planning",
+    "categoryBn": "পরিবার পরিকল্পনা",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Family Planning",
+    "url": "https://chaldal.com/47"
+  },
+  {
+    "id": 1665,
+    "category": "Mouthwashes, Inhaler & Balm",
+    "categoryBn": "মাউথওয়াশ, ইনহেলার এবং বাম",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Mouthwashes, Inhaler & Balm",
+    "url": "https://chaldal.com/1665"
+  },
+  {
+    "id": 1261,
+    "category": "Adult Diapers",
+    "categoryBn": "বয়স্ক ডায়পার",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Adult Diapers",
+    "url": "https://chaldal.com/1261"
+  },
+  {
+    "id": 1666,
+    "category": "Medical Devices",
+    "categoryBn": "চিকিৎসা সংক্রান্ত যন্ত্রপাতি",
+    "topCategory": "Health & Wellness",
+    "hierarchy": "Health & Wellness > Medical Devices",
+    "url": "https://chaldal.com/1666"
+  },
+  {
+    "id": 1417,
+    "category": "Vehicle Essentials",
+    "categoryBn": "যানবাহন প্রয়োজনীয়",
+    "topCategory": "Vehicle Essentials",
+    "hierarchy": "Vehicle Essentials",
+    "url": "https://chaldal.com/1417"
+  },
+  {
+    "id": 1750,
+    "category": "Tong",
+    "categoryBn": "টং",
+    "topCategory": "Tong",
+    "hierarchy": "Tong",
+    "url": "https://chaldal.com/1750"
+  },
+  {
+    "id": 1479,
+    "category": "New Arrival",
+    "categoryBn": "নিউ এরাইভাল",
+    "topCategory": "New Arrival",
+    "hierarchy": "New Arrival",
+    "url": "https://chaldal.com/1479"
   }
 ]

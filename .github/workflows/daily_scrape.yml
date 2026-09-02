@@ -15,24 +15,23 @@ jobs:
     steps:
       # 1. Checkout Code
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # 2. Checkout Database (Into the 'public' folder)
       - name: Checkout Database
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: database
           path: public
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
       - name: Install Dependencies
         run: |
           pip install -r scraper/requirements.txt
-          playwright install chromium
 
       - name: Run Scraper
         # This will write files into the 'public' folder
