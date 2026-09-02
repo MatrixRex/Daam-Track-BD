@@ -7,7 +7,19 @@ jobs:
   diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Test DNS and IP
+      - name: Setup Cloudflare WARP
+        run: |
+          echo "=== Installing Cloudflare WARP ==="
+          curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-warp.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq cloudflare-warp
+          warp-cli --accept-tos registration new || true
+          warp-cli --accept-tos connect || true
+          sleep 5
+          warp-cli --accept-tos status || true
+
+      - name: Test IP After WARP
         run: |
           echo "=== RUNNER PUBLIC IP ==="
           curl -s https://api.ipify.org
@@ -15,18 +27,14 @@ jobs:
           echo "=== IP GEOLOCATION ==="
           curl -s http://ip-api.com/json/
           echo ""
-          echo "=== DNS LOOKUP ==="
-          dig +short catalog.chaldal.com
-          dig +short chaldal.com
-          echo ""
 
       - name: Test HTTP Connectivity
         run: |
           echo "=== CURL chaldal.com ==="
-          curl -I --connect-timeout 10 https://chaldal.com || echo "chaldal.com FAILED"
+          curl -I --max-time 15 https://chaldal.com || echo "chaldal.com FAILED"
           echo ""
           echo "=== CURL catalog.chaldal.com ==="
-          curl -I --connect-timeout 10 https://catalog.chaldal.com || echo "catalog.chaldal.com FAILED"
+          curl -I --max-time 15 https://catalog.chaldal.com || echo "catalog.chaldal.com FAILED"
           echo ""
 
       - name: Test Python Catalog Request
@@ -55,11 +63,12 @@ jobs:
               'Origin': 'https://chaldal.com',
               'Referer': 'https://chaldal.com/'
           }
-          for ep in ['https://catalog.chaldal.com/searchOld', 'https://chaldal.com/searchOld']:
-              try:
-                  print(f'Testing {ep}...')
-                  r = requests.post(ep, json=payload, headers=headers, timeout=10)
-                  print(f'{ep} -> Status: {r.status_code}, Length: {len(r.text)}')
-              except Exception as e:
-                  print(f'{ep} -> ERROR: {e}')
+          try:
+              print('Testing https://catalog.chaldal.com/searchOld...')
+              r = requests.post('https://catalog.chaldal.com/searchOld', json=payload, headers=headers, timeout=15)
+              print(f'catalog.chaldal.com -> Status: {r.status_code}, Length: {len(r.text)}')
+              if r.status_code == 200:
+                  print('SUCCESS! Hits:', len(r.json().get('hits', [])))
+          except Exception as e:
+              print(f'catalog.chaldal.com -> ERROR: {e}')
           "
