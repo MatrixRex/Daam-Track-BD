@@ -8,6 +8,8 @@ Bangladesh commodity price tracker. React + Vite + DuckDB WASM frontend, Python 
 - `pnpm build` — production build (outputs `dist/`)
 - `pnpm lint` — ESLint (only check; no typecheck in this repo)
 - `pnpm preview` — preview production build (auto-selects available port)
+- `pnpm scrape` — run scraper locally into `public/` (Chaldal catalog API)
+- `pnpm scrape:push` — scrape locally and push directly to remote `database` branch
 - `python generate_fake_data.py` — populate `public/data/` with 10yr synthetic data (needed before `pnpm dev` to see charts)
 
 ## Architecture

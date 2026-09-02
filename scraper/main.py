@@ -278,5 +278,72 @@ def scrape():
     seconds = int(duration % 60)
     print(f"--- Finished in {minutes}m {seconds}s ({duration:.2f}s total) ---")
 
+def push_to_database():
+    """Clones the database branch into a temporary directory, copies scraped data, and pushes."""
+    import subprocess
+    import tempfile
+    import shutil
+    import stat
+
+    print("\n--- Pushing Scraped Data to GitHub 'database' Branch ---")
+    try:
+        origin_url = subprocess.check_output(
+            ["git", "remote", "get-url", "origin"],
+            cwd=BASE_DIR,
+            text=True
+        ).strip()
+    except Exception as e:
+        print(f"[!] Failed to get git origin URL: {e}")
+        return
+
+    temp_dir = tempfile.mkdtemp(prefix="daamtrack_db_")
+    try:
+        print(f"Cloning 'database' branch into temporary workspace...")
+        subprocess.check_call(
+            ["git", "clone", "--depth", "1", "--branch", "database", origin_url, temp_dir]
+        )
+
+        dest_data = os.path.join(temp_dir, "data")
+        dest_images = os.path.join(temp_dir, "images")
+
+        if os.path.exists(DATA_DIR):
+            print("Syncing data files...")
+            shutil.copytree(DATA_DIR, dest_data, dirs_exist_ok=True)
+        if os.path.exists(IMAGE_DIR):
+            print("Syncing image files...")
+            shutil.copytree(IMAGE_DIR, dest_images, dirs_exist_ok=True)
+
+        # Stage changes
+        subprocess.check_call(["git", "add", "."], cwd=temp_dir)
+        status_proc = subprocess.run(["git", "diff", "--staged", "--quiet"], cwd=temp_dir)
+
+        if status_proc.returncode == 0:
+            print("No new changes detected on 'database' branch.")
+        else:
+            today = datetime.datetime.now().strftime("%Y-%m-%d")
+            commit_msg = f"Manual Scrape Update: {today}"
+            subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=temp_dir)
+            print(f"Pushing commit '{commit_msg}' to origin/database...")
+            subprocess.check_call(["git", "push", "origin", "database"], cwd=temp_dir)
+            print("Successfully pushed updated dataset to GitHub 'database' branch!")
+    except Exception as e:
+        print(f"[!] Error while pushing to database branch: {e}")
+    finally:
+        def on_rm_error(func, path, exc_info):
+            try:
+                os.chmod(path, stat.S_IWRITE)
+                func(path)
+            except Exception:
+                pass
+        shutil.rmtree(temp_dir, onerror=on_rm_error)
+
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="DaamTrack Chaldal Scraper")
+    parser.add_argument("--push", action="store_true", help="Push scraped data directly to database branch on GitHub")
+    args = parser.parse_args()
+
     scrape()
+
+    if args.push:
+        push_to_database()
