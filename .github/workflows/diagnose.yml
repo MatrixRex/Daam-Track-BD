@@ -1,0 +1,65 @@
+name: Diagnostic Network Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test DNS and IP
+        run: |
+          echo "=== RUNNER PUBLIC IP ==="
+          curl -s https://api.ipify.org
+          echo ""
+          echo "=== IP GEOLOCATION ==="
+          curl -s http://ip-api.com/json/
+          echo ""
+          echo "=== DNS LOOKUP ==="
+          dig +short catalog.chaldal.com
+          dig +short chaldal.com
+          echo ""
+
+      - name: Test HTTP Connectivity
+        run: |
+          echo "=== CURL chaldal.com ==="
+          curl -I --connect-timeout 10 https://chaldal.com || echo "chaldal.com FAILED"
+          echo ""
+          echo "=== CURL catalog.chaldal.com ==="
+          curl -I --connect-timeout 10 https://catalog.chaldal.com || echo "catalog.chaldal.com FAILED"
+          echo ""
+
+      - name: Test Python Catalog Request
+        run: |
+          python3 -c "
+          import requests
+          payload = {
+              'apiKey': 'e964fc2d51064efa97e94db7c64bf3d044279d4ed0ad4bdd9dce89fecc9156f0',
+              'storeId': 1,
+              'warehouseId': 8,
+              'pageSize': 2,
+              'currentPageIndex': 0,
+              'metropolitanAreaId': 1,
+              'query': '',
+              'productVariantId': -1,
+              'bundleId': {'case': 'None'},
+              'canSeeOutOfStock': 'false',
+              'filters': ['categories=11'],
+              'maxOutOfStockCount': {'case': 'Some', 'fields': [5]},
+              'shouldShowAlternateProductsForAllOutOfStock': {'case': 'Some', 'fields': [True]},
+              'customerGuid': {'case': 'None'}
+          }
+          headers = {
+              'Content-Type': 'application/json',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+              'Origin': 'https://chaldal.com',
+              'Referer': 'https://chaldal.com/'
+          }
+          for ep in ['https://catalog.chaldal.com/searchOld', 'https://chaldal.com/searchOld']:
+              try:
+                  print(f'Testing {ep}...')
+                  r = requests.post(ep, json=payload, headers=headers, timeout=10)
+                  print(f'{ep} -> Status: {r.status_code}, Length: {len(r.text)}')
+              except Exception as e:
+                  print(f'{ep} -> ERROR: {e}')
+          "
