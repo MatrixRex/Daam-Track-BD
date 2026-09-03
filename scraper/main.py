@@ -131,9 +131,10 @@ def fetch_category_products(session, category_id, page_size=500):
 
             return all_hits
         else:
+            print(f"    [!] Category {category_id} returned HTTP {response.status_code}: {response.text[:100]}", flush=True)
             return []
     except Exception as e:
-        print(f"    [!] Error requesting category {category_id}: {e}")
+        print(f"    [!] Error requesting category {category_id}: {e}", flush=True)
         return []
 
 def scrape():
@@ -168,6 +169,7 @@ def scrape():
             continue
 
         products = fetch_category_products(session, cat_id)
+        time.sleep(0.3) # Polite delay to avoid WAF rate-limiting
         count_for_page = 0
 
         for product in products:
