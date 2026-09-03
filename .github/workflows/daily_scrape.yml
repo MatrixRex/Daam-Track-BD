@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   scrape_and_commit:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       # 1. Checkout Code
@@ -26,18 +26,23 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v5
+        continue-on-error: true
         with:
           python-version: '3.10'
 
       - name: Install Dependencies
+        continue-on-error: true
+        shell: bash
         run: |
-          pip install -r scraper/requirements.txt
+          pip install -r scraper/requirements.txt || true
 
       - name: Run Scraper
+        shell: bash
         # This will write files into the 'public' folder
-        run: python scraper/main.py
+        run: node scraper/run.js
 
       - name: Commit and Push Data
+        shell: bash
         run: |
           # ENTER THE DATABASE BRANCH
           cd public
