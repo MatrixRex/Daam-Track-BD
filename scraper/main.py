@@ -277,13 +277,19 @@ def scrape():
     minutes = int(duration // 60)
     seconds = int(duration % 60)
     print(f"--- Finished in {minutes}m {seconds}s ({duration:.2f}s total) ---")
+    return df_new if scraped_data else None
 
-def push_to_database():
-    """Clones the database branch into a temporary directory, copies scraped data, and pushes."""
+def push_to_database(df_new=None):
+    """Clones the database branch into a temporary directory, merges newly scraped data safely, and pushes."""
     import subprocess
     import tempfile
     import shutil
     import stat
+    import glob
+
+    if df_new is None or len(df_new) == 0:
+        print("[!] No new scraped data provided to push.")
+        return
 
     print("\n--- Pushing Scraped Data to GitHub 'database' Branch ---")
     try:
@@ -303,17 +309,55 @@ def push_to_database():
             ["git", "clone", "--depth", "1", "--branch", "database", origin_url, temp_dir]
         )
 
-        dest_data = os.path.join(temp_dir, "data")
-        dest_images = os.path.join(temp_dir, "images")
+        current_year = datetime.datetime.now().year
+        remote_year_dir = os.path.join(temp_dir, "data", "prices", f"year={current_year}")
+        os.makedirs(remote_year_dir, exist_ok=True)
+        remote_parquet = os.path.join(remote_year_dir, "data.parquet")
 
-        if os.path.exists(DATA_DIR):
-            print("Syncing data files...")
-            shutil.copytree(DATA_DIR, dest_data, dirs_exist_ok=True)
+        if os.path.exists(remote_parquet):
+            print(f"Merging with remote database ({remote_parquet})...")
+            df_remote = pd.read_parquet(remote_parquet)
+            df_final = pd.concat([df_remote, df_new], ignore_index=True)
+        else:
+            print(f"Creating new remote year parquet ({remote_parquet})...")
+            df_final = df_new
+
+        # Duplicate protection on Date + Name + Unit
+        df_final = df_final.drop_duplicates(subset=['date', 'name', 'unit'], keep='first')
+        df_final = df_final.sort_values(by=['name', 'date'])
+        df_final.to_parquet(remote_parquet, index=False, compression='snappy')
+        print(f"Remote parquet updated: {len(df_final)} records for year {current_year}.")
+
+        # Rebuild meta.json across ALL years in the remote database
+        print("Rebuilding meta.json across all partition years...")
+        all_parquet_paths = glob.glob(os.path.join(temp_dir, "data", "prices", "year=*", "data.parquet"))
+        dfs = []
+        for p in all_parquet_paths:
+            try:
+                dfs.append(pd.read_parquet(p))
+            except Exception as e:
+                print(f"Warning: could not read {p}: {e}")
+
+        if dfs:
+            combined_all = pd.concat(dfs, ignore_index=True)
+            meta_df = combined_all.sort_values('date').drop_duplicates('name', keep='last')
+            meta_df = meta_df[['name', 'category', 'unit', 'image', 'price']]
+            meta_path = os.path.join(temp_dir, "data", "meta.json")
+            meta_df.to_json(meta_path, orient='records', force_ascii=False)
+            print(f"Remote search index (meta.json) updated with {len(meta_df)} unique items.")
+
+        # Sync images (add only, do not delete existing remote images)
+        dest_images = os.path.join(temp_dir, "images")
         if os.path.exists(IMAGE_DIR):
-            print("Syncing image files...")
+            print("Syncing new images to remote images folder...")
             shutil.copytree(IMAGE_DIR, dest_images, dirs_exist_ok=True)
 
-        # Stage changes
+        # Sync the true remote data back to local public/data so local dev is in sync
+        if os.path.exists(DATA_DIR):
+            print("Updating local public/data to match restored remote database...")
+            shutil.copytree(os.path.join(temp_dir, "data"), DATA_DIR, dirs_exist_ok=True)
+
+        # Stage changes in cloned repo
         subprocess.check_call(["git", "add", "."], cwd=temp_dir)
         status_proc = subprocess.run(["git", "diff", "--staged", "--quiet"], cwd=temp_dir)
 
@@ -343,7 +387,7 @@ if __name__ == "__main__":
     parser.add_argument("--push", action="store_true", help="Push scraped data directly to database branch on GitHub")
     args = parser.parse_args()
 
-    scrape()
+    df_scraped = scrape()
 
     if args.push:
-        push_to_database()
+        push_to_database(df_scraped)

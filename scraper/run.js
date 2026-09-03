@@ -1,6 +1,7 @@
 import { spawnSync, spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import process from 'process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const mainScript = path.join(__dirname, 'main.py');
@@ -21,7 +22,9 @@ function findWorkingPython() {
       if (res.status === 0 && out.includes('Python 3')) {
         return bin;
       }
-    } catch (e) {}
+    } catch {
+      // Ignore execution errors when checking binary candidates
+    }
   }
   return null;
 }
