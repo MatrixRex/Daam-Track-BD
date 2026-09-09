@@ -49,3 +49,11 @@ python main.py               # scrape prices
 - Remove `public/data/` before regenerating if the data schema changes
 - `useDuckDB` hook is a singleton — initializes once per page load; data source change triggers reload
 - `Data Fix`: manual workflow `fix_data.yml` runs `scraper/fix_data.py` on `database` branch
+
+## Self-Hosted Runner (`C:\actions-runner`)
+- Scrapes run daily on the local self-hosted runner (`runs-on: self-hosted`)
+- **Autostart**: Automatically launches silently on PC start / Windows user logon via `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` (`start-runner.ps1`)
+- **Status check**: Run `C:\actions-runner\status-runner.cmd` to check local process and GitHub status
+- **Stop runner**: Run `C:\actions-runner\stop-runner.cmd`
+- **Start runner**: Run `C:\actions-runner\start-runner.cmd`
+- **Event log**: `C:\actions-runner\runner-events.log`

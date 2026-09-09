@@ -44,8 +44,8 @@ jobs:
           # ENTER THE DATABASE BRANCH
           cd public
           
-          git config --global user.name "DaamTrack Bot"
-          git config --global user.email "bot@daamtrack.bd"
+          git config user.name "DaamTrack Bot"
+          git config user.email "bot@daamtrack.bd"
           
           # Add all new files in this branch
           git add .

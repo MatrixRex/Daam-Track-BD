@@ -368,6 +368,8 @@ def push_to_database(df_new=None):
         else:
             today = datetime.datetime.now().strftime("%Y-%m-%d")
             commit_msg = f"Manual Scrape Update: {today}"
+            subprocess.check_call(["git", "config", "user.name", "DaamTrack Bot"], cwd=temp_dir)
+            subprocess.check_call(["git", "config", "user.email", "bot@daamtrack.bd"], cwd=temp_dir)
             subprocess.check_call(["git", "commit", "-m", commit_msg], cwd=temp_dir)
             print(f"Pushing commit '{commit_msg}' to origin/database...")
             subprocess.check_call(["git", "push", "origin", "database"], cwd=temp_dir)
