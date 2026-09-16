@@ -2,8 +2,14 @@ name: Daily Scraper
 
 on:
   schedule:
-    - cron: '0 18 * * *' # Midnight Dhaka Time
+    - cron: '30 8 * * *'  # 2:30 PM Dhaka Time (Primary Afternoon Run)
+    - cron: '0 17 * * *'   # 11:00 PM Dhaka Time (Redundant Night Fallback)
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force scrape even if today was already updated'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -11,6 +17,7 @@ permissions:
 jobs:
   scrape_and_commit:
     runs-on: self-hosted
+    timeout-minutes: 600
 
     steps:
       # 1. Checkout Code
@@ -23,22 +30,56 @@ jobs:
         with:
           ref: database
           path: public
+          fetch-depth: 10
+
+      # 3. Check If Today Already Scraped
+      - name: Check If Today Already Scraped
+        id: check_status
+        shell: powershell
+        run: |
+          $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Bangladesh Standard Time")
+          $dhakaDate = [TimeZoneInfo]::ConvertTimeFromUtc([DateTime]::UtcNow, $tz)
+          $todayStr = $dhakaDate.ToString("yyyy-MM-dd")
+          Write-Host "Current date in Dhaka: $todayStr"
+
+          if ("${{ inputs.force }}" -eq "true") {
+            Write-Host "Force run requested via manual dispatch. Proceeding with scrape."
+            "skip=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            exit 0
+          }
+
+          cd public
+          $match = git log -10 --grep="Daily Update: $todayStr" --oneline
+          if ($match) {
+            Write-Host "Found existing commit for $todayStr on database branch:"
+            Write-Host "  $match"
+            Write-Host "Today's scrape was already completed successfully. Skipping runner execution."
+            "skip=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            Write-Host "No successful scrape commit found for $todayStr on database branch."
+            Write-Host "Proceeding with daily scrape."
+            "skip=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          }
 
       - name: Set up Python
+        if: steps.check_status.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
       - name: Install Dependencies
+        if: steps.check_status.outputs.skip != 'true'
         shell: powershell
         run: pip install -r scraper/requirements.txt
 
       - name: Run Scraper
+        if: steps.check_status.outputs.skip != 'true'
         shell: powershell
         # This will write files into the 'public' folder
         run: node scraper/run.js
 
       - name: Commit and Push Data
+        if: steps.check_status.outputs.skip != 'true'
         shell: powershell
         run: |
           # ENTER THE DATABASE BRANCH
@@ -52,9 +93,27 @@ jobs:
           
           git diff --staged --quiet
           if ($LASTEXITCODE -ne 0) {
-            $today = (Get-Date).ToString("yyyy-MM-dd")
+            $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Bangladesh Standard Time")
+            $dhakaDate = [TimeZoneInfo]::ConvertTimeFromUtc([DateTime]::UtcNow, $tz)
+            $today = $dhakaDate.ToString("yyyy-MM-dd")
             git commit -m "Daily Update: $today"
-            git push
+
+            $pushed = $false
+            for ($i = 1; $i -le 5; $i++) {
+              Write-Host "Push attempt $i of 5..."
+              git push
+              if ($LASTEXITCODE -eq 0) {
+                $pushed = $true
+                Write-Host "Successfully pushed data to database branch."
+                break
+              }
+              Write-Host "Push failed. Retrying in 15 seconds..."
+              Start-Sleep -Seconds 15
+            }
+            if (-not $pushed) {
+              Write-Error "Failed to push to database branch after 5 attempts."
+              exit 1
+            }
           } else {
             Write-Host "No changes to commit."
           }
