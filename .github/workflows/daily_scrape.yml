@@ -70,7 +70,7 @@ jobs:
       - name: Install Dependencies
         if: steps.check_status.outputs.skip != 'true'
         shell: powershell
-        run: pip install -r scraper/requirements.txt
+        run: python -m pip install -r scraper/requirements.txt
 
       - name: Run Scraper
         if: steps.check_status.outputs.skip != 'true'
